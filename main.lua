@@ -71,11 +71,12 @@ function pal:AddSynonymsGroup( ... )
 	pal["synonyms_groups"][#pal["synonyms_groups"] +1] = {...}
 end
 
-function pal:BuildEmotionGrid( pal["emotion_grid_max_size"] ) --sets the play field used for emotion simulation
-for x = 1, pal["emotion_grid_max_size"] = 3 do
-for y = 1, pal["emotion_grid_max_size"] = 3 do
-pal["emotion_data"][x] = {}
-pal["emotion_data"][x][y] = {}
+function pal:BuildEmotionGrid( size ) --sets the play field used for emotion simulation
+	pal["emotion_grid_max_size"] = size
+for x = 1, size do
+for y = 1, size do
+	pal["emotion_grid"][x] = {}
+	pal["emotion_grid"][x][y] = {}
       end
    end 
 end
@@ -89,15 +90,29 @@ if leve == 1 then pal["annoyed_responces_attachment"][#pal["annoyed_responces_at
 if leve == 2 then pal["annoyed_responces"][#pal["annoyed_responces"] +1] = responce end
 end
 
+pal:BuildEmotionGrid( pal["emotion_grid_max_size"] )
+
 -- end of data control functions and start of main ai loop ---------------------------------------------------------------------------------------------------
 
-function pal:RunSpellCheck()
+function pal:RunSpellCheck( input )
+	local mstr = input
+	local nul = 0
+for z = 1, #pal["spellchecking"] do
+for y = 1, #pal["spellchecking"][z]["i"] do
+	mstr, nul = string.gsub( mstr, pal["spellchecking"][z]["i"][y], pal["spellchecking"]["c"][z] )
+   end
+end
+return mstr
+end
+
+function pal:BuildResponceTo( input ) --USE THIS TO GET THE AI TO MAKE A RESPONCE TO THE INPUT
+	local master = input
+
+	master = self:RunSpellCheck( master )
 
 end
 
-function pal:BuildResponceTo( input )
-
-end
+-- end of main ai loop and start of loading external data ----------------------------------------------------------------------------------------------------
 
 function pal:SaveInfo()
 

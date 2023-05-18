@@ -99,7 +99,7 @@ function pal:RunSpellCheck( input )
 	local nul = 0
 for z = 1, #pal["spellchecking"] do
 for y = 1, #pal["spellchecking"][z]["i"] do
-	mstr, nul = string.gsub( mstr, pal["spellchecking"][z]["i"][y], pal["spellchecking"]["c"][z] )
+	mstr, nul = string.gsub( mstr, pal["spellchecking"][z]["i"][y].." ", pal["spellchecking"]["c"][z].." " )
    end
 end
 return mstr
@@ -116,9 +116,24 @@ end
 
 function pal:SaveInfo()
 
+
+
 end
 
 function pal:LoadInfo()
+
+local processdata = function( strtp, chart )
+	local lastpoint = 1
+	local data = {}
+for z = 1, string.len( strtp ) do
+if string.sub( strtp, z, z ) == "chart" then
+	data[#data +1] = string.sub( strtp, lastpoint, z -1 )
+if printcode == true then print( string.sub( strtp, lastpoint, z -1 ) ) end
+	lastpoint = z +string.len( chart )
+   end
+end
+return processdata
+end
 
 end
 
@@ -127,7 +142,6 @@ require( "requires.lua" )
 pal:LoadInfo()
 for z = 1, #pal["info_database_added"] do pal["info_database"][#pal["info_database"] +1] = pal["info_database_added"][z] end
 for z = 1, #pal["info_database_removed"] do pal:RemoveInfo( pal["info_database_removed"][z] ) end
-
 
 --do code for convo start here
 

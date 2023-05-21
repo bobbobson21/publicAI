@@ -12,6 +12,7 @@
 	pal["emotion_level_wanted"] = {3,2}
 	pal["emotion_grid"] = {}
 	pal["emotion_grid_max_size"] = 3
+	pal["emotion_sensitivity"] = 0.2
 	pal["idk_responces"] = {}
 	pal["annoyance_maxlevel"] = 4
 	pal["annoyance_responcecounter"] = {}
@@ -30,16 +31,9 @@
 
 -- end of seting pal vars start of data control functions ----------------------------------------------------------------------------------------------------
 
-function pal:getvar( v ) return pal["sandbox"][v] end
-function pal:setvar( k, v ) pal["sandbox"][k] = v end
-
-function pal:EmotionLevelEquals( tbl )
-return ( tbl[1] == pal["emotion_level"][1] and tbl[2] == pal["emotion_level"][2] )
-end
-
-function pal:EmotionLevelNotEquals( tbl )
-return ( tbl[1] ~= pal["emotion_level"][1] or tbl[2] ~= pal["emotion_level"][2] )
-end
+function pal:GetVar( v ) return pal["sandbox"][v] end --sandbox is for data that pal needs to access
+function pal:SetVar( k, v ) pal["sandbox"][k] = v end
+function pal:Sandbox() return pal["sandbox"] end
 
 function pal:notrequiredtag( tag ) --for tags you want it to seach for but only mark down the result and not desqalify it if result cant be found
 	local starts, ends = string.find( tag, self:GetTextToRespondTo(), 1, true )
@@ -113,15 +107,15 @@ return {["sf"]=result["sf"],["sfl"]=result["sfl"],["ec"]=result["ec"],["a"]=resu
    end
 end
 
-function pal:AddSpellChecking( correct, ... )
+function pal:AddSpellChecking( correct, ... ) --spellchecker
 	pal["spellchecking"][#pal["spellchecking"] +1] = {["c"]=correct,["i"]={...}}
 end
 
-function pal:AddSynonymsGroup( id, ... )
+function pal:AddSynonymsGroup( id, ... ) --for grouping synonyms togethed so that one could be select via the id
 	pal["synonyms_groups"][id] = {...}
 end
 
-function pal:GetSynonymsWord( id )
+function pal:GetSynonymsWord( id ) --gets a synonym from a synonym id
 return pal["synonyms_groups"][id][math.random( 1, #pal["synonyms_groups"][id] )]
 end
 
@@ -135,12 +129,24 @@ for y = 1, size do
    end 
 end
 
-function pal:AddEmotion( gridlocation, openingemotiveremarks, closeingemotiveremarks, emotivewords, wordsthatmaketheaifeelmorelikethis ) --for when the ai dose not have a responce
-	pal["emotion_grid"][gridlocation[1]][gridlocation[2]] = {["oer"]=openingemotiveremarks,["cer"]=closeingemotiveremarks,["words"]=emotivewords,["wtmifmlt"]=wordsthatmaketheaifeelmorelikethis}
+function pal:AddEmotion( gridlocation, emotivewords, wordsthatmaketheaifeelmorelikethis, emotionclass ) --for when the ai dose not have a responce
+	pal["emotion_grid"][gridlocation[1]][gridlocation[2]] = {["words"]=emotivewords,["wtmifmlt"]=wordsthatmaketheaifeelmorelikethis,["emotionclass"]=emotionclass,}
 end
 
-function pal:GetEmotiveWord( gridlocation )
-return pal["emotion_grid"][gridlocation[1]][gridlocation[2]]["words"][math.random( 1, #pal["emotion_grid"][gridlocation[1]][gridlocation[2]]["words"] )]
+function pal:EmotionLevelEquals( tbl ) --can be used in responces to determin if this responce could or should have a chance of selection
+return ( tbl[1] == pal["emotion_level"][1] and tbl[2] == pal["emotion_level"][2] )
+end
+
+function pal:EmotionLevelNotEquals( tbl ) 
+return ( tbl[1] ~= pal["emotion_level"][1] or tbl[2] ~= pal["emotion_level"][2] )
+end
+
+function pal:GetEmotiveWord() --words that describe what it thinks of the user
+return pal["emotion_grid"][pal["emotion_level"][1]][pal["emotion_level"][2]]["words"][math.random( 1, #pal["emotion_grid"][pal["emotion_level"][1]][pal["emotion_level"][2]]["words"] )]
+end
+
+function pal:GetEmotiveClass() --words that describe how it is feeling in genral
+return pal["emotion_grid"][pal["emotion_level"][1]][pal["emotion_level"][2]]["emotionclass"][math.random( 1, #pal["emotion_grid"][pal["emotion_level"][1]][pal["emotion_level"][2]]["emotionclass"] )]
 end
 
 function pal:AddIDKresponces( responce ) --for when the ai dose not have a responce
@@ -161,11 +167,11 @@ if leve == 1 then return pal["annoyance_responces_attachment"][math.random( 1, #
 if leve == 2 then return pal["annoyance_responces"][math.random( 1, #pal["annoyance_responces"] )] end
 end
 
-function pal:SetPriorInput( text )
+function pal:SetPriorInput( text ) --sets the previous thing the player said
 	pal["prior_input"] = text
 end
 
-function pal:GetPriorInput()
+function pal:GetPriorInput() --the previous thing the player said
 return pal["prior_input"]
 end
 
@@ -173,7 +179,7 @@ pal:BuildEmotionGrid( pal["emotion_grid_max_size"] )
 
 -- end of data control functions and start of AI loop --------------------------------------------------------------------------------------------------------
 
-function pal:EmotionGravatate()
+function pal:EmotionGravatate() --allows for emotion to go back to normal levels
 	local gravatateamount = 0.03 
 	local x = pal["emotion_level_wanted"][1] -pal["emotion_level"][1]
 	local y = pal["emotion_level_wanted"][2] -pal["emotion_level"][2]
@@ -182,7 +188,7 @@ function pal:EmotionGravatate()
 	pal["emotion_level"][2] = pal["emotion_level"][2] +y
 end
 
-function pal:AnnoyanceDecreese()
+function pal:AnnoyanceDecreese() --allows for annoyence to war off over time
 if pal["annoyance_level"] == nil or pal["annoyance_level"] <= 0 then
 for k, v in pairs( pal["annoyance_responcecounter"] ) do
 	v = v -1
@@ -205,7 +211,7 @@ if pal["last_sim_time"] == nil then pal["last_sim_time"] = os.time() end
 for z = 1, simlen do pal:Loop() end
 end
 
-function pal:RunSpellCheck( input )
+function pal:RunSpellCheck( input ) --fixes spelling issues in what theplayer says so it is easyer to find the best responce to what the player says
 	local mstr = ( string.gsub( input, ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
 	local nul = 0
 for z = 1, #pal["spellchecking"] do
@@ -216,9 +222,8 @@ end
 return mstr
 end
 
-function pal:RunAjustEmotionToEmotiveKeyWords( input )
+function pal:RunAjustEmotionToEmotiveKeyWords( input ) --allows for to AI to feel hurt by the manner of which the player speeks
 	local xy = {0,0}
-	local div = 1
 
 for x = 1, pal["emotion_grid_max_size"] do
 for y = 1, pal["emotion_grid_max_size"] do
@@ -228,7 +233,6 @@ for z = 1, pal["emotion_grid"][x][y]["words"] do
 if has ~= nil then
 	xy[1] = x
 	xy[2] = y
-	div = div +1
    end
 end
 
@@ -237,16 +241,16 @@ for z = 1, pal["emotion_grid"][x][y]["wtmifmlt"] do
 if has ~= nil then
 	xy[1] = x
 	xy[2] = y
-	div = div +1
             end
          end
       end
    end
 end
 
-	xy[1] = xy[1] /div
-	xy[2] = xy[2] /div
-	pal["emotion_level"] = pal["emotion_level"] +xy
+	xy[1] = xy[1] /( xy[1] +xy[2] )
+	xy[2] = xy[2] /( xy[1] +xy[2] )
+	pal["emotion_level"][1]	= pal["emotion_level"][1] +( xy[1] *pal["emotion_sensitivity"] )
+	pal["emotion_level"][2] = pal["emotion_level"][2] +( xy[2] *pal["emotion_sensitivity"] )
 	pal["emotion_level"][1] = math.max( 1, math.min( pal["emotion_grid_max_size"], pal["emotion_level"][1] ) )
 	pal["emotion_level"][2] = math.max( 1, math.min( pal["emotion_grid_max_size"], pal["emotion_level"][2] ) )
 end
@@ -257,7 +261,7 @@ function pal:RunFindResponce( input )
 	pal["match_level_words_processed_old"] = -1
 	local currentresponceindex = -1
 
-for index = 1, #pal["info_database"] do
+for index = 1, #pal["info_database"] do --searches thougth all infomation in pal's info_database
 
 	pal["match_level_length_processed"] = 0
 	pal["match_level_words_processed"] = 0
@@ -266,7 +270,7 @@ for index = 1, #pal["info_database"] do
 	local searchin_prior = pal["info_database"][z]["sfl"]
 	local importance = pal["info_database"][z]["i"]
 
-if searchin ~= nil then
+if searchin ~= nil then --checks to see if the text the player entered shares enougth words with the current infomation being searched thougth
 for z = 1, searchin do
 	local text = searchin[z]
 	pal["found_tag"]  = false
@@ -297,7 +301,7 @@ else
    end
 end
 
-if searchin_prior ~= nil then
+if searchin_prior ~= nil then --checks to see if the text the player entered previously shares enougth words with the current infomation being searched thougth
 for z = 1, #searchin_prior do
 	local text = searchin_prior[z]
 	pal["found_tag"]  = false
@@ -327,12 +331,12 @@ else
    end 
 end
 
-if pal["match_level_length_processed"] >= 1 then
-if pal["match_level_words_processed"] >= pal["match_level_words_processed_old"] then
-if importance >= pal["current_responce_importance"] then
+if pal["match_level_length_processed"] >= 1 then --checks acceptablity
+if pal["match_level_words_processed"] >= pal["match_level_words_processed_old"] then --checks acceptablity
+if importance >= pal["current_responce_importance"] then --checks acceptablity
 
-	pal["match_level_words_processed_old"] = pal["match_level_words_processed"]
-	pal["current_responce_importance"] = importance
+	pal["match_level_words_processed_old"] = pal["match_level_words_processed"] --updates minmal acceptablity level
+	pal["current_responce_importance"] = importance --updates minmal acceptablity level
 	currentresponceindex = index
 
          end
@@ -345,7 +349,7 @@ if currentresponceindex ~= -1 then
    end
 end
 
-function pal:RunAnnoyanceTest( inputindex, input )
+function pal:RunAnnoyanceTest( inputindex, input ) --simulate annoyance
 	local annoyedlevel = pal["annoyance_responcecounter"][inputindex] or 0
 if annoyedlevel >= 1 then
 if annoyedlevel >= pal["annoyance_maxlevel"] then
@@ -357,7 +361,7 @@ end
 	pal["annoyance_responcecounter"][inputindex] = math.min( annoyedlevel +1, pal["annoyance_maxlevel"] +1 )
 end
 
-function pal:RunLuaCodeInResponce( input )
+function pal:RunLuaCodeInResponce( input ) --exacutes any lua code in the responce
 	local startcutat = -1
 	local endcutat = -1
 	local levelat = 0
@@ -404,6 +408,8 @@ if outputdata["a"] ~= false then outputresponce = self:RunAnnoyanceTest( outputi
 
 	pal["emotion_change"][1] = pal["emotion_change"][1] +outputdata["ec"][1]  --remove here to remove emotion change
 	pal["emotion_change"][2] = pal["emotion_change"][2] +outputdata["ec"][2]  --remove here to remove emotion change
+	pal["emotion_level"][1] = math.max( 1, math.min( pal["emotion_grid_max_size"], pal["emotion_level"][1] ) ) --remove here to remove emotion change
+	pal["emotion_level"][2] = math.max( 1, math.min( pal["emotion_grid_max_size"], pal["emotion_level"][2] ) ) --remove here to remove emotion change
 
 if outputdata["subresponces"] ~= nil then --add sub responces
 for z = 1, #outputdata["subresponces"] do
@@ -411,8 +417,8 @@ self:AddInfoTbl( outputdata["subresponces"][z] )
    end
 end
 
+	pal["prior_input"] = input --used in the prior search
 	outputresponce = pal:RunLuaCodeInResponce()
-	pal["prior_input"] = input
 	
 return outputresponce
 end

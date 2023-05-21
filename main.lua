@@ -13,18 +13,18 @@
 	pal["emotion_grid"] = {}
 	pal["emotion_grid_max_size"] = 3
 	pal["idk_responces"] = {}
-	pal["annoyed_maxlevel"] = 5
-	pal["annoyed_responcecounter"] = {}
-	pal["annoyed_responces_attachment"] = {}
-	pal["annoyed_responces"] = {}
+	pal["annoyance_maxlevel"] = 4
+	pal["annoyance_responcecounter"] = {}
+	pal["annoyance_responces_attachment"] = {}
+	pal["annoyance_decreese_in"] = 60
+	pal["annoyance_responces"] = {}
 	pal["searchfor_groups"] = {}
 	pal["sandbox"] = {}
 	pal["runfunctionkey"] = "֍"
-	
-	pal["matchlevel_lengthprocessed"] = -1
-	pal["matchlevel_wordsprocessed"] = -1
-	pal["matchlevel_wordsprocessed_old"] = -1
-	pal["currentresponceimportance"] = -999
+	pal["match_level_length_processed"] = -1
+	pal["match_level_words_processed"] = -1
+	pal["match_level_words_processed_old"] = -1
+	pal["current_responce_importance"] = -999
 	pal["found_tag"] = false
 	pal["found_tag_at"] = 0
 
@@ -44,8 +44,8 @@ end
 function pal:notrequiredtag( tag ) --for tags you want it to seach for but only mark down the result and not desqalify it if result cant be found
 	local starts, ends = string.find( tag, self:GetTextToRespondTo(), 1, true )
 if starts ~= nil then
-	pal["matchlevel_lengthprocessed"] = pal["matchlevel_lengthprocessed"] -1
-	pal["matchlevel_wordsprocessed"] = pal["matchlevel_wordsprocessed"] -1
+	pal["match_level_length_processed"] = pal["match_level_length_processed"] -1
+	pal["match_level_words_processed"] = pal["match_level_words_processed"] -1
 	pal["found_tag_at"] = ends
 end
 return true
@@ -78,16 +78,39 @@ if pal["info_database_added"][z]["id"] == id then pal["info_database_added"][z] 
    end   
 end
 
-function pal:AddInfo( searchfor, searchfor_prior, emotion_change, add_emotion_text, annoyable, inportance, responces, subresponces, id, append ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier contain functions
-	pal["info_database"][#pal["info_database"] +1] = {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["aet"]=add_emotion_text,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subresponces"]=subresponces,["id"]=id,["append"]=append}
+function pal:AddInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subresponces, id, append ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier contain functions
+	pal["info_database"][#pal["info_database"] +1] = {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subresponces"]=subresponces,["id"]=id,["append"]=append}
 if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
 for z = 1, pal["info_database_removed"] do
 if pal["info_database_removed"][z] == id then pal["info_database_removed"][z] = nil end
    end
 end
 
-function pal:ReturnInfo( searchfor, searchfor_prior, emotion_change, add_emotion_text, annoyable, inportance, responces, subresponces, id, append ) --format like so {"word","word","word"}, {"word","from","the","prior","text","responded","to"}, {0.15,0.001}, true, true, 1, {"hi","bye","gay"}, {ReturnInfo( DATA ),ReturnInfo( DATA )}, "code_for_editing_info", "appends_to_all_responces"
-return {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["aet"]=add_emotion_text,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subresponces"]=subresponces,["id"]=id,["append"]=append}
+function pal:AddInfoTbl( tbl ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier contain functions
+	pal["info_database"][#pal["info_database"] +1] = tbl
+if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
+for z = 1, pal["info_database_removed"] do
+if pal["info_database_removed"][z] == id then pal["info_database_removed"][z] = nil end
+   end
+end
+
+function pal:ReturnInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subresponces, id, append ) --format like so {"word","word","word"}, {"word","from","the","prior","text","responded","to"}, {0.15,0.001}, true, 1, {"hi","bye","gay"}, {ReturnInfo( DATA ),ReturnInfo( DATA )}, "code_for_editing_info", "appends_to_all_responces"
+return {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subresponces"]=subresponces,["id"]=id,["append"]=append}
+end
+
+function pal:GetInfoByIndex( index )
+	local result = pal["info_database"][index]
+return {["sf"]=result["sf"],["sfl"]=result["sfl"],["ec"]=result["ec"],["a"]=result["a"],["i"]=result["i"],["responces"]=result["responces"],["subresponces"]=result["subresponces"],["id"]=result["id"],["append"]=result["append"]}
+end
+
+function pal:GetInfoById( id )
+	local result = pal["info_database"]
+for z = 1, #result do
+if result[z]["id"] == id then
+	local result = pal["info_database"][z]
+return {["sf"]=result["sf"],["sfl"]=result["sfl"],["ec"]=result["ec"],["a"]=result["a"],["i"]=result["i"],["responces"]=result["responces"],["subresponces"]=result["subresponces"],["id"]=result["id"],["append"]=result["append"]}
+      end
+   end
 end
 
 function pal:AddSpellChecking( correct, ... )
@@ -128,9 +151,14 @@ function pal:GetIDKresponce()
 return pal["idk_responces"][math.random( 1, pal["idk_responces"] )]
 end
 
-function pal:AddAnnoyedRespoces( level, responce ) --for if you ask the same question to many times
-if leve == 1 then pal["annoyed_responces_attachment"][#pal["annoyed_responces_attachment"] +1] = responce end
-if leve == 2 then pal["annoyed_responces"][#pal["annoyed_responces"] +1] = responce end
+function pal:AddAnnoyanceRespoces( level, responce ) --for if you ask the same question to many times
+if leve == 1 then pal["annoyance_responces_attachment"][#pal["annoyance_responces_attachment"] +1] = responce end
+if leve == 2 then pal["annoyance_responces"][#pal["annoyance_responces"] +1] = responce end
+end
+
+function pal:GetAnnoyanceRespoce( level ) --for if you ask the same question to many times
+if leve == 1 then return pal["annoyance_responces_attachment"][math.random( 1, #pal["annoyance_responces_attachment"] )] end
+if leve == 2 then return pal["annoyance_responces"][math.random( 1, #pal["annoyance_responces"] )] end
 end
 
 function pal:SetPriorInput( text )
@@ -154,9 +182,21 @@ function pal:EmotionGravatate()
 	pal["emotion_level"][2] = pal["emotion_level"][2] +y
 end
 
+function pal:AnnoyanceDecreese()
+if pal["annoyance_level"] == nil or pal["annoyance_level"] <= 0 then
+for k, v in pairs( pal["annoyance_responcecounter"] ) do
+	v = v -1
+if v <= 0 then pal["annoyance_responcecounter"][k] = 0 end
+end
+	pal["annoyance_level"] = pal["annoyance_maxlevel"] +1
+end
+	pal["annoyance_level"] = pal["annoyance_level"] -1
+end
+
 function pal:Loop() --runs every second but it only a simulation meaning anything that envolves printing can not be done in this
-pal:EmotionGravatate()
---put any code 
+pal:EmotionGravatate()  --remove here to remove emotion change
+pal:AnnoyanceDecreese()
+--put any code here
 end
 
 function pal:RunLoopSimulation()
@@ -213,14 +253,14 @@ end
 
 function pal:RunFindResponce( input )
 	
-	pal["currentresponceimportance"] = -999
-	pal["matchlevel_wordsprocessed_old"] = -1
+	pal["current_responce_importance"] = -999
+	pal["match_level_words_processed_old"] = -1
 	local currentresponceindex = -1
 
 for index = 1, #pal["info_database"] do
 
-	pal["matchlevel_lengthprocessed"] = 0
-	pal["matchlevel_wordsprocessed"] = 0
+	pal["match_level_length_processed"] = 0
+	pal["match_level_words_processed"] = 0
 
 	local searchin = pal["info_database"][z]["sf"]
 	local searchin_prior = pal["info_database"][z]["sfl"]
@@ -233,7 +273,7 @@ for z = 1, searchin do
 	pal["found_tag_at"] = 0
 if string.len( text ) <= 4 then text = text.." " end
 if string.sub( text, 1, 1 ) == pal["runfunctionkey"] then
-	local run, err = load( "return"..string.sub( text, 2, string.len( text ) ) )
+	local run, err = load( "return "..string.sub( text, 2, string.len( text ) ) )
 	pal["found_tag"] = ( run() == true )
 else
 	local starts, ends = string.find( input, text, 1, true )
@@ -245,9 +285,9 @@ end
 
 
 if pal["found_tag"]  == true then 
-if pal["found_tag_at"] >= pal["matchlevel_lengthprocessed"] then
-	pal["matchlevel_lengthprocessed"] = pal["found_tag_at"]
-	pal["matchlevel_wordsprocessed"] = pal["matchlevel_wordsprocessed"] +1
+if pal["found_tag_at"] >= pal["match_level_length_processed"] then
+	pal["match_level_length_processed"] = pal["found_tag_at"]
+	pal["match_level_words_processed"] = pal["match_level_words_processed"] +1
 else
 	pal["found_tag_at"] = -999
 end
@@ -264,8 +304,8 @@ for z = 1, #searchin_prior do
 	pal["found_tag_at"] = 0
 if string.len( text ) <= 4 then text = text.." " end
 if string.sub( text, 1, 1 ) == pal["runfunctionkey"] then
-	local run, err = load( "return"..string.sub( text, 2, string.len( text ) ) )
-	pal["found_tag"]  = ( run() == true )
+	local exe, null = load( "return"..string.sub( text, 2, string.len( text ) ) )
+	pal["found_tag"]  = ( exe() == true )
 else
 	local starts, ends = string.find( input, text, 1, true )
 if starts ~= nil then
@@ -275,9 +315,9 @@ if starts ~= nil then
 end
 
 if pal["found_tag"]  == true then 
-if pal["found_tag_at"] >= pal["matchlevel_lengthprocessed"] then
-	pal["matchlevel_lengthprocessed"] = pal["found_tag_at"]
-	pal["matchlevel_wordsprocessed"] = pal["matchlevel_wordsprocessed"] +1
+if pal["found_tag_at"] >= pal["match_level_length_processed"] then
+	pal["match_level_length_processed"] = pal["found_tag_at"]
+	pal["match_level_words_processed"] = pal["match_level_words_processed"] +1
 else
 	pal["found_tag_at"] = -999
 end
@@ -287,12 +327,12 @@ else
    end 
 end
 
-if pal["matchlevel_lengthprocessed"] >= 1 then
-if pal["matchlevel_wordsprocessed"] >= pal["matchlevel_wordsprocessed_old"] then
-if importance >= pal["currentresponceimportance"] then
+if pal["match_level_length_processed"] >= 1 then
+if pal["match_level_words_processed"] >= pal["match_level_words_processed_old"] then
+if importance >= pal["current_responce_importance"] then
 
-	pal["matchlevel_wordsprocessed_old"] = pal["matchlevel_wordsprocessed"]
-	pal["currentresponceimportance"] = importance
+	pal["match_level_words_processed_old"] = pal["match_level_words_processed"]
+	pal["current_responce_importance"] = importance
 	currentresponceindex = index
 
          end
@@ -301,23 +341,80 @@ if importance >= pal["currentresponceimportance"] then
 end
 
 if currentresponceindex ~= -1 then
-	local result = pal["info_database"][currentresponceindex]
-return {["sf"]=result["sf"],["sfl"]=result["sfl"],["ec"]=result["ec"],["aet"]=result["aet"],["a"]=result["a"],["i"]=result["i"],["responces"]=result["responces"],["subresponces"]=result["subresponces"],["id"]=result["id"],["append"]=result["append"]}
+	return currentresponceindex
    end
+end
+
+function pal:RunAnnoyanceTest( inputindex, input )
+	local annoyedlevel = pal["annoyance_responcecounter"][inputindex] or 0
+if annoyedlevel >= 1 then
+if annoyedlevel >= pal["annoyance_maxlevel"] then
+	return pal:GetAnnoyanceRespoce( 1 )..input
+else
+	return pal:GetAnnoyanceRespoce( 2 )
+   end
+end
+	pal["annoyance_responcecounter"][inputindex] = math.min( annoyedlevel +1, pal["annoyance_maxlevel"] +1 )
+end
+
+function pal:RunLuaCodeInResponce( input )
+	local startcutat = -1
+	local endcutat = -1
+	local levelat = 0
+	local processing = false
+	local masterstr = input
+	local diffrence = 0
+
+for z = 1, string.len( input ) +1000 do
+	local point = string.sub( input, z, z )
+if point == pal["runfunctionkey"] then startcutat, processing = point, false end
+if point == "(" then levelat, processing = levelat, true end
+if point == ")"  then
+	levelat = levelat +1
+
+if levelat == 0 and processing == true then
+	local exe, null = load( "return "..string.sub( input, startcutat +1, endcutat ) )
+	local result = exe()
+if result ~= nil then
+	masterstr = string.sub( masterstr, 1, startcutat -( 1 +diffrence ) )..result..string.sub( masterstr, endcutat +( 1 +diffrence ), string.len( masterstr ) )
+	diffrence = string.len( masterstr ) -string.len( input )
+end
+	levelat = 0
+	processing = false
+      end
+   end
+end
+return masterstr
 end
 
 function pal:BuildResponceTo( input ) --USE THIS TO GET THE AI TO MAKE A RESPONCE TO THE INPUT
 	local master = input
-	local output = ""
 
 self:RunLoopSimulation()
 	master = self:RunSpellCheck( master )
 function pal:GetTextToRespondTo() return master end
-self:RunAjustEmotionToEmotiveKeyWords( master )
-	output = self:RunFindResponce( master )
-if output == nil then return self:GetIDKresponce() end
+self:RunAjustEmotionToEmotiveKeyWords( master ) --remove here to remove emotion change
 
+	local outputindex = self:RunFindResponce( master )
+	local outputdata = self:GetInfoByIndex( outputindex )
+	local outputresponce = outputdata["responces"][math.random( 1, outputdata["responces"] )]..outputdata["append"]
+	
+if outputindex == -1 then return self:GetIDKresponce() end
+if outputdata["a"] ~= false then outputresponce = self:RunAnnoyanceTest( outputindex, outputresponce ) end
 
+	pal["emotion_change"][1] = pal["emotion_change"][1] +outputdata["ec"][1]  --remove here to remove emotion change
+	pal["emotion_change"][2] = pal["emotion_change"][2] +outputdata["ec"][2]  --remove here to remove emotion change
+
+if outputdata["subresponces"] ~= nil then --add sub responces
+for z = 1, #outputdata["subresponces"] do
+self:AddInfoTbl( outputdata["subresponces"][z] )
+   end
+end
+
+	outputresponce = pal:RunLuaCodeInResponce()
+	pal["prior_input"] = input
+	
+return outputresponce
 end
 
 pal:RunLoopSimulation()
@@ -336,7 +433,7 @@ local processdata = function( strtp, chart )
 	local lastpoint = 1
 	local data = {}
 for z = 1, string.len( strtp ) do
-if string.sub( strtp, z, z ) == "chart" then
+if string.sub( strtp, z, z +( string.len( chart ) -1 ) ) == chart then
 	data[#data +1] = string.sub( strtp, lastpoint, z -1 )
 if printcode == true then print( string.sub( strtp, lastpoint, z -1 ) ) end
 	lastpoint = z +string.len( chart )

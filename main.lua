@@ -20,7 +20,7 @@
 	pal["annoyance_decreese_in"] = 60
 	pal["annoyance_responces"] = {}
 	pal["searchfor_groups"] = {}
-	pal["sandbox"] = {}
+	pal["sandbox"] = {["funcs"]=(),}
 	pal["runfunctionkey"] = "֍"
 	pal["match_level_length_processed"] = -1
 	pal["match_level_words_processed"] = -1
@@ -33,7 +33,7 @@
 
 function pal:GetVar( v ) return pal["sandbox"][v] end --sandbox is for data that pal needs to access
 function pal:SetVar( k, v ) pal["sandbox"][k] = v end
-function pal:Sandbox() return pal["sandbox"] end
+function pal:Sandbox() return pal["sandbox"]["funcs"] end
 
 function pal:notrequiredtag( tag ) --for tags you want it to seach for but only mark down the result and not desqalify it if result cant be found
 	local starts, ends = string.find( tag, self:GetTextToRespondTo(), 1, true )
@@ -429,7 +429,12 @@ pal:RunLoopSimulation()
 
 function pal:SaveInfo()
 
+	local addresponcesfiledata = ""
+	local sandboxfile = ""
 
+for z = 1, #pal["info_database_added"] do
+
+end
 
 end
 

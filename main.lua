@@ -1,5 +1,6 @@
 
 	inruntime = false
+	local importedfile = {...}
 
 	pal = {}
 	pal["info_database"] = {}
@@ -20,7 +21,7 @@
 	pal["annoyance_decreese_in"] = 60
 	pal["annoyance_responces"] = {}
 	pal["searchfor_groups"] = {}
-	pal["sandbox"] = {["funcs"]=(),}
+	pal["sandbox"] = {["funcs"]={},}
 	pal["runfunctionkey"] = "֍"
 	pal["match_level_length_processed"] = -1
 	pal["match_level_words_processed"] = -1
@@ -28,6 +29,7 @@
 	pal["current_responce_importance"] = -999
 	pal["found_tag"] = false
 	pal["found_tag_at"] = 0
+	pal["save_directory"] = ( importedfile[1] or "" ).."/savdata"
 
 -- end of seting pal vars start of data control functions ----------------------------------------------------------------------------------------------------
 
@@ -72,7 +74,7 @@ if pal["info_database_added"][z]["id"] == id then pal["info_database_added"][z] 
    end   
 end
 
-function pal:AddInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subresponces, id, append ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier contain functions
+function pal:AddInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subresponces, id, append ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier even functions like "֍hi( true )"
 	pal["info_database"][#pal["info_database"] +1] = {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subresponces"]=subresponces,["id"]=id,["append"]=append}
 if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
 for z = 1, pal["info_database_removed"] do
@@ -80,7 +82,7 @@ if pal["info_database_removed"][z] == id then pal["info_database_removed"][z] = 
    end
 end
 
-function pal:AddInfoTbl( tbl ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier contain functions
+function pal:AddInfoTbl( tbl ) --an unscure but fast way of adding info
 	pal["info_database"][#pal["info_database"] +1] = tbl
 if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
 for z = 1, pal["info_database_removed"] do
@@ -92,12 +94,12 @@ function pal:ReturnInfo( searchfor, searchfor_prior, emotion_change, annoyable, 
 return {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subresponces"]=subresponces,["id"]=id,["append"]=append}
 end
 
-function pal:GetInfoByIndex( index )
+function pal:GetInfoByIndex( index ) --finds info by the index which repasents it placement it the database
 	local result = pal["info_database"][index]
 return {["sf"]=result["sf"],["sfl"]=result["sfl"],["ec"]=result["ec"],["a"]=result["a"],["i"]=result["i"],["responces"]=result["responces"],["subresponces"]=result["subresponces"],["id"]=result["id"],["append"]=result["append"]}
 end
 
-function pal:GetInfoById( id )
+function pal:GetInfoById( id ) --finds info by id
 	local result = pal["info_database"]
 for z = 1, #result do
 if result[z]["id"] == id then
@@ -427,42 +429,68 @@ pal:RunLoopSimulation()
 
 -- end of main ai loop and start of loading external data ----------------------------------------------------------------------------------------------------
 
-function pal:SaveInfo()
+function pal:SaveInfo() --saves all info added to AI after intal loading
 
-	local addresponcesfiledata = ""
-	local sandboxfile = ""
+	local addresponcesfiledata = "" --start of saveing responce file data
 
 for z = 1, #pal["info_database_added"] do
+	local currententry = pal["info_database_added"][z]
+	local responces = ""
+	local subresponces = ""
 
+for y = 1, pal["info_database_added"][z]["responces"] do --reformats responces so thay can be saved with ease
+if responces == "" then
+responces = responces..pal["info_database_added"][z]["responces"][y]
+else
+responces = responces..","..pal["info_database_added"][z]["responces"][y]
+   end
 end
+
+for y = 1, pal["info_database_added"][z]["subresponces"] do --reformats sub responces so thay can be saved with ease
+	local currententryB = pal["info_database_added"][z]["subresponces"][y]
+	local currentdata = "{['sf']="..currententryB["sf"]..",['sfl']="..currententryB["sfl"]..",['ec']="..currententryB["ec"]..",['a']="..currententryB["a"]..",['i']="..currententryB["i"]..",['id']="..currententryB["id"]..",['append']="..currententryB["append"].."}"
+if subresponces == "" then
+subresponces = subresponces..currentdata
+else
+subresponces = subresponces..","..currentdata
+   end
+end
+	
+
+	local currentdata = "pal:AddInfo( "..tostring( currententry["sf"] )..", "..tostring( currententry["sfl"] )..", {"..tostring( currententry["ec"][1] )..","..tostring( currententry["ec"][2] ).."}, "..tostring( currententry["a"] )..", "..tostring( currententry["i"] )..", {"..tostring( responces ).."}, {"..tostring( subresponces ).."}, "..tostring( currententry["id"] )..", "..tostring( currententry["append"] ).." )"
+if addresponcesfiledata == "" then --responce saveing
+addresponcesfiledata = addresponcesfiledata..currentdata
+else
+addresponcesfiledata = addresponcesfiledata..string.char( 10 )..currentdata
+   end
+end
+
+for z = 1, #pal["info_database_removed"] do --deleted responces saveing
+	local currententry = pal["info_database_removed"][z]
+	local currentdata = "pal:RemoveInfo( "..currententry.." )"
+	if addresponcesfiledata == "" then
+addresponcesfiledata = addresponcesfiledata..currentdata
+else
+addresponcesfiledata = addresponcesfiledata..string.char( 10 )..currentdata
+   end
+end
+
+	local file = io.open( pal["save_directory"].."/".."main_save.dat", "w" )
+io.write( addresponcesfiledata )
+file:close()
 
 end
 
 function pal:LoadInfo()
-
-local processdata = function( strtp, chart )
-	local lastpoint = 1
-	local data = {}
-for z = 1, string.len( strtp ) do
-if string.sub( strtp, z, z +( string.len( chart ) -1 ) ) == chart then
-	data[#data +1] = string.sub( strtp, lastpoint, z -1 )
-if printcode == true then print( string.sub( strtp, lastpoint, z -1 ) ) end
-	lastpoint = z +string.len( chart )
-   end
-end
-return processdata
-end
-
+dofile( pal["save_directory"].."/".."main_save.dat" )
 end
 
 require( "requires.lua" )
 
+inruntime = true
+
 pal:LoadInfo()
-for z = 1, #pal["info_database_added"] do pal["info_database"][#pal["info_database"] +1] = pal["info_database_added"][z] end
-for z = 1, #pal["info_database_removed"] do pal:RemoveInfo( pal["info_database_removed"][z] ) end
 
 --do code for convo start here
-
-inruntime = true
 
 return pal

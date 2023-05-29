@@ -1,4 +1,6 @@
 @echo off
 echo compiling...
-start /b main.lua
+start /b talk.lua
+
+pause
 pause

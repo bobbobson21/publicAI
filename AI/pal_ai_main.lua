@@ -1,6 +1,9 @@
 
 	inruntime = false
-	local importedfile = {...}
+	local cdc = io.popen( "cd" )
+	local current_dir = cdc:read( "*l" )
+for z = 1, string.len( current_dir ) do if string.sub( current_dir, z, z ) == string.char( 92 ) then current_dir = string.sub( current_dir, 1, z -1 ).."/"..string.sub( current_dir, z +1, string.len( current_dir ) ) end end
+cdc:close()
 
 	pal = {}
 	pal["info_database"] = {}
@@ -29,7 +32,7 @@
 	pal["current_responce_importance"] = -999
 	pal["found_tag"] = false
 	pal["found_tag_at"] = 0
-	pal["save_directory"] = ( importedfile[1] or "" ).."/savdata"
+	pal["save_directory"] = ( current_dir ).."/savdata"
 
 -- end of seting pal vars start of data control functions ----------------------------------------------------------------------------------------------------
 
@@ -38,13 +41,18 @@ function pal:SetVar( k, v ) pal["sandbox"][k] = v end
 function pal:Sandbox() return pal["sandbox"]["funcs"] end
 
 function pal:notrequiredtag( tag ) --for tags you want it to seach for but only mark down the result and not desqalify it if result cant be found
-	local starts, ends = string.find( tag, self:GetTextToRespondTo(), 1, true )
+	local starts, ends = string.find( self:BRTGetTextToRespondTo(), tag, 1, true )
 if starts ~= nil then
 	pal["match_level_length_processed"] = pal["match_level_length_processed"] -1
 	pal["match_level_words_processed"] = pal["match_level_words_processed"] -1
+else
 	pal["found_tag_at"] = ends
 end
 return true
+end
+
+function pal:AddTagGroup( name, collection ) --a collection of tags which if refrenced like so @TAG_NAME, in the search for sections of added info will be replaced with collection
+	pal["searchfor_groups"][#pal["searchfor_groups"] +1] = {["groupname"]=name,["tags"]=collection}
 end
 
 function pal:RemoveInfo( id )
@@ -74,7 +82,18 @@ if pal["info_database_added"][z]["id"] == id then pal["info_database_added"][z] 
    end   
 end
 
-function pal:AddInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subresponces, id, append ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier even functions like "֍hi( true )"
+function pal:SetNewInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subresponces, id, append ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier even functions like "֍hi( true )"
+	
+	searchfor = ( string.gsub( searchfor, ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
+	local null = 0
+for z = 1, #pal["searchfor_groups"] do
+	searchfor, null = string.gsub( searchfor, "@"..pal["searchfor_groups"][z]["groupname"].." ", pal["searchfor_groups"][z]["tags"] )
+end
+	searchfor_prior = ( string.gsub( searchfor_prior, ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
+for z = 1, #pal["searchfor_groups"] do
+	searchfor_prior, null = string.gsub( searchfor_prior, "@"..pal["searchfor_groups"][z]["groupname"].." ", pal["searchfor_groups"][z]["tags"] )
+end
+	
 	pal["info_database"][#pal["info_database"] +1] = {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subresponces"]=subresponces,["id"]=id,["append"]=append}
 if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
 for z = 1, pal["info_database_removed"] do
@@ -82,7 +101,18 @@ if pal["info_database_removed"][z] == id then pal["info_database_removed"][z] = 
    end
 end
 
-function pal:AddInfoTbl( tbl ) --an unscure but fast way of adding info
+function pal:SetNewInfoTbl( tbl ) --an unscure but fast way of adding info
+
+	tbl["sf"] = ( string.gsub( tbl["sf"], ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
+	local null = 0
+for z = 1, #pal["searchfor_groups"] do
+	tbl["sf"], null = string.gsub( tbl["sf"], "@"..pal["searchfor_groups"][z]["groupname"].." ", pal["searchfor_groups"][z]["tags"] )
+end
+	tbl["sfl"] = ( string.gsub( tbl["sfl"], ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
+for z = 1, #pal["searchfor_groups"] do
+	tbl["sfl"], null = string.gsub( tbl["sfl"], "@"..pal["searchfor_groups"][z]["groupname"].." ", pal["searchfor_groups"][z]["tags"] )
+end
+
 	pal["info_database"][#pal["info_database"] +1] = tbl
 if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
 for z = 1, pal["info_database_removed"] do
@@ -91,11 +121,32 @@ if pal["info_database_removed"][z] == id then pal["info_database_removed"][z] = 
 end
 
 function pal:ReturnInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subresponces, id, append ) --format like so {"word","word","word"}, {"word","from","the","prior","text","responded","to"}, {0.15,0.001}, true, 1, {"hi","bye","gay"}, {ReturnInfo( DATA ),ReturnInfo( DATA )}, "code_for_editing_info", "appends_to_all_responces"
+
+	searchfor = ( string.gsub( searchfor, ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
+	local null = 0
+for z = 1, #pal["searchfor_groups"] do
+	searchfor, null = string.gsub( searchfor, "@"..pal["searchfor_groups"][z]["groupname"].." ", pal["searchfor_groups"][z]["tags"] )
+end
+	searchfor_prior = ( string.gsub( searchfor_prior, ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
+for z = 1, #pal["searchfor_groups"] do
+	searchfor_prior, null = string.gsub( searchfor_prior, "@"..pal["searchfor_groups"][z]["groupname"].." ", pal["searchfor_groups"][z]["tags"] )
+end
+
 return {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subresponces"]=subresponces,["id"]=id,["append"]=append}
+end
+
+function pal:RemoveAllInfo() --removes all the info and all memory of it ever exsisting
+	pal["info_database"] = nil
+	pal["info_database_added"] = nil
+	pal["info_database_removed"] = nil
+	pal["info_database_removed"] = {}
+	pal["info_database_added"] = {}
+	pal["info_database"] = {}
 end
 
 function pal:GetInfoByIndex( index ) --finds info by the index which repasents it placement it the database
 	local result = pal["info_database"][index]
+if result == nil then return {} end
 return {["sf"]=result["sf"],["sfl"]=result["sfl"],["ec"]=result["ec"],["a"]=result["a"],["i"]=result["i"],["responces"]=result["responces"],["subresponces"]=result["subresponces"],["id"]=result["id"],["append"]=result["append"]}
 end
 
@@ -113,7 +164,7 @@ function pal:AddSpellChecking( correct, ... ) --spellchecker
 	pal["spellchecking"][#pal["spellchecking"] +1] = {["c"]=correct,["i"]={...}}
 end
 
-function pal:AddSynonymsGroup( id, ... ) --for grouping synonyms togethed so that one could be select via the id
+function pal:SetNewSynonymsGroup( id, ... ) --for grouping synonyms togethed so that one could be select via the id
 	pal["synonyms_groups"][id] = {...}
 end
 
@@ -131,7 +182,7 @@ for y = 1, size do
    end 
 end
 
-function pal:AddEmotion( gridlocation, emotivewords, wordsthatmaketheaifeelmorelikethis, emotionclass ) --for when the ai dose not have a responce
+function pal:SetNewEmotion( gridlocation, emotivewords, wordsthatmaketheaifeelmorelikethis, emotionclass ) --for when the ai dose not have a responce
 	pal["emotion_grid"][gridlocation[1]][gridlocation[2]] = {["words"]=emotivewords,["wtmifmlt"]=wordsthatmaketheaifeelmorelikethis,["emotionclass"]=emotionclass,}
 end
 
@@ -151,7 +202,7 @@ function pal:GetEmotiveClass() --words that describe how it is feeling in genral
 return pal["emotion_grid"][pal["emotion_level"][1]][pal["emotion_level"][2]]["emotionclass"][math.random( 1, #pal["emotion_grid"][pal["emotion_level"][1]][pal["emotion_level"][2]]["emotionclass"] )]
 end
 
-function pal:AddIDKresponces( responce ) --for when the ai dose not have a responce
+function pal:SetNewIDKresponces( responce ) --for when the ai dose not have a responce
 	pal["idk_responces"][#pal["idk_responces"] +1] = responce
 end
 
@@ -159,7 +210,7 @@ function pal:GetIDKresponce()
 return pal["idk_responces"][math.random( 1, pal["idk_responces"] )]
 end
 
-function pal:AddAnnoyanceRespoces( level, responce ) --for if you ask the same question to many times
+function pal:SetNewAnnoyanceRespoces( level, responce ) --for if you ask the same question to many times
 if leve == 1 then pal["annoyance_responces_attachment"][#pal["annoyance_responces_attachment"] +1] = responce end
 if leve == 2 then pal["annoyance_responces"][#pal["annoyance_responces"] +1] = responce end
 end
@@ -194,7 +245,7 @@ function pal:AnnoyanceDecreese() --allows for annoyence to war off over time
 if pal["annoyance_level"] == nil or pal["annoyance_level"] <= 0 then
 for k, v in pairs( pal["annoyance_responcecounter"] ) do
 	v = v -1
-if v <= 0 then pal["annoyance_responcecounter"][k] = 0 end
+if v <= 0 then pal["annoyance_responcecounter"][k] = nil end
 end
 	pal["annoyance_level"] = pal["annoyance_maxlevel"] +1
 end
@@ -210,10 +261,12 @@ end
 function pal:RunLoopSimulation()
 if pal["last_sim_time"] == nil then pal["last_sim_time"] = os.time() end
 	local simlen = os.time() -pal["last_sim_time"]
+if pal.OnRunLoopSimulation ~= nil then pal:OnRunLoopSimulation( simlen ) end	
 for z = 1, simlen do pal:Loop() end
 end
 
 function pal:RunSpellCheck( input ) --fixes spelling issues in what theplayer says so it is easyer to find the best responce to what the player says
+if pal.OnRunSpellCheck ~= nil then pal:OnRunSpellCheck( input ) end	
 	local mstr = ( string.gsub( input, ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
 	local nul = 0
 for z = 1, #pal["spellchecking"] do
@@ -225,19 +278,22 @@ return mstr
 end
 
 function pal:RunAjustEmotionToEmotiveKeyWords( input ) --allows for to AI to feel hurt by the manner of which the player speeks
+if pal.OnRunAjustEmotionToEmotiveKeyWords ~= nil then pal:OnRunAjustEmotionToEmotiveKeyWords( input ) end
 	local xy = {0,0}
 
 for x = 1, pal["emotion_grid_max_size"] do
 for y = 1, pal["emotion_grid_max_size"] do
-if pal["emotion_grid"][x][y]["words"] ~= nil then
+if pal["emotion_grid"][x] ~= nil and pal["emotion_grid"][x][y] ~= nil and pal["emotion_grid"][x][y]["words"] ~= nil then
 for z = 1, pal["emotion_grid"][x][y]["words"] do
 	local has, word = string.find( input, pal["emotion_grid"][x][y]["words"], 1, true )
 if has ~= nil then
 	xy[1] = x
 	xy[2] = y
+      end
    end
 end
 
+if pal["emotion_grid"][x] ~= nil and pal["emotion_grid"][x][y] ~= nil and pal["emotion_grid"][x][y]["wtmifmlt"] ~= nil then
 for z = 1, pal["emotion_grid"][x][y]["wtmifmlt"] do
 	local has, word = string.find( input, pal["emotion_grid"][x][y]["wtmifmlt"], 1, true )
 if has ~= nil then
@@ -258,7 +314,8 @@ end
 end
 
 function pal:RunFindResponce( input )
-	
+if pal.OnRunFindResponce ~= nil then pal:OnRunFindResponce( input ) end
+
 	pal["current_responce_importance"] = -999
 	pal["match_level_words_processed_old"] = -1
 	local currentresponceindex = -1
@@ -352,6 +409,7 @@ if currentresponceindex ~= -1 then
 end
 
 function pal:RunAnnoyanceTest( inputindex, input ) --simulate annoyance
+if pal.OnRunAnnoyanceTest ~= nil then pal:OnRunAnnoyanceTest( inputindex, input ) end
 	local annoyedlevel = pal["annoyance_responcecounter"][inputindex] or 0
 if annoyedlevel >= 1 then
 if annoyedlevel >= pal["annoyance_maxlevel"] then
@@ -364,6 +422,8 @@ end
 end
 
 function pal:RunLuaCodeInResponce( input ) --exacutes any lua code in the responce
+if pal.OnRunLuaCodeInResponce ~= nil then pal:OnRunLuaCodeInResponce( input ) end
+
 	local startcutat = -1
 	local endcutat = -1
 	local levelat = 0
@@ -396,14 +456,18 @@ end
 function pal:BuildResponceTo( input ) --USE THIS TO GET THE AI TO MAKE A RESPONCE TO THE INPUT
 	local master = input
 
+if pal.OnBuildResponceTo ~= nil then pal:OnBuildResponceTo( input ) end
+function pal:BRTGetTextToRespondTo() return master end
+
 self:RunLoopSimulation()
 	master = self:RunSpellCheck( master )
-function pal:GetTextToRespondTo() return master end
 self:RunAjustEmotionToEmotiveKeyWords( master ) --remove here to remove emotion change
 
 	local outputindex = self:RunFindResponce( master )
 	local outputdata = self:GetInfoByIndex( outputindex )
-	local outputresponce = outputdata["responces"][math.random( 1, outputdata["responces"] )]..outputdata["append"]
+	local outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )]..outputdata["append"]
+	
+function pal:BRTGetInfoIndex() return outputindex end
 	
 if outputindex == -1 then return self:GetIDKresponce() end
 if outputdata["a"] ~= false then outputresponce = self:RunAnnoyanceTest( outputindex, outputresponce ) end
@@ -430,6 +494,7 @@ pal:RunLoopSimulation()
 -- end of main ai loop and start of loading external data ----------------------------------------------------------------------------------------------------
 
 function pal:SaveInfo() --saves all info added to AI after intal loading
+if pal.OnSaveInfo ~= nil then pal:OnSaveInfo() end
 
 	local addresponcesfiledata = "" --start of saveing responce file data
 
@@ -482,13 +547,41 @@ file:close()
 end
 
 function pal:LoadInfo()
-dofile( pal["save_directory"].."/".."main_save.dat" )
+if pal.OnLoadInfo ~= nil then pal:OnLoadInfo() end
+	local file =io.open( pal["save_directory"].."/".."main_save.dat" ,"r")
+if file ~=nil then io.close( file ); file = true else file = false end
+if file == true then dofile( pal["save_directory"].."/".."main_save.dat" ) end
 end
 
-require( "requires.lua" )
+function pal:SetRestorePoint() --sets a restore point that we can undo to which is useful for siturations where you may have more then one pal AI but only have one pal file
+if pal.OnSetRestorePoint ~= nil then pal:OnSetRestorePoint() end
+if PAL_RESTORE_TABLE == nil then PAL_RESTORE_TABLE = {}
+for k, v in pairs( pal["annoyance_responcecounter"] ) do
+if k ~= "last_sim_time" then
+if type( v ) == "table" then
+for l, w in pairs( pal["annoyance_responcecounter"][k] ) do
+	PAL_RESTORE_TABLE[k] = w
+end
+else
+	PAL_RESTORE_TABLE[k] = v
+	        end
+         end
+      end
+   end
+end
 
-inruntime = true
+function pal:LoadRestorePoint() --loades restore point
+if pal.OnLoadRestorePoint ~= nil then pal:OnLoadRestorePoint() end
+if PAL_RESTORE_TABLE ~= nil then
+	pal = nil
+	pal = PAL_RESTORE_TABLE
+   end
+end
 
+dofile( current_dir.."/AI/loads.lua" )
+
+	inruntime = true
+pal:SetRestorePoint()
 pal:LoadInfo()
 
 --do code for convo start here

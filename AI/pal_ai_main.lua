@@ -261,12 +261,12 @@ end
 function pal:RunLoopSimulation()
 if pal["last_sim_time"] == nil then pal["last_sim_time"] = os.time() end
 	local simlen = os.time() -pal["last_sim_time"]
-if pal.OnRunLoopSimulation ~= nil then pal:OnRunLoopSimulation( simlen ) end	
+if PALOnRunLoopSimulation ~= nil then pal:OnRunLoopSimulation( simlen ) end	
 for z = 1, simlen do pal:Loop() end
 end
 
 function pal:RunSpellCheck( input ) --fixes spelling issues in what theplayer says so it is easyer to find the best responce to what the player says
-if pal.OnRunSpellCheck ~= nil then pal:OnRunSpellCheck( input ) end	
+if PALOnRunSpellCheck ~= nil then pal:OnRunSpellCheck( input ) end	
 	local mstr = ( string.gsub( input, ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
 	local nul = 0
 for z = 1, #pal["spellchecking"] do
@@ -278,7 +278,7 @@ return mstr
 end
 
 function pal:RunAjustEmotionToEmotiveKeyWords( input ) --allows for to AI to feel hurt by the manner of which the player speeks
-if pal.OnRunAjustEmotionToEmotiveKeyWords ~= nil then pal:OnRunAjustEmotionToEmotiveKeyWords( input ) end
+if PALOnRunAjustEmotionToEmotiveKeyWords ~= nil then PALOnRunAjustEmotionToEmotiveKeyWords( input ) end
 	local xy = {0,0}
 
 for x = 1, pal["emotion_grid_max_size"] do
@@ -314,7 +314,7 @@ end
 end
 
 function pal:RunFindResponce( input )
-if pal.OnRunFindResponce ~= nil then pal:OnRunFindResponce( input ) end
+if PALOnRunFindResponce ~= nil then PALOnRunFindResponce( input ) end
 
 	pal["current_responce_importance"] = -999
 	pal["match_level_words_processed_old"] = -1
@@ -409,7 +409,7 @@ if currentresponceindex ~= -1 then
 end
 
 function pal:RunAnnoyanceTest( inputindex, input ) --simulate annoyance
-if pal.OnRunAnnoyanceTest ~= nil then pal:OnRunAnnoyanceTest( inputindex, input ) end
+if PALOnRunAnnoyanceTest ~= nil then PALOnRunAnnoyanceTest( inputindex, input ) end
 	local annoyedlevel = pal["annoyance_responcecounter"][inputindex] or 0
 if annoyedlevel >= 1 then
 if annoyedlevel >= pal["annoyance_maxlevel"] then
@@ -422,7 +422,7 @@ end
 end
 
 function pal:RunLuaCodeInResponce( input ) --exacutes any lua code in the responce
-if pal.OnRunLuaCodeInResponce ~= nil then pal:OnRunLuaCodeInResponce( input ) end
+if PALOnRunLuaCodeInResponce ~= nil then PALOnRunLuaCodeInResponce( input ) end
 
 	local startcutat = -1
 	local endcutat = -1
@@ -456,7 +456,7 @@ end
 function pal:BuildResponceTo( input ) --USE THIS TO GET THE AI TO MAKE A RESPONCE TO THE INPUT
 	local master = input
 
-if pal.OnBuildResponceTo ~= nil then pal:OnBuildResponceTo( input ) end
+if PALOnBuildResponceTo ~= nil then PALOnBuildResponceTo( input ) end
 function pal:BRTGetTextToRespondTo() return master end
 
 self:RunLoopSimulation()
@@ -494,7 +494,7 @@ pal:RunLoopSimulation()
 -- end of main ai loop and start of loading external data ----------------------------------------------------------------------------------------------------
 
 function pal:SaveInfo() --saves all info added to AI after intal loading
-if pal.OnSaveInfo ~= nil then pal:OnSaveInfo() end
+if PALOnSaveInfo ~= nil then PALOnSaveInfo() end
 
 	local addresponcesfiledata = "" --start of saveing responce file data
 
@@ -547,14 +547,14 @@ file:close()
 end
 
 function pal:LoadInfo()
-if pal.OnLoadInfo ~= nil then pal:OnLoadInfo() end
+if PALOnLoadInfo ~= nil then PALOnLoadInfo() end
 	local file =io.open( pal["save_directory"].."/".."main_save.dat" ,"r")
 if file ~=nil then io.close( file ); file = true else file = false end
 if file == true then dofile( pal["save_directory"].."/".."main_save.dat" ) end
 end
 
 function pal:SetRestorePoint() --sets a restore point that we can undo to which is useful for siturations where you may have more then one pal AI but only have one pal file
-if pal.OnSetRestorePoint ~= nil then pal:OnSetRestorePoint() end
+if PALOnSetRestorePoint ~= nil then PALOnSetRestorePoint() end
 if PAL_RESTORE_TABLE == nil then PAL_RESTORE_TABLE = {}
 for k, v in pairs( pal["annoyance_responcecounter"] ) do
 if k ~= "last_sim_time" then
@@ -571,7 +571,7 @@ else
 end
 
 function pal:LoadRestorePoint() --loades restore point
-if pal.OnLoadRestorePoint ~= nil then pal:OnLoadRestorePoint() end
+if PALOnLoadRestorePoint ~= nil then PALOnLoadRestorePoint() end
 if PAL_RESTORE_TABLE ~= nil then
 	pal = nil
 	pal = PAL_RESTORE_TABLE
@@ -581,8 +581,9 @@ end
 dofile( current_dir.."/AI/loads.lua" )
 
 	inruntime = true
-pal:SetRestorePoint()
+	
 pal:LoadInfo()
+pal:SetRestorePoint()
 
 --do code for convo start here
 

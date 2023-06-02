@@ -17,6 +17,7 @@ cdc:close()
 	pal["emotion_grid"] = {}
 	pal["emotion_grid_max_size"] = 3
 	pal["emotion_sensitivity"] = 0.2
+	pal["emotion_gravatate_power"] = 0.03
 	pal["idk_responces"] = {}
 	pal["annoyance_maxlevel"] = 4
 	pal["annoyance_responcecounter"] = {}
@@ -182,24 +183,26 @@ for y = 1, size do
    end 
 end
 
-function pal:SetNewEmotion( gridlocation, emotivewords, wordsthatmaketheaifeelmorelikethis, emotionclass ) --for when the ai dose not have a responce
+function pal:AddNewEmotion( gridlocation, emotivewords, wordsthatmaketheaifeelmorelikethis, emotionclass ) --for when the ai dose not have a responce
 	pal["emotion_grid"][gridlocation[1]][gridlocation[2]] = {["words"]=emotivewords,["wtmifmlt"]=wordsthatmaketheaifeelmorelikethis,["emotionclass"]=emotionclass,}
 end
 
 function pal:EmotionLevelEquals( tbl ) --can be used in responces to determin if this responce could or should have a chance of selection
-return ( tbl[1] == pal["emotion_level"][1] and tbl[2] == pal["emotion_level"][2] )
+return ( tbl[1] == math.floor( 0.50 +pal["emotion_level"][1] ) and tbl[2] == math.floor( 0.50 +pal["emotion_level"][2] ) )
 end
 
 function pal:EmotionLevelNotEquals( tbl ) 
-return ( tbl[1] ~= pal["emotion_level"][1] or tbl[2] ~= pal["emotion_level"][2] )
+return ( tbl[1] ~= math.floor( 0.50 +pal["emotion_level"][1] ) or tbl[2] ~= math.floor( 0.50 +pal["emotion_level"][2] ) )
 end
 
 function pal:GetEmotiveWord() --words that describe what it thinks of the user
-return pal["emotion_grid"][pal["emotion_level"][1]][pal["emotion_level"][2]]["words"][math.random( 1, #pal["emotion_grid"][pal["emotion_level"][1]][pal["emotion_level"][2]]["words"] )]
+if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["words"] == nil then return "" end
+return pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["words"][math.random( 1, #pal["emotion_grid"][pal["emotion_level"][1]][pal["emotion_level"][2]]["words"] )]
 end
 
 function pal:GetEmotiveClass() --words that describe how it is feeling in genral
-return pal["emotion_grid"][pal["emotion_level"][1]][pal["emotion_level"][2]]["emotionclass"][math.random( 1, #pal["emotion_grid"][pal["emotion_level"][1]][pal["emotion_level"][2]]["emotionclass"] )]
+if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["emotionclass"] == nil then return "" end
+return pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["emotionclass"][math.random( 1, #pal["emotion_grid"][pal["emotion_level"][1]][pal["emotion_level"][2]]["emotionclass"] )]
 end
 
 function pal:SetNewIDKresponces( responce ) --for when the ai dose not have a responce
@@ -207,7 +210,8 @@ function pal:SetNewIDKresponces( responce ) --for when the ai dose not have a re
 end
 
 function pal:GetIDKresponce()
-return pal["idk_responces"][math.random( 1, pal["idk_responces"] )]
+if #pal["idk_responces"] <= 0 then return "ERROR: AI TRIED TO MAKE AN IDK RESPONCE BUT HAS NO IDK DATA" end
+return pal["idk_responces"][math.random( 1, #pal["idk_responces"] )]
 end
 
 function pal:SetNewAnnoyanceRespoces( level, responce ) --for if you ask the same question to many times
@@ -233,10 +237,9 @@ pal:BuildEmotionGrid( pal["emotion_grid_max_size"] )
 -- end of data control functions and start of AI loop --------------------------------------------------------------------------------------------------------
 
 function pal:EmotionGravatate() --allows for emotion to go back to normal levels
-	local gravatateamount = 0.03 
 	local x = pal["emotion_level_wanted"][1] -pal["emotion_level"][1]
 	local y = pal["emotion_level_wanted"][2] -pal["emotion_level"][2]
-	x = ( x /( x+y ) ) *gravatateamount; y = ( y /( x+y ) ) *gravatateamount
+	x = ( x /( x+y ) ) *pal["emotion_gravatate_power"]; y = ( y /( x+y ) ) *pal["emotion_gravatate_power"]
 	pal["emotion_level"][1] = pal["emotion_level"][1] +x
 	pal["emotion_level"][2] = pal["emotion_level"][2] +y
 end
@@ -465,11 +468,12 @@ self:RunAjustEmotionToEmotiveKeyWords( master ) --remove here to remove emotion 
 
 	local outputindex = self:RunFindResponce( master )
 	local outputdata = self:GetInfoByIndex( outputindex )
-	local outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )]..outputdata["append"]
-	
+
 function pal:BRTGetInfoIndex() return outputindex end
+if outputindex == nil then return self:GetIDKresponce() end
 	
-if outputindex == -1 then return self:GetIDKresponce() end
+	local outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )]..outputdata["append"]
+
 if outputdata["a"] ~= false then outputresponce = self:RunAnnoyanceTest( outputindex, outputresponce ) end
 
 	pal["emotion_change"][1] = pal["emotion_change"][1] +outputdata["ec"][1]  --remove here to remove emotion change

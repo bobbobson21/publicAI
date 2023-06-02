@@ -6,5 +6,9 @@ cdc:close()
 	local AI = dofile( current_dir.."/AI/pal_ai_main.lua" )
 
 ::talk_start::
-print( AI:BuildResponceTo( io.read() ) )
+io.write( "user: " )
+	local input = io.read()
+print( "" )
+print( "AI: "..AI:BuildResponceTo( input ) )
+print( "" )
 goto talk_start

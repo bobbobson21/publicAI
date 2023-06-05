@@ -183,8 +183,8 @@ for y = 1, size do
    end 
 end
 
-function pal:AddNewEmotion( gridlocation, emotivewords, wordsthatmaketheaifeelmorelikethis, emotionclass ) --for when the ai dose not have a responce
-	pal["emotion_grid"][gridlocation[1]][gridlocation[2]] = {["words"]=emotivewords,["wtmifmlt"]=wordsthatmaketheaifeelmorelikethis,["emotionclass"]=emotionclass,}
+function pal:AddNewEmotion( gridlocation, emotivewords, wordsthatmaketheaifeelmorelikethis, emotionclass, sentanceappending ) --for when the ai dose not have a responce
+	pal["emotion_grid"][gridlocation[1]][gridlocation[2]] = {["words"]=emotivewords,["wtmifmlt"]=wordsthatmaketheaifeelmorelikethis,["emotionclass"]=emotionclass,["sentanceappending"]=sentanceappending,}
 end
 
 function pal:EmotionLevelEquals( tbl ) --can be used in responces to determin if this responce could or should have a chance of selection

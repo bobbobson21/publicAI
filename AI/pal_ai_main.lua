@@ -9,6 +9,7 @@ cdc:close()
 	pal["info_database"] = {}
 	pal["info_database_added"] = {}
 	pal["info_database_removed"] = {}
+	pal["info_degrade_level"] = {}
 	pal["synonyms_groups"] = {}
 	pal["spellchecking"] = {}
 	pal["prior_input"] = ""
@@ -40,6 +41,10 @@ cdc:close()
 function pal:GetVar( v ) return pal["sandbox"][v] end --sandbox is for data that pal needs to access
 function pal:SetVar( k, v ) pal["sandbox"][k] = v end
 function pal:Sandbox() return pal["sandbox"]["funcs"] end
+
+function pal:DegradeInfoOverXCycles( cyclesinfostayesinmemory ) --put in to the reponce part of info to make it so the responce eventually degrades to nothing
+if pal["info_degrade_level"][pal:BRTGetInfoIndex()] == nil then pal["info_degrade_level"][pal:BRTGetInfoIndex()] = cyclesinfostayesinmemory -1 end
+end
 
 function pal:notrequiredtag( tag ) --for tags you want it to seach for but only mark down the result and not desqalify it if result cant be found
 	local starts, ends = string.find( self:BRTGetTextToRespondTo(), tag, 1, true )
@@ -205,6 +210,11 @@ if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 
 return pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["emotionclass"][math.random( 1, #pal["emotion_grid"][pal["emotion_level"][1]][pal["emotion_level"][2]]["emotionclass"] )]
 end
 
+function pal:GetEmotiveEnd() --an emotive ending to a sentence
+if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["sentanceappending"] == nil then return "" end
+return pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["sentanceappending"][math.random( 1, #pal["emotion_grid"][pal["emotion_level"][1]][pal["emotion_level"][2]]["sentanceappending"] )]
+end
+
 function pal:SetNewIDKresponces( responce ) --for when the ai dose not have a responce
 	pal["idk_responces"][#pal["idk_responces"] +1] = responce
 end
@@ -253,6 +263,16 @@ end
 	pal["annoyance_level"] = pal["annoyance_maxlevel"] +1
 end
 	pal["annoyance_level"] = pal["annoyance_level"] -1
+end
+
+function pal:DegradeInfo()
+for k, v in pairs( pal["info_degrade_level"] ) do
+	v = v -1
+if v <= 0 then
+	pal["info_database_removed"][#pal["info_database_removed"] +1] = pal["info_database"][k]["id"]
+	pal["info_database"][k], pal["info_degrade_level"][k] = nil, nil
+      end
+   end
 end
 
 function pal:Loop() --runs every second but it only a simulation meaning anything that envolves printing can not be done in this

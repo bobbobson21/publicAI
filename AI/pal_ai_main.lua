@@ -602,7 +602,7 @@ if PAL_RESTORE_TABLE ~= nil then
    end
 end
 
-dofile( current_dir.."/AI/loads.lua" )
+require( current_dir.."/AI/loads.lua" )
 
 	inruntime = true
 	

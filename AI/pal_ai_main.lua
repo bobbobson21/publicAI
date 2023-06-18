@@ -307,8 +307,8 @@ if PALOnRunAjustEmotionToEmotiveKeyWords ~= nil then PALOnRunAjustEmotionToEmoti
 for x = 1, pal["emotion_grid_max_size"] do
 for y = 1, pal["emotion_grid_max_size"] do
 if pal["emotion_grid"][x] ~= nil and pal["emotion_grid"][x][y] ~= nil and pal["emotion_grid"][x][y]["words"] ~= nil then
-for z = 1, pal["emotion_grid"][x][y]["words"] do
-	local has, word = string.find( input, pal["emotion_grid"][x][y]["words"], 1, true )
+for z = 1, #pal["emotion_grid"][x][y]["words"] do
+	local has, word = string.find( input, pal["emotion_grid"][x][y]["words"][z], 1, true )
 if has ~= nil then
 	xy[1] = x
 	xy[2] = y
@@ -317,8 +317,8 @@ if has ~= nil then
 end
 
 if pal["emotion_grid"][x] ~= nil and pal["emotion_grid"][x][y] ~= nil and pal["emotion_grid"][x][y]["wtmifmlt"] ~= nil then
-for z = 1, pal["emotion_grid"][x][y]["wtmifmlt"] do
-	local has, word = string.find( input, pal["emotion_grid"][x][y]["wtmifmlt"], 1, true )
+for z = 1, #pal["emotion_grid"][x][y]["wtmifmlt"] do
+	local has, word = string.find( input, pal["emotion_grid"][x][y]["wtmifmlt"][z], 1, true )
 if has ~= nil then
 	xy[1] = x
 	xy[2] = y
@@ -602,7 +602,7 @@ if PAL_RESTORE_TABLE ~= nil then
    end
 end
 
-require( current_dir.."/AI/loads.lua" )
+local test = dofile( current_dir.."/AI/loads.lua" )
 
 	inruntime = true
 	

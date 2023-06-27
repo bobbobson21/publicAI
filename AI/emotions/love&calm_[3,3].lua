@@ -10,7 +10,7 @@
 	}
 
 	local wordstomaketheaifeelthis = { --words to use that make the AI feel like this note all content from the emotionalwords tbl will also be added to this one and you should only use this for sware words and stuff like that
-	
+
 	}
 
 	local emotionclass = { --how the ai feels
@@ -23,7 +23,7 @@
 	"contempt",
 	}
 
-	local sentanceappending = {
+	local sentanceappending = { --how to end a sentance when feeling this emotion
 	"Hope we talk again soon.",
 	"See you later.",
 	"See you later alagator.",

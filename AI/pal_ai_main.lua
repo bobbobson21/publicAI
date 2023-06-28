@@ -6,6 +6,7 @@ for z = 1, string.len( current_dir ) do if string.sub( current_dir, z, z ) == st
 cdc:close()
 
 	pal = {}
+	pal["selfhooks"] = {}
 	pal["info_database"] = {}
 	pal["info_database_added"] = {}
 	pal["info_database_removed"] = {}
@@ -40,10 +41,32 @@ cdc:close()
 
 function pal:GetVar( v ) return pal["sandbox"][v] end --sandbox is for data that pal needs to access
 function pal:SetVar( k, v ) pal["sandbox"][k] = v end
-function pal:Sandbox() return pal["sandbox"]["funcs"] end
+function pal:Sandbox() return pal["sandbox"]["funcs"] end --use the sandbox so that if you need to restore the AI to a prior point you can also restore function and values you created
 
-function pal:DegradeInfoOverXCycles( cyclesinfostayesinmemory ) --put in to the reponce part of info to make it so the responce eventually degrades to nothing
-if pal["info_degrade_level"][pal:BRTGetInfoIndex()] == nil then pal["info_degrade_level"][pal:BRTGetInfoIndex()] = cyclesinfostayesinmemory -1 end
+function pal:AddSelfHook( cat, name, v ) --catagory, hook name, function --adds hooks so systems can better interract with the AI
+if pal["selfhooks"][cat] == nil then pal["selfhooks"][cat] = {} end
+	pal["selfhooks"][cat][name] = v
+end
+
+function pal:removeSelfHook( cat, name )
+if name == nil then pal["selfhooks"][cat] = nil; return end
+	pal["selfhooks"][cat][name] = nil
+end
+
+function pal:GetHooksAsTable() --gets all the hooks
+return pal["selfhooks"]
+end
+
+function pal:RunSelfHooks( cat, ... ) --runs hooks
+	local selfuseid = "PALOn"
+if string.sub( cat, 1, string.len( selfuseid ) ) ~= selfuseid then return nil end --to make it only useable for pal functions as to not mess stuff up
+	local returns = {}
+	local passto = {...}
+for k, v in pairs( pal["selfhooks"][cat] ) do
+	returns = nil
+	returns = {v( passto )}
+end
+return unpack( returns )
 end
 
 function pal:notrequiredtag( tag ) --for tags you want it to seach for but only mark down the result and not desqalify it if result cant be found
@@ -57,49 +80,55 @@ end
 return true
 end
 
-function pal:AddTagGroup( name, collection ) --a collection of tags which if refrenced like so @TAG_NAME, in the search for sections of added info will be replaced with collection
+function pal:AddNewTagGroup( name, collection ) --a collection of tags which if refrenced like so @TAG_NAME, in the search for sections of added info will be replaced with collection
+RunSelfHooks( "PALOnAddTagGroup", name, collection )
 	pal["searchfor_groups"][#pal["searchfor_groups"] +1] = {["groupname"]=name,["tags"]=collection}
+end
+
+function pal:DegradeInfoOverXCycles( id, cyclesinfostayesinmemory ) --makes info eventually degrades to nothing use to simulates forgetfulness
+RunSelfHooks( "PALOnDegradeInfoOverXCycles", id, cyclesinfostayesinmemory )
+	local index = 0
+for z = 1, #result do
+if result[z]["id"] == id then
+	index = z
+   end
+end
+if pal["info_degrade_level"][index] == nil and index >= 1 then pal["info_degrade_level"][index] = cyclesinfostayesinmemory -1 end
 end
 
 function pal:RemoveInfo( id )
 if inruntime == true then pal["info_database_removed" +1] = id end
 for z = 1, #pal["info_database"] do
 if id == pal["info_database"][z]["id"] then pal["info_database"][z] = nil end
-if type( pal["info_database"][z]["id"] ) ~= "table" then
-	local stopthis = false
-for y = 1, #pal["info_database"][z]["id"] do
-if stopthis == false then
-if pal["info_database"][z]["id"] == id then pal["info_database"][z] = nil; stopthis = true end
-         end
-      end
-   end
 end
    
 for z = 1, #pal["info_database_added"] do
 if id == pal["info_database_added"][z]["id"] then pal["info_database_added"][z] = nil end
-if type( pal["info_database_added"][z]["id"] ) ~= "table" then
-	local stopthis = false
-for y = 1, #pal["info_database_added"][z]["id"] do
-if stopthis == false then
-if pal["info_database_added"][z]["id"] == id then pal["info_database_added"][z] = nil; stopthis = true end
-            end
-         end
-      end
    end   
 end
 
 function pal:SetNewInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subresponces, id, append ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier even functions like "֍hi( true )"
 	
-	searchfor = ( string.gsub( searchfor, ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
-	local null = 0
-for z = 1, #pal["searchfor_groups"] do
-	searchfor, null = string.gsub( searchfor, "@"..pal["searchfor_groups"][z]["groupname"].." ", pal["searchfor_groups"][z]["tags"] )
+for z = 1, #searchfor do
+for y = 1, #pal["searchfor_groups"] do
+if searchfor[z] == "@"..pal["searchfor_groups"][y]["groupname"] then 
+for x = 1, #pal["searchfor_groups"][y]["tags"] do
+	searchfor[#searchfor +1] = pal["searchfor_groups"][y]["tags"][x]
+         end
+	  end
+   end
 end
-	searchfor_prior = ( string.gsub( searchfor_prior, ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
-for z = 1, #pal["searchfor_groups"] do
-	searchfor_prior, null = string.gsub( searchfor_prior, "@"..pal["searchfor_groups"][z]["groupname"].." ", pal["searchfor_groups"][z]["tags"] )
+
+for z = 1, #searchfor_prior do
+for y = 1, #pal["searchfor_groups"] do
+if searchfor_prior[z] == "@"..pal["searchfor_groups"][y]["groupname"] then 
+for x = 1, #pal["searchfor_groups"][y]["tags"] do
+	searchfor_prior[#searchfor_prior +1] = pal["searchfor_groups"][y]["tags"][x]
+         end
+	  end
+   end
 end
-	
+
 	pal["info_database"][#pal["info_database"] +1] = {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subresponces"]=subresponces,["id"]=id,["append"]=append}
 if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
 for z = 1, pal["info_database_removed"] do
@@ -109,16 +138,25 @@ end
 
 function pal:SetNewInfoTbl( tbl ) --an unscure but fast way of adding info
 
-	tbl["sf"] = ( string.gsub( tbl["sf"], ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
-	local null = 0
-for z = 1, #pal["searchfor_groups"] do
-	tbl["sf"], null = string.gsub( tbl["sf"], "@"..pal["searchfor_groups"][z]["groupname"].." ", pal["searchfor_groups"][z]["tags"] )
-end
-	tbl["sfl"] = ( string.gsub( tbl["sfl"], ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
-for z = 1, #pal["searchfor_groups"] do
-	tbl["sfl"], null = string.gsub( tbl["sfl"], "@"..pal["searchfor_groups"][z]["groupname"].." ", pal["searchfor_groups"][z]["tags"] )
+for z = 1, #searchfor do
+for y = 1, #pal["searchfor_groups"] do
+if searchfor[z] == "@"..pal["searchfor_groups"][y]["groupname"] then 
+for x = 1, #pal["searchfor_groups"][y]["tags"] do
+	searchfor[#searchfor +1] = pal["searchfor_groups"][y]["tags"][x]
+         end
+	  end
+   end
 end
 
+for z = 1, #searchfor_prior do
+for y = 1, #pal["searchfor_groups"] do
+if searchfor_prior[z] == "@"..pal["searchfor_groups"][y]["groupname"] then 
+for x = 1, #pal["searchfor_groups"][y]["tags"] do
+	searchfor_prior[#searchfor_prior +1] = pal["searchfor_groups"][y]["tags"][x]
+         end
+	  end
+   end
+end
 	pal["info_database"][#pal["info_database"] +1] = tbl
 if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
 for z = 1, pal["info_database_removed"] do
@@ -128,14 +166,24 @@ end
 
 function pal:ReturnInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subresponces, id, append ) --format like so {"word","word","word"}, {"word","from","the","prior","text","responded","to"}, {0.15,0.001}, true, 1, {"hi","bye","gay"}, {ReturnInfo( DATA ),ReturnInfo( DATA )}, "code_for_editing_info", "appends_to_all_responces"
 
-	searchfor = ( string.gsub( searchfor, ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
-	local null = 0
-for z = 1, #pal["searchfor_groups"] do
-	searchfor, null = string.gsub( searchfor, "@"..pal["searchfor_groups"][z]["groupname"].." ", pal["searchfor_groups"][z]["tags"] )
+for z = 1, #searchfor do
+for y = 1, #pal["searchfor_groups"] do
+if searchfor[z] == "@"..pal["searchfor_groups"][y]["groupname"] then 
+for x = 1, #pal["searchfor_groups"][y]["tags"] do
+	searchfor[#searchfor +1] = pal["searchfor_groups"][y]["tags"][x]
+         end
+	  end
+   end
 end
-	searchfor_prior = ( string.gsub( searchfor_prior, ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
-for z = 1, #pal["searchfor_groups"] do
-	searchfor_prior, null = string.gsub( searchfor_prior, "@"..pal["searchfor_groups"][z]["groupname"].." ", pal["searchfor_groups"][z]["tags"] )
+
+for z = 1, #searchfor_prior do
+for y = 1, #pal["searchfor_groups"] do
+if searchfor_prior[z] == "@"..pal["searchfor_groups"][y]["groupname"] then 
+for x = 1, #pal["searchfor_groups"][y]["tags"] do
+	searchfor_prior[#searchfor_prior +1] = pal["searchfor_groups"][y]["tags"][x]
+         end
+	  end
+   end
 end
 
 return {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subresponces"]=subresponces,["id"]=id,["append"]=append}
@@ -265,7 +313,7 @@ end
 	pal["annoyance_level"] = pal["annoyance_level"] -1
 end
 
-function pal:DegradeInfo()
+function pal:DegradeInfo() --dose the actually info degradeing
 for k, v in pairs( pal["info_degrade_level"] ) do
 	v = v -1
 if v <= 0 then
@@ -278,6 +326,7 @@ end
 function pal:Loop() --runs every second but it only a simulation meaning anything that envolves printing can not be done in this
 pal:EmotionGravatate()  --remove here to remove emotion change
 pal:AnnoyanceDecreese()
+pal:DegradeInfo()
 --put any code here
 end
 
@@ -432,8 +481,8 @@ if currentresponceindex ~= -1 then
 end
 
 function pal:RunAnnoyanceTest( inputindex, input ) --simulate annoyance
-if PALOnRunAnnoyanceTest ~= nil then PALOnRunAnnoyanceTest( inputindex, input ) end
 	local annoyedlevel = pal["annoyance_responcecounter"][inputindex] or 0
+if PALOnRunAnnoyanceTest ~= nil then PALOnRunAnnoyanceTest( inputindex, input, annoyedlevel ) end
 if annoyedlevel >= 1 then
 if annoyedlevel >= pal["annoyance_maxlevel"] then
 	return pal:GetAnnoyanceRespoce( 1 )..input
@@ -444,36 +493,19 @@ end
 	pal["annoyance_responcecounter"][inputindex] = math.min( annoyedlevel +1, pal["annoyance_maxlevel"] +1 )
 end
 
-function pal:RunLuaCodeInResponce( input ) --exacutes any lua code in the responce
+function pal:RunLuaCodeInResponce( input ) --exacutes any lua code in a responce from the responce section of infomation 
 if PALOnRunLuaCodeInResponce ~= nil then PALOnRunLuaCodeInResponce( input ) end
 
-	local startcutat = -1
-	local endcutat = -1
-	local levelat = 0
-	local processing = false
-	local masterstr = input
-	local diffrence = 0
+	local point, null = string.find( input, pal["runfunctionkey"], 1, true )
+if point ~= nil then
 
-for z = 1, string.len( input ) +1000 do
-	local point = string.sub( input, z, z )
-if point == pal["runfunctionkey"] then startcutat, processing = point, false end
-if point == "(" then levelat, processing = levelat, true end
-if point == ")"  then
-	levelat = levelat +1
-
-if levelat == 0 and processing == true then
-	local exe, null = load( "return "..string.sub( input, startcutat +1, endcutat ) )
+	local exe, null = load( string.sub( input, point, string.len( input ) ) )
 	local result = exe()
+	
 if result ~= nil then
-	masterstr = string.sub( masterstr, 1, startcutat -( 1 +diffrence ) )..result..string.sub( masterstr, endcutat +( 1 +diffrence ), string.len( masterstr ) )
-	diffrence = string.len( masterstr ) -string.len( input )
-end
-	levelat = 0
-	processing = false
+	return result
       end
    end
-end
-return masterstr
 end
 
 function pal:BuildResponceTo( input ) --USE THIS TO GET THE AI TO MAKE A RESPONCE TO THE INPUT

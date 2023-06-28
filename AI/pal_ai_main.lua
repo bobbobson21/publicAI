@@ -43,30 +43,34 @@ function pal:GetVar( v ) return pal["sandbox"][v] end --sandbox is for data that
 function pal:SetVar( k, v ) pal["sandbox"][k] = v end
 function pal:Sandbox() return pal["sandbox"]["funcs"] end --use the sandbox so that if you need to restore the AI to a prior point you can also restore function and values you created
 
-function pal:AddSelfHook( cat, name, v ) --catagory, hook name, function --adds hooks so systems can better interract with the AI
+function pal:SetNewSelfHook( cat, name, v ) --catagory, hook name, function --adds hooks so systems can better interract with the AI
 if pal["selfhooks"][cat] == nil then pal["selfhooks"][cat] = {} end
 	pal["selfhooks"][cat][name] = v
 end
 
-function pal:removeSelfHook( cat, name )
+function pal:RemoveSelfHook( cat, name )
+if cat == nil then pal["selfhooks"] = nil;  pal["selfhooks"] = {}; return end
 if name == nil then pal["selfhooks"][cat] = nil; return end
 	pal["selfhooks"][cat][name] = nil
 end
 
-function pal:GetHooksAsTable() --gets all the hooks
+function pal:GetSelfHooksAsTable() --gets all the hooks
 return pal["selfhooks"]
 end
 
-function pal:RunSelfHooks( cat, ... ) --runs hooks
+function pal:RunSelfHooks( cat, tbl ) --runs hooks
 	local selfuseid = "PALOn"
 if string.sub( cat, 1, string.len( selfuseid ) ) ~= selfuseid then return nil end --to make it only useable for pal functions as to not mess stuff up
 	local returns = {}
-	local passto = {...}
+
+if pal["selfhooks"][cat] ~= nil then
 for k, v in pairs( pal["selfhooks"][cat] ) do
 	returns = nil
-	returns = {v( passto )}
+	returns = {v( unpack( tbl ) )}
+   end
 end
-return unpack( returns )
+
+if #returns <= 1 then return returns[1] else return unpack( returns ) end --we only use unpack here because there is no way you should need to loop througth returned data
 end
 
 function pal:notrequiredtag( tag ) --for tags you want it to seach for but only mark down the result and not desqalify it if result cant be found
@@ -81,12 +85,12 @@ return true
 end
 
 function pal:AddNewTagGroup( name, collection ) --a collection of tags which if refrenced like so @TAG_NAME, in the search for sections of added info will be replaced with collection
-RunSelfHooks( "PALOnAddTagGroup", name, collection )
+if RunSelfHooks( "PALOnAddTagGroup", {name,collection} ) == false then return end
 	pal["searchfor_groups"][#pal["searchfor_groups"] +1] = {["groupname"]=name,["tags"]=collection}
 end
 
 function pal:DegradeInfoOverXCycles( id, cyclesinfostayesinmemory ) --makes info eventually degrades to nothing use to simulates forgetfulness
-RunSelfHooks( "PALOnDegradeInfoOverXCycles", id, cyclesinfostayesinmemory )
+if RunSelfHooks( "PALOnDegradeInfoOverXCycles", {id,cyclesinfostayesinmemory} ) == false then return end
 	local index = 0
 for z = 1, #result do
 if result[z]["id"] == id then
@@ -97,6 +101,7 @@ if pal["info_degrade_level"][index] == nil and index >= 1 then pal["info_degrade
 end
 
 function pal:RemoveInfo( id )
+if RunSelfHooks( "PALOnRemoveInfo", id ) == false then return end
 if inruntime == true then pal["info_database_removed" +1] = id end
 for z = 1, #pal["info_database"] do
 if id == pal["info_database"][z]["id"] then pal["info_database"][z] = nil end
@@ -108,7 +113,7 @@ if id == pal["info_database_added"][z]["id"] then pal["info_database_added"][z] 
 end
 
 function pal:SetNewInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subresponces, id, append ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier even functions like "֍hi( true )"
-	
+if RunSelfHooks( "PALOnSetNewInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subresponces,id,append} ) == false then return end
 for z = 1, #searchfor do
 for y = 1, #pal["searchfor_groups"] do
 if searchfor[z] == "@"..pal["searchfor_groups"][y]["groupname"] then 
@@ -137,6 +142,7 @@ if pal["info_database_removed"][z] == id then pal["info_database_removed"][z] = 
 end
 
 function pal:SetNewInfoTbl( tbl ) --an unscure but fast way of adding info
+if RunSelfHooks( "PALOnSetNewInfoTbl", {tbl} ) == false then return end
 
 for z = 1, #searchfor do
 for y = 1, #pal["searchfor_groups"] do
@@ -165,6 +171,7 @@ if pal["info_database_removed"][z] == id then pal["info_database_removed"][z] = 
 end
 
 function pal:ReturnInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subresponces, id, append ) --format like so {"word","word","word"}, {"word","from","the","prior","text","responded","to"}, {0.15,0.001}, true, 1, {"hi","bye","gay"}, {ReturnInfo( DATA ),ReturnInfo( DATA )}, "code_for_editing_info", "appends_to_all_responces"
+if RunSelfHooks( "PALOnReturnInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subresponces,id,append} ) == false then return end
 
 for z = 1, #searchfor do
 for y = 1, #pal["searchfor_groups"] do
@@ -190,6 +197,7 @@ return {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=ann
 end
 
 function pal:RemoveAllInfo() --removes all the info and all memory of it ever exsisting
+if RunSelfHooks( "PALOnRemoveAllInfo", {} ) == false then return end
 	pal["info_database"] = nil
 	pal["info_database_added"] = nil
 	pal["info_database_removed"] = nil
@@ -205,20 +213,34 @@ return {["sf"]=result["sf"],["sfl"]=result["sfl"],["ec"]=result["ec"],["a"]=resu
 end
 
 function pal:GetInfoById( id ) --finds info by id
-	local result = pal["info_database"]
+	local results = {}
 for z = 1, #result do
 if result[z]["id"] == id then
 	local result = pal["info_database"][z]
-return {["sf"]=result["sf"],["sfl"]=result["sfl"],["ec"]=result["ec"],["a"]=result["a"],["i"]=result["i"],["responces"]=result["responces"],["subresponces"]=result["subresponces"],["id"]=result["id"],["append"]=result["append"]}
-      end
+	results[#results +1] = {["sf"]=result["sf"],["sfl"]=result["sfl"],["ec"]=result["ec"],["a"]=result["a"],["i"]=result["i"],["responces"]=result["responces"],["subresponces"]=result["subresponces"],["id"]=result["id"],["append"]=result["append"]}
    end
+end
+if #results <= 1 then return results[1] else return results end
+end
+
+function pal:GetInfoIndexById( id )
+	local result = pal["info_database"]
+	local results = {}
+for z = 1, #result do
+if result[z]["id"] == id then
+	results[#results +1] = z
+   end
+end
+if #results <= 1 then return results[1] else return results end
 end
 
 function pal:AddSpellChecking( correct, ... ) --spellchecker
+if RunSelfHooks( "PALOnAddSpellChecking", {correct,...} ) == false then return end
 	pal["spellchecking"][#pal["spellchecking"] +1] = {["c"]=correct,["i"]={...}}
 end
 
 function pal:SetNewSynonymsGroup( id, ... ) --for grouping synonyms togethed so that one could be select via the id
+if RunSelfHooks( "PALOnSetNewSynonymsGroup", {correct,...} ) == false then return end
 	pal["synonyms_groups"][id] = {...}
 end
 
@@ -227,6 +249,7 @@ return pal["synonyms_groups"][id][math.random( 1, #pal["synonyms_groups"][id] )]
 end
 
 function pal:BuildEmotionGrid( size ) --sets the play field used for emotion simulation
+if pal:RunSelfHooks( "PALOnBuildEmotionGrid", {size} ) == false then return end
 	pal["emotion_grid_max_size"] = size
 for x = 1, size do
 for y = 1, size do
@@ -237,6 +260,7 @@ for y = 1, size do
 end
 
 function pal:AddNewEmotion( gridlocation, emotivewords, wordsthatmaketheaifeelmorelikethis, emotionclass, sentanceappending ) --for when the ai dose not have a responce
+if pal:RunSelfHooks( "PALOnAddNewEmotion", {gridlocation,emotivewords,wordsthatmaketheaifeelmorelikethis,emotionclass,sentanceappending} ) == false then return end
 	pal["emotion_grid"][gridlocation[1]][gridlocation[2]] = {["words"]=emotivewords,["wtmifmlt"]=wordsthatmaketheaifeelmorelikethis,["emotionclass"]=emotionclass,["sentanceappending"]=sentanceappending,}
 end
 
@@ -273,8 +297,9 @@ return pal["idk_responces"][math.random( 1, #pal["idk_responces"] )]
 end
 
 function pal:SetNewAnnoyanceRespoces( level, responce ) --for if you ask the same question to many times
-if leve == 1 then pal["annoyance_responces_attachment"][#pal["annoyance_responces_attachment"] +1] = responce end
-if leve == 2 then pal["annoyance_responces"][#pal["annoyance_responces"] +1] = responce end
+if pal:RunSelfHooks( "PALOnSetNewAnnoyanceRespoces", {level,responce} ) == false then return end
+if leve == 1 then pal["annoyance_responces_attachment"][#pal["annoyance_responces_attachment"] +1] = responce end --at level 1 it will still awnser questions and stuff but it will tell you this is getting annoying
+if leve == 2 then pal["annoyance_responces"][#pal["annoyance_responces"] +1] = responce end --at level 2 it will refuse to awnser questions
 end
 
 function pal:GetAnnoyanceRespoce( level ) --for if you ask the same question to many times
@@ -283,6 +308,7 @@ if leve == 2 then return pal["annoyance_responces"][math.random( 1, #pal["annoya
 end
 
 function pal:SetPriorInput( text ) --sets the previous thing the player said
+if pal:RunSelfHooks( "PALOnSetPriorInput", {text} ) == false then return end
 	pal["prior_input"] = text
 end
 
@@ -324,6 +350,7 @@ if v <= 0 then
 end
 
 function pal:Loop() --runs every second but it only a simulation meaning anything that envolves printing can not be done in this
+if pal:RunSelfHooks( "PALOnLoop", {} ) == false then return end
 pal:EmotionGravatate()  --remove here to remove emotion change
 pal:AnnoyanceDecreese()
 pal:DegradeInfo()
@@ -332,13 +359,12 @@ end
 
 function pal:RunLoopSimulation()
 if pal["last_sim_time"] == nil then pal["last_sim_time"] = os.time() end
-	local simlen = os.time() -pal["last_sim_time"]
-if PALOnRunLoopSimulation ~= nil then pal:OnRunLoopSimulation( simlen ) end	
+	local simlen = os.time() -pal["last_sim_time"]	
 for z = 1, simlen do pal:Loop() end
 end
 
 function pal:RunSpellCheck( input ) --fixes spelling issues in what theplayer says so it is easyer to find the best responce to what the player says
-if PALOnRunSpellCheck ~= nil then pal:OnRunSpellCheck( input ) end	
+if pal:RunSelfHooks( "PALOnRunSpellCheck", {input} ) == false then return end
 	local mstr = ( string.gsub( input, ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
 	local nul = 0
 for z = 1, #pal["spellchecking"] do
@@ -350,7 +376,7 @@ return mstr
 end
 
 function pal:RunAjustEmotionToEmotiveKeyWords( input ) --allows for to AI to feel hurt by the manner of which the player speeks
-if PALOnRunAjustEmotionToEmotiveKeyWords ~= nil then PALOnRunAjustEmotionToEmotiveKeyWords( input ) end
+if pal:RunSelfHooks( "PALOnRunAjustEmotionToEmotiveKeyWords", {input} ) == false then return end
 	local xy = {0,0}
 
 for x = 1, pal["emotion_grid_max_size"] do
@@ -383,10 +409,11 @@ end
 	pal["emotion_level"][2] = pal["emotion_level"][2] +( xy[2] *pal["emotion_sensitivity"] )
 	pal["emotion_level"][1] = math.max( 1, math.min( pal["emotion_grid_max_size"], pal["emotion_level"][1] ) )
 	pal["emotion_level"][2] = math.max( 1, math.min( pal["emotion_grid_max_size"], pal["emotion_level"][2] ) )
+if pal:RunSelfHooks( "PALRunAjustEmotionToEmotiveKeyWordsNewEmotion", {input,{pal["emotion_level"][1],pal["emotion_level"][2]}} ) == false then return end
 end
 
 function pal:RunFindResponce( input )
-if PALOnRunFindResponce ~= nil then PALOnRunFindResponce( input ) end
+if pal:RunSelfHooks( "PALOnRunFindResponce", {input} ) == false then return end
 
 	pal["current_responce_importance"] = -999
 	pal["match_level_words_processed_old"] = -1
@@ -407,8 +434,8 @@ for z = 1, searchin do
 	pal["found_tag"]  = false
 	pal["found_tag_at"] = 0
 if string.len( text ) <= 4 then text = text.." " end
-if string.sub( text, 1, 1 ) == pal["runfunctionkey"] then
-	local run, err = load( "return "..string.sub( text, 2, string.len( text ) ) )
+if string.sub( text, 1, 1 ) == pal["runfunctionkey"] and string.sub( text, string.len( text ), string.len( text ) ) == pal["runfunctionkey"] then
+	local run, err = load( "return "..string.sub( text, 2, string.len( text ) ) -1 )
 	pal["found_tag"] = ( run() == true )
 else
 	local starts, ends = string.find( input, text, 1, true )
@@ -438,8 +465,8 @@ for z = 1, #searchin_prior do
 	pal["found_tag"]  = false
 	pal["found_tag_at"] = 0
 if string.len( text ) <= 4 then text = text.." " end
-if string.sub( text, 1, 1 ) == pal["runfunctionkey"] then
-	local exe, null = load( "return"..string.sub( text, 2, string.len( text ) ) )
+if string.sub( text, 1, 1 ) == pal["runfunctionkey"] and string.sub( text, string.len( text ), string.len( text ) ) == pal["runfunctionkey"] then
+	local exe, null = load( "return"..string.sub( text, 2, string.len( text ) -1 ) )
 	pal["found_tag"]  = ( exe() == true )
 else
 	local starts, ends = string.find( input, text, 1, true )
@@ -476,6 +503,7 @@ if importance >= pal["current_responce_importance"] then --checks acceptablity
 end
 
 if currentresponceindex ~= -1 then
+if pal:RunSelfHooks( "PALOnRunFindResponceFound", {currentresponceindex} ) == false then return end
 	return currentresponceindex
    end
 end
@@ -485,7 +513,7 @@ function pal:RunAnnoyanceTest( inputindex, input ) --simulate annoyance
 if PALOnRunAnnoyanceTest ~= nil then PALOnRunAnnoyanceTest( inputindex, input, annoyedlevel ) end
 if annoyedlevel >= 1 then
 if annoyedlevel >= pal["annoyance_maxlevel"] then
-	return pal:GetAnnoyanceRespoce( 1 )..input
+	return input..pal:GetAnnoyanceRespoce( 1 )
 else
 	return pal:GetAnnoyanceRespoce( 2 )
    end
@@ -494,18 +522,32 @@ end
 end
 
 function pal:RunLuaCodeInResponce( input ) --exacutes any lua code in a responce from the responce section of infomation 
-if PALOnRunLuaCodeInResponce ~= nil then PALOnRunLuaCodeInResponce( input ) end
+if pal:RunSelfHooks( "PALOnRunLuaCodeInResponce", {input} ) == false then return end
 
-	local point, null = string.find( input, pal["runfunctionkey"], 1, true )
-if point ~= nil then
+	local outstring = input
+	local stringdiffreance = 0
+	local pointa = 0
+	local pointb = 0
 
-	local exe, null = load( string.sub( input, point, string.len( input ) ) )
-	local result = exe()
-	
+for z = 1, string.len( input ) do
+if string.sub( input, z, z ) == pal["runfunctionkey"] then
+if pointa == 0 then pointa = z else pointb = z end
+if pointa ~= 0 and pointb ~= 0 then
+  
+	local exe, null = load( string.sub( input, pointa +1, pointb -1 ) )
+	local result = exe()  
+  
 if result ~= nil then
-	return result
-      end
-   end
+	outstring = string.sub( outstring, 1, pointa -1 +stringdiffreance )..result..string.len( outstring, pointb +1 +stringdiffreance, string.len( outstring ) )
+	stringdiffreance = string.len( outstring ) -string.len( input )	
+end
+	pointa, pointb = 0, 0
+      end  
+   end 
+end
+
+if pal:RunSelfHooks( "PALOnRunLuaCodeInResponceChange", {input,outstring} ) == false then return end
+return outstring
 end
 
 function pal:BuildResponceTo( input ) --USE THIS TO GET THE AI TO MAKE A RESPONCE TO THE INPUT

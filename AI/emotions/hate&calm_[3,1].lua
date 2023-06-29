@@ -28,29 +28,6 @@
 	"ticked off",
 	}
 
-	local sentanceappending = { --how to end a sentance when feeling this emotion
-	"Now leave me alone fool.",
-	"Now stop bothering me jackass.",
-	"Now wil that be all loser.",
-	"Stop talking to me now if you can mnage it you fool.",
-	"Now get lost.",
-	"Now get lost you pain in the butt.",
-	"Now leave me alone you little pest.",
-	"Now leave me alone you little butt head.",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	"",
-	}
+	local sentanceappending = nil
 
 pal:AddNewEmotion( {1,1}, emotionalwords, wordstomaketheaifeelthis, emotionclass, sentanceappending )

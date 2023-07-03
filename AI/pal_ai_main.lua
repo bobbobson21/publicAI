@@ -552,9 +552,9 @@ end
 
 function pal:BuildResponceTo( input ) --USE THIS TO GET THE AI TO MAKE A RESPONCE TO THE INPUT
 	local master = input
-
-if PALOnBuildResponceTo ~= nil then PALOnBuildResponceTo( input ) end
+	
 function pal:BRTGetTextToRespondTo() return master end
+if pal:RunSelfHooks( "PALOnBuildResponceTo", {input} ) == false then return end
 
 self:RunLoopSimulation()
 	master = self:RunSpellCheck( master )
@@ -592,7 +592,7 @@ pal:RunLoopSimulation()
 -- end of main ai loop and start of loading external data ----------------------------------------------------------------------------------------------------
 
 function pal:SaveInfo() --saves all info added to AI after intal loading
-if PALOnSaveInfo ~= nil then PALOnSaveInfo() end
+if pal:RunSelfHooks( "PALOnSaveInfo", {} ) == false then return end
 
 	local addresponcesfiledata = "" --start of saveing responce file data
 
@@ -645,38 +645,38 @@ file:close()
 end
 
 function pal:LoadInfo()
-if PALOnLoadInfo ~= nil then PALOnLoadInfo() end
+if pal:RunSelfHooks( "PALOnLoadInfo", {} ) == false then return end
 	local file =io.open( pal["save_directory"].."/".."main_save.dat" ,"r")
 if file ~=nil then io.close( file ); file = true else file = false end
 if file == true then dofile( pal["save_directory"].."/".."main_save.dat" ) end
 end
 
 function pal:SetRestorePoint() --sets a restore point that we can undo to which is useful for siturations where you may have more then one pal AI but only have one pal file
-if PALOnSetRestorePoint ~= nil then PALOnSetRestorePoint() end
-if PAL_RESTORE_TABLE == nil then PAL_RESTORE_TABLE = {}
-for k, v in pairs( pal["annoyance_responcecounter"] ) do
+if pal:RunSelfHooks( "PALOnSetRestorePoint", {} ) == false then return end
+if PAL_RESTORE_TABLE == nil then PAL_RESTORE_TABLE = {} end
+
+for k, v in pairs( pal ) do
 if k ~= "last_sim_time" then
 if type( v ) == "table" then
-for l, w in pairs( pal["annoyance_responcecounter"][k] ) do
-	PAL_RESTORE_TABLE[k] = w
+for l, w in pairs( pal[k] ) do
+	PAL_RESTORE_TABLE[k][l] = w
 end
 else
 	PAL_RESTORE_TABLE[k] = v
-	        end
          end
       end
    end
 end
 
 function pal:LoadRestorePoint() --loades restore point
-if PALOnLoadRestorePoint ~= nil then PALOnLoadRestorePoint() end
+if pal:RunSelfHooks( "PALOnLoadRestorePoint", {} ) == false then return end
 if PAL_RESTORE_TABLE ~= nil then
 	pal = nil
 	pal = PAL_RESTORE_TABLE
    end
 end
 
-local test = dofile( current_dir.."/AI/loads.lua" )
+dofile( current_dir.."/AI/loads.lua" )
 
 	inruntime = true
 	

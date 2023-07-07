@@ -6,6 +6,11 @@
 	"mean",
 	"pesting",
 	"bad",
+	"streser",
+	"annoyer",
+	"annoying",
+	"tenseing",
+	"demanding",
 	}
 
 	local wordstomaketheaifeelthis = { --words to use that make the AI feel like this note all content from the emotionalwords tbl will also be added to this one and you should only use this for sware words and stuff like that
@@ -15,28 +20,41 @@
 	"bitch",
 	"ass",
 	"douch",
+	"hurry up",
+	"be faster",
+	"slow",
+	"dumb",
+	"try again",
 	}
 
 	local emotionclass = { --how the ai feels
 	"angry",
+	"stressed",
 	"inranged",
+	"bothered",
 	"annoyed",
+	"worried",
 	"pissed off",
+	"tense",
 	"upset",
+	"nervous",
 	"displeased",
+	"troubled",
 	"sad",
+	"strained",
 	"ticked off",
+	"hassled",
 	}
 
 	local sentanceappending = { --how to end a sentance when feeling this emotion
-	"Now leave me alone fool.",
-	"Now stop bothering me jackass.",
-	"Now wil that be all loser.",
-	"Stop talking to me now if you can manage it you fool.",
+	"Now leave me alone please.",
+	"Now stop bothering me.",
+	"Now can you just leave",
+	"Stop talking to me now if you can mnage it you fool.",
 	"Now get lost.",
-	"Now get lost you pain in the butt.",
-	"Now leave me alone you little pest.",
-	"Now leave me alone you little butt head.",
+	"Now get lost please.",
+	"Now leave me alone please,",
+	"Now leave me alone I just want some peace.",
 	"",
 	"",
 	"",
@@ -53,4 +71,4 @@
 	"",
 	}
 
-pal:AddNewEmotion( {1,1}, emotionalwords, wordstomaketheaifeelthis, emotionclass, sentanceappending )
+pal:AddNewEmotion( {2,1}, emotionalwords, wordstomaketheaifeelthis, emotionclass, sentanceappending )

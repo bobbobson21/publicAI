@@ -683,6 +683,4 @@ dofile( current_dir.."/AI/loads.lua" )
 pal:LoadInfo()
 pal:SetRestorePoint()
 
---do code for convo start here
-
 return pal

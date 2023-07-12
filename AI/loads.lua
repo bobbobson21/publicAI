@@ -4,6 +4,11 @@ for z = 1, string.len( current_dir ) do if string.sub( current_dir, z, z ) == st
 cdc:close()
 
 dofile( current_dir.."/AI/IDKresponces/idkdata.lua" )
-dofile( current_dir.."/AI/emotions/nutral_[3,2].lua" )
-dofile( current_dir.."/AI/emotions/love&calm_[3,3].lua" )
+
 dofile( current_dir.."/AI/emotions/hate&anger_[1,1].lua" )
+dofile( current_dir.."/AI/emotions/hate&calm_[3,1].lua" )
+dofile( current_dir.."/AI/emotions/hate&stress_[2,1].lua" )
+dofile( current_dir.."/AI/emotions/love&calm_[3,3].lua" )
+dofile( current_dir.."/AI/emotions/nutral_[3,2].lua" )
+
+pal:SetRestorePoint()

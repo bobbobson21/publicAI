@@ -557,6 +557,7 @@ function pal:BRTGetTextToRespondTo() return master end
 if pal:RunSelfHooks( "PALOnBuildResponceTo", {input} ) == false then return end
 
 self:RunLoopSimulation()
+
 	master = self:RunSpellCheck( master )
 self:RunAjustEmotionToEmotiveKeyWords( master ) --remove here to remove emotion change
 
@@ -564,10 +565,14 @@ self:RunAjustEmotionToEmotiveKeyWords( master ) --remove here to remove emotion 
 	local outputdata = self:GetInfoByIndex( outputindex )
 
 function pal:BRTGetInfoIndex() return outputindex end
-if outputindex == nil then return self:GetIDKresponce() end
+if outputindex == nil then
+	local str = pal:RunSelfHooks( "PALOnIDKoutput", {input} )
+if str ~= nil and str ~= false then return str end
+return self:GetIDKresponce() 
+end
 	
 	local outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )]..outputdata["append"]
-
+	
 if outputdata["a"] ~= false then outputresponce = self:RunAnnoyanceTest( outputindex, outputresponce ) end
 
 	pal["emotion_change"][1] = pal["emotion_change"][1] +outputdata["ec"][1]  --remove here to remove emotion change
@@ -583,6 +588,8 @@ end
 
 	pal["prior_input"] = input --used in the prior search
 	outputresponce = pal:RunLuaCodeInResponce()
+	
+if pal:RunSelfHooks( "PALOnGotResponce", {outputresponce} ) == false then return end
 	
 return outputresponce
 end
@@ -657,13 +664,7 @@ if PAL_RESTORE_TABLE == nil then PAL_RESTORE_TABLE = {} end
 
 for k, v in pairs( pal ) do
 if k ~= "last_sim_time" then
-if type( v ) == "table" then
-for l, w in pairs( pal[k] ) do
-	PAL_RESTORE_TABLE[k][l] = w
-end
-else
 	PAL_RESTORE_TABLE[k] = v
-         end
       end
    end
 end

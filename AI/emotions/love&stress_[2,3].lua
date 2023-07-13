@@ -6,29 +6,37 @@
 	"lovely",
 	"good",
 	"caring",
+	"stressing",
+	"problmatic",
+	"stress induceing",
+	"mean",
+	"disappointment",
 	}
 
 	local wordstomaketheaifeelthis = { --words to use that make the AI feel like this note all content from the emotionalwords tbl will also be added to this one and you should only use this for sware words and stuff like that
-
+	"fucker",
+	"cunt",
+	"dick",
+	"bitch",
+	"ass",
+	"douch",
 	}
 
 	local emotionclass = { --how the ai feels
-	"happy",
-	"good",
-	"positive",
-	"infaturted",
-	"calm",
-	"good",
-	"contempt",
+	"stressed",
+	"unsure",
+	"uneasy",
+	"worried",
+	"concerned",
 	}
 
 	local sentanceappending = { --how to end a sentance when feeling this emotion
-	"Hope we talk again soon.",
-	"See you later.",
-	"See you later alagator.",
-	"Byyyyeeeeee.",
-	"See you later lovely.",
-	"See you later cutie.",
+	"can you try and be a bit calmer",
+	"See you later loud mouth", --
+	"Bye.",
+	"Oh and calm down ok.",
+	"Please be nicer from now on.",
+	"Dont disappoint me with your words again.",
 	"",
 	"",
 	"",
@@ -36,4 +44,4 @@
 	"",
 	}
 
-pal:AddNewEmotion( {3,3}, emotionalwords, wordstomaketheaifeelthis, emotionclass, sentanceappending )
+pal:AddNewEmotion( {2,3}, emotionalwords, wordstomaketheaifeelthis, emotionclass, sentanceappending )

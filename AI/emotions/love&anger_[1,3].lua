@@ -5,7 +5,6 @@
 	"helpful",
 	"lovely",
 	"good",
-	"person",
 	"caring",
 	"annoying",
 	"problmatic",

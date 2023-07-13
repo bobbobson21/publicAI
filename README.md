@@ -8,8 +8,9 @@ the modual folder should contain things like learning code and running maths cod
 structer infomation files like how it is done below if you want the AI to be fast:
 
 ```
-function PALOnBuildResponceTo( input )
+SetNewSelfHook( "PALOnRunSpellCheck", "RANDOMNAME", function( input )
 pal:LoadRestorePoint() --RESTORS THE AI TO BEFORE ANYTHING WAS ADDED EFFECTIVLY REMOOVEING ALL THE INOFOMATION BELOW SO THAT IT OR SOMETHING ELSE CAN BE ADDED AGAIN
+pal:LoadInfo() --loads all save data
 if string.find( input, "who", 1, true ) ~= nil then
 --QUESTION INFO
 end
@@ -19,7 +20,7 @@ end
 if string.find( input, "you", 1, true ) ~= nil then
 --OPIOION INFO
    end
-end
+end)
 ```
  
 # using

@@ -55,4 +55,4 @@
 	"",
 	}
 
-pal:AddNewEmotion( {1,2}, emotionalwords, wordstomaketheaifeelthis, emotionclass, sentanceappending )
+pal:AddNewEmotion( {2,2}, emotionalwords, wordstomaketheaifeelthis, emotionclass, sentanceappending )

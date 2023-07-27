@@ -15,5 +15,6 @@ dofile( current_dir.."/AI/emotions/love&stress_[2,3].lua" )
 dofile( current_dir.."/AI/emotions/indiffrent&anger_[1,2].lua" )
 dofile( current_dir.."/AI/emotions/indiffrent&stress_[2,2].lua" )
 
+dofile( current_dir.."/AI/infomation/infomodel.lua" )
 
 pal:SetRestorePoint()

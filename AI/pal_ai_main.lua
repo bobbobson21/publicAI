@@ -113,7 +113,7 @@ if id == pal["info_database_added"][z]["id"] then pal["info_database_added"][z] 
 end
 
 function pal:SetNewInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subresponces, id, append ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier even functions like "֍hi( true )"
-if RunSelfHooks( "PALOnSetNewInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subresponces,id,append} ) == false then return end
+if pal:RunSelfHooks( "PALOnSetNewInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subresponces,id,append} ) == false then return end
 for z = 1, #searchfor do
 for y = 1, #pal["searchfor_groups"] do
 if searchfor[z] == "@"..pal["searchfor_groups"][y]["groupname"] then 
@@ -136,7 +136,7 @@ end
 
 	pal["info_database"][#pal["info_database"] +1] = {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subresponces"]=subresponces,["id"]=id,["append"]=append}
 if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
-for z = 1, pal["info_database_removed"] do
+for z = 1, #pal["info_database_removed"] do
 if pal["info_database_removed"][z] == id then pal["info_database_removed"][z] = nil end
    end
 end
@@ -420,16 +420,17 @@ if pal:RunSelfHooks( "PALOnRunFindResponce", {input} ) == false then return end
 	local currentresponceindex = -1
 
 for index = 1, #pal["info_database"] do --searches thougth all infomation in pal's info_database
+if pal["info_database"] ~= nil then
 
 	pal["match_level_length_processed"] = 0
 	pal["match_level_words_processed"] = 0
 
-	local searchin = pal["info_database"][z]["sf"]
-	local searchin_prior = pal["info_database"][z]["sfl"]
-	local importance = pal["info_database"][z]["i"]
+	local searchin = pal["info_database"][index]["sf"]
+	local searchin_prior = pal["info_database"][index]["sfl"]
+	local importance = pal["info_database"][index]["i"] or 0
 
 if searchin ~= nil then --checks to see if the text the player entered shares enougth words with the current infomation being searched thougth
-for z = 1, searchin do
+for z = 1, #searchin do
 	local text = searchin[z]
 	pal["found_tag"]  = false
 	pal["found_tag_at"] = 0
@@ -497,6 +498,7 @@ if importance >= pal["current_responce_importance"] then --checks acceptablity
 	pal["current_responce_importance"] = importance --updates minmal acceptablity level
 	currentresponceindex = index
 
+            end
          end
       end
    end
@@ -510,18 +512,23 @@ end
 
 function pal:RunAnnoyanceTest( inputindex, input ) --simulate annoyance
 	local annoyedlevel = pal["annoyance_responcecounter"][inputindex] or 0
-if PALOnRunAnnoyanceTest ~= nil then PALOnRunAnnoyanceTest( inputindex, input, annoyedlevel ) end
-if annoyedlevel >= 1 then
-if annoyedlevel >= pal["annoyance_maxlevel"] then
-	return input..pal:GetAnnoyanceRespoce( 1 )
-else
-	return pal:GetAnnoyanceRespoce( 2 )
-   end
-end
+if pal:RunSelfHooks( "PALOnRunAnnoyanceTest", {inputindex, input, annoyedlevel} ) == false then return end
+
 	pal["annoyance_responcecounter"][inputindex] = math.min( annoyedlevel +1, pal["annoyance_maxlevel"] +1 )
+
+if annoyedlevel >= 2 then
+if annoyedlevel >= pal["annoyance_maxlevel"] then
+   return input..pal:GetAnnoyanceRespoce( 1 )
+else
+   return pal:GetAnnoyanceRespoce( 2 )
+end
+else
+   return input
+   end
 end
 
 function pal:RunLuaCodeInResponce( input ) --exacutes any lua code in a responce from the responce section of infomation 
+--if input == nil then return end
 if pal:RunSelfHooks( "PALOnRunLuaCodeInResponce", {input} ) == false then return end
 
 	local outstring = input
@@ -571,12 +578,12 @@ if str ~= nil and str ~= false then return str end
 return self:GetIDKresponce() 
 end
 	
-	local outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )]..outputdata["append"]
+	local outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )]..( outputdata["append"] or "" )
 	
 if outputdata["a"] ~= false then outputresponce = self:RunAnnoyanceTest( outputindex, outputresponce ) end
 
-	pal["emotion_change"][1] = pal["emotion_change"][1] +outputdata["ec"][1]  --remove here to remove emotion change
-	pal["emotion_change"][2] = pal["emotion_change"][2] +outputdata["ec"][2]  --remove here to remove emotion change
+	pal["emotion_level"][1] = pal["emotion_level"][1] +outputdata["ec"][1]  --remove here to remove emotion change
+	pal["emotion_level"][2] = pal["emotion_level"][2] +outputdata["ec"][2]  --remove here to remove emotion change
 	pal["emotion_level"][1] = math.max( 1, math.min( pal["emotion_grid_max_size"], pal["emotion_level"][1] ) ) --remove here to remove emotion change
 	pal["emotion_level"][2] = math.max( 1, math.min( pal["emotion_grid_max_size"], pal["emotion_level"][2] ) ) --remove here to remove emotion change
 
@@ -587,7 +594,7 @@ self:AddInfoTbl( outputdata["subresponces"][z] )
 end
 
 	pal["prior_input"] = input --used in the prior search
-	outputresponce = pal:RunLuaCodeInResponce()
+	outputresponce = pal:RunLuaCodeInResponce( outputresponce )
 	
 if pal:RunSelfHooks( "PALOnGotResponce", {outputresponce} ) == false then return end
 	

@@ -9,6 +9,6 @@ cdc:close()
 io.write( "user: " )
 	local input = io.read()
 print( "" )
-print( "AI: "..AI:BuildResponceTo( input ) )
+print( "AI: "..tostring( AI:BuildResponceTo( input ) ) )
 print( "" )
 goto talk_start

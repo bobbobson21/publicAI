@@ -28,13 +28,7 @@ cdc:close()
 	pal["annoyance_responces"] = {}
 	pal["searchfor_groups"] = {}
 	pal["sandbox"] = {["funcs"]={},}
-	pal["runfunctionkey"] = "֍"
-	pal["match_level_length_processed"] = -1
-	pal["match_level_words_processed"] = -1
-	pal["match_level_words_processed_old"] = -1
-	pal["current_responce_importance"] = -999
-	pal["found_tag"] = false
-	pal["found_tag_at"] = 0
+	pal["runfunctionkey"] = "|"
 	pal["save_directory"] = ( current_dir ).."/savdata"
 
 -- end of seting pal vars start of data control functions ----------------------------------------------------------------------------------------------------
@@ -73,15 +67,15 @@ end
 if #returns <= 1 then return returns[1] else return unpack( returns ) end --we only use unpack here because there is no way you should need to loop througth returned data
 end
 
-function pal:notrequiredtag( tag ) --for tags you want it to seach for but only mark down the result and not desqalify it if result cant be found
+function pal:nrt( tag ) --for tags you want it to seach for but only mark down the result and not desqalify it if result cant be found
 	local starts, ends = string.find( self:BRTGetTextToRespondTo(), tag, 1, true )
+	local strlen = 0
 if starts ~= nil then
-	pal["match_level_length_processed"] = pal["match_level_length_processed"] -1
+	pal["match_level_length_processed"] = pal["match_level_length_processed"] -string.len( tag )
 	pal["match_level_words_processed"] = pal["match_level_words_processed"] -1
-else
-	pal["found_tag_at"] = ends
+	strlen = string.len( tag )
 end
-return true
+return true, strlen
 end
 
 function pal:AddNewTagGroup( name, collection ) --a collection of tags which if refrenced like so @TAG_NAME, in the search for sections of added info will be replaced with collection
@@ -430,19 +424,21 @@ if pal["info_database"] ~= nil then
 	local importance = pal["info_database"][index]["i"] or 0
 
 if searchin ~= nil then --checks to see if the text the player entered shares enougth words with the current infomation being searched thougth
-for z = 1, #searchin do
-	local text = searchin[z]
 	pal["found_tag"]  = false
 	pal["found_tag_at"] = 0
+for z = 1, #searchin do
+	local text = searchin[z]
 if string.len( text ) <= 4 then text = text.." " end
 if string.sub( text, 1, 1 ) == pal["runfunctionkey"] and string.sub( text, string.len( text ), string.len( text ) ) == pal["runfunctionkey"] then
-	local run, err = load( "return "..string.sub( text, 2, string.len( text ) ) -1 )
-	pal["found_tag"] = ( run() == true )
+	local run, err = load( "return "..string.sub( text, 2, string.len( text ) -1 ) )
+	local ft, fta = run()
+	pal["found_tag"] = ( ft == true )
+	pal["found_tag_at"] = pal["found_tag_at"] +( fta or 999999 )
 else
 	local starts, ends = string.find( input, text, 1, true )
 if starts ~= nil then
-	pal["found_tag"]  = true
-	pal["found_tag_at"] = ends
+	pal["found_tag"] = true
+	pal["found_tag_at"] = pal["found_tag_at"] +string.len( text )
    end
 end
 
@@ -452,28 +448,30 @@ if pal["found_tag_at"] >= pal["match_level_length_processed"] then
 	pal["match_level_length_processed"] = pal["found_tag_at"]
 	pal["match_level_words_processed"] = pal["match_level_words_processed"] +1
 else
-	pal["found_tag_at"] = -999
+	pal["found_tag_at"] = -99999999
 end
 else
-	pal["found_tag_at"] = -999
-      end 
-   end
+	pal["found_tag_at"] = -99999999
+   end 
+end
+if pal["match_level_words_processed"] >= #searchin then pal["found_tag_at"] = -99999999 end
 end
 
 if searchin_prior ~= nil then --checks to see if the text the player entered previously shares enougth words with the current infomation being searched thougth
+	pal["found_tag"]  = false
 for z = 1, #searchin_prior do
 	local text = searchin_prior[z]
-	pal["found_tag"]  = false
-	pal["found_tag_at"] = 0
 if string.len( text ) <= 4 then text = text.." " end
 if string.sub( text, 1, 1 ) == pal["runfunctionkey"] and string.sub( text, string.len( text ), string.len( text ) ) == pal["runfunctionkey"] then
-	local exe, null = load( "return"..string.sub( text, 2, string.len( text ) -1 ) )
-	pal["found_tag"]  = ( exe() == true )
+	local run, null = load( "return"..string.sub( text, 2, string.len( text ) -1 ) )
+	local ft, fta = run()
+	pal["found_tag"] = ( ft == true )
+	pal["found_tag_at"] = pal["found_tag_at"] +( fta or 0 )
 else
 	local starts, ends = string.find( input, text, 1, true )
 if starts ~= nil then
 	pal["found_tag"]  = true
-	pal["found_tag_at"] = ends
+	pal["found_tag_at"] = pal["found_tag_at"] +string.len( text )
    end
 end
 
@@ -482,10 +480,10 @@ if pal["found_tag_at"] >= pal["match_level_length_processed"] then
 	pal["match_level_length_processed"] = pal["found_tag_at"]
 	pal["match_level_words_processed"] = pal["match_level_words_processed"] +1
 else
-	pal["found_tag_at"] = -999
+	pal["found_tag_at"] = -99999999
 end
 else
-	pal["found_tag_at"] = -999
+	pal["found_tag_at"] = -99999999
       end 
    end 
 end

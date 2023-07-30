@@ -3,8 +3,6 @@
 for z = 1, string.len( current_dir ) do if string.sub( current_dir, z, z ) == string.char( 92 ) then current_dir = string.sub( current_dir, 1, z -1 ).."/"..string.sub( current_dir, z +1, string.len( current_dir ) ) end end
 cdc:close()
 
-dofile( current_dir.."/AI/IDKresponces/idkdata.lua" )
-
 dofile( current_dir.."/AI/emotions/nutral_[3,2].lua" )
 dofile( current_dir.."/AI/emotions/hate&anger_[1,1].lua" )
 dofile( current_dir.."/AI/emotions/hate&calm_[3,1].lua" )
@@ -14,6 +12,10 @@ dofile( current_dir.."/AI/emotions/love&anger_[1,3].lua" )
 dofile( current_dir.."/AI/emotions/love&stress_[2,3].lua" )
 dofile( current_dir.."/AI/emotions/indiffrent&anger_[1,2].lua" )
 dofile( current_dir.."/AI/emotions/indiffrent&stress_[2,2].lua" )
+
+dofile( current_dir.."/AI/IDKresponces/idkdata.lua" )
+
+dofile( current_dir.."/AI/annoyance/annoyence_res.lua" )
 
 dofile( current_dir.."/AI/infomation/infomodel.lua" )
 

@@ -24,7 +24,7 @@ cdc:close()
 	pal["annoyance_maxlevel"] = 4
 	pal["annoyance_responcecounter"] = {}
 	pal["annoyance_responces_attachment"] = {}
-	pal["annoyance_decreese_in"] = 60
+	pal["annoyance_decreese_in"] = 15
 	pal["annoyance_responces"] = {}
 	pal["searchfor_groups"] = {}
 	pal["sandbox"] = {["funcs"]={},}
@@ -67,7 +67,7 @@ end
 if #returns <= 1 then return returns[1] else return unpack( returns ) end --we only use unpack here because there is no way you should need to loop througth returned data
 end
 
-function pal:nrt( tag ) --for tags you want it to seach for but only mark down the result and not desqalify it if result cant be found
+function pal:NRT( tag ) --for tags you want it to seach for but only mark down the result and not desqalify it if result cant be found
 	local starts, ends = string.find( self:BRTGetTextToRespondTo(), tag, 1, true )
 	local strlen = 0
 if starts ~= nil then
@@ -292,13 +292,13 @@ end
 
 function pal:SetNewAnnoyanceRespoces( level, responce ) --for if you ask the same question to many times
 if pal:RunSelfHooks( "PALOnSetNewAnnoyanceRespoces", {level,responce} ) == false then return end
-if leve == 1 then pal["annoyance_responces_attachment"][#pal["annoyance_responces_attachment"] +1] = responce end --at level 1 it will still awnser questions and stuff but it will tell you this is getting annoying
-if leve == 2 then pal["annoyance_responces"][#pal["annoyance_responces"] +1] = responce end --at level 2 it will refuse to awnser questions
+if level == 1 then pal["annoyance_responces_attachment"][#pal["annoyance_responces_attachment"] +1] = responce end --at level 1 it will still awnser questions and stuff but it will tell you this is getting annoying
+if level == 2 then pal["annoyance_responces"][#pal["annoyance_responces"] +1] = responce end --at level 2 it will refuse to awnser questions
 end
 
 function pal:GetAnnoyanceRespoce( level ) --for if you ask the same question to many times
-if leve == 1 then return pal["annoyance_responces_attachment"][math.random( 1, #pal["annoyance_responces_attachment"] )] end
-if leve == 2 then return pal["annoyance_responces"][math.random( 1, #pal["annoyance_responces"] )] end
+if level == 1 then return pal["annoyance_responces_attachment"][math.random( 1, #pal["annoyance_responces_attachment"] )] end
+if level == 2 then return pal["annoyance_responces"][math.random( 1, #pal["annoyance_responces"] )] end
 end
 
 function pal:SetPriorInput( text ) --sets the previous thing the player said
@@ -323,14 +323,15 @@ function pal:EmotionGravatate() --allows for emotion to go back to normal levels
 end
 
 function pal:AnnoyanceDecreese() --allows for annoyence to war off over time
-if pal["annoyance_level"] == nil or pal["annoyance_level"] <= 0 then
+if pal["annoyance_decreese_time"] == nil then pal["annoyance_decreese_time"] = pal["annoyance_decreese_in"] end
+	pal["annoyance_decreese_time"] = pal["annoyance_decreese_time"] -1
+if pal["annoyance_decreese_time"] <= 0 then
+	pal["annoyance_decreese_time"] = nil
 for k, v in pairs( pal["annoyance_responcecounter"] ) do
-	v = v -1
+	pal["annoyance_responcecounter"][k] = pal["annoyance_responcecounter"][k] -1
 if v <= 0 then pal["annoyance_responcecounter"][k] = nil end
-end
-	pal["annoyance_level"] = pal["annoyance_maxlevel"] +1
-end
-	pal["annoyance_level"] = pal["annoyance_level"] -1
+      end
+   end
 end
 
 function pal:DegradeInfo() --dose the actually info degradeing
@@ -353,7 +354,8 @@ end
 
 function pal:RunLoopSimulation()
 if pal["last_sim_time"] == nil then pal["last_sim_time"] = os.time() end
-	local simlen = os.time() -pal["last_sim_time"]	
+	local simlen = os.time() -pal["last_sim_time"]
+	pal["last_sim_time"] = os.time()	
 for z = 1, simlen do pal:Loop() end
 end
 
@@ -512,13 +514,13 @@ function pal:RunAnnoyanceTest( inputindex, input ) --simulate annoyance
 	local annoyedlevel = pal["annoyance_responcecounter"][inputindex] or 0
 if pal:RunSelfHooks( "PALOnRunAnnoyanceTest", {inputindex, input, annoyedlevel} ) == false then return end
 
-	pal["annoyance_responcecounter"][inputindex] = math.min( annoyedlevel +1, pal["annoyance_maxlevel"] +1 )
+	pal["annoyance_responcecounter"][inputindex] = math.min( annoyedlevel +1, pal["annoyance_maxlevel"] )
 
-if annoyedlevel >= 2 then
+if annoyedlevel >= 1 then
 if annoyedlevel >= pal["annoyance_maxlevel"] then
-   return input..pal:GetAnnoyanceRespoce( 1 )
+	return pal:GetAnnoyanceRespoce( 2 )
 else
-   return pal:GetAnnoyanceRespoce( 2 )
+   return input.." "..pal:GetAnnoyanceRespoce( 1 )
 end
 else
    return input
@@ -526,7 +528,7 @@ else
 end
 
 function pal:RunLuaCodeInResponce( input ) --exacutes any lua code in a responce from the responce section of infomation 
---if input == nil then return end
+if input == nil then return end
 if pal:RunSelfHooks( "PALOnRunLuaCodeInResponce", {input} ) == false then return end
 
 	local outstring = input
@@ -576,7 +578,7 @@ if str ~= nil and str ~= false then return str end
 return self:GetIDKresponce() 
 end
 	
-	local outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )]..( outputdata["append"] or "" )
+	local outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )]..( outputdata["sentanceappending"] or "" )
 	
 if outputdata["a"] ~= false then outputresponce = self:RunAnnoyanceTest( outputindex, outputresponce ) end
 

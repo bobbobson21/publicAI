@@ -1,0 +1,1 @@
+pal:AddSpellChecking( "hello", "helo", "heloo", "hrllo", "heiio", "heooo", "uello", "hwllo", "hell9o", "hell0", "hell9", "hello0" ) 

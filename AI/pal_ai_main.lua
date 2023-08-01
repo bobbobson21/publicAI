@@ -229,7 +229,7 @@ if #results <= 1 then return results[1] else return results end
 end
 
 function pal:AddSpellChecking( correct, ... ) --spellchecker
-if RunSelfHooks( "PALOnAddSpellChecking", {correct,...} ) == false then return end
+if pal:RunSelfHooks( "PALOnAddSpellChecking", {correct,...} ) == false then return end
 	pal["spellchecking"][#pal["spellchecking"] +1] = {["c"]=correct,["i"]={...}}
 end
 
@@ -365,7 +365,8 @@ if pal:RunSelfHooks( "PALOnRunSpellCheck", {input} ) == false then return end
 	local nul = 0
 for z = 1, #pal["spellchecking"] do
 for y = 1, #pal["spellchecking"][z]["i"] do
-	mstr, nul = string.gsub( mstr, pal["spellchecking"][z]["i"][y].." ", pal["spellchecking"]["c"][z].." " )
+	mstr, nul = string.gsub( mstr, pal["spellchecking"][z]["i"][y].." ", pal["spellchecking"][z]["c"].." " )
+if input == pal["spellchecking"][z]["i"][y] then mstr = pal["spellchecking"][z]["c"] end
    end
 end
 return mstr

@@ -616,16 +616,16 @@ for z = 1, #pal["info_database_added"] do
 	local responces = ""
 	local subresponces = ""
 
-for y = 1, pal["info_database_added"][z]["responces"] do --reformats responces so thay can be saved with ease
+for y = 1, currententry["responces"] do --reformats responces so thay can be saved with ease
 if responces == "" then
-responces = responces..pal["info_database_added"][z]["responces"][y]
+responces = responces..currententry["responces"][y]
 else
-responces = responces..","..pal["info_database_added"][z]["responces"][y]
+responces = responces..","..currententry[z]["responces"][y]
    end
 end
 
-for y = 1, pal["info_database_added"][z]["subresponces"] do --reformats sub responces so thay can be saved with ease
-	local currententryB = pal["info_database_added"][z]["subresponces"][y]
+for y = 1, pal["info_database_added"][z]["subresponces"] do --reformats sub info so thay can be saved with ease
+	local currententryB = currententry["subresponces"][y]
 	local currentdata = "{['sf']="..currententryB["sf"]..",['sfl']="..currententryB["sfl"]..",['ec']="..currententryB["ec"]..",['a']="..currententryB["a"]..",['i']="..currententryB["i"]..",['id']="..currententryB["id"]..",['append']="..currententryB["append"].."}"
 if subresponces == "" then
 subresponces = subresponces..currentdata
@@ -635,9 +635,9 @@ subresponces = subresponces..","..currentdata
 end
 	
 
-	local currentdata = "pal:AddInfo( "..tostring( currententry["sf"] )..", "..tostring( currententry["sfl"] )..", {"..tostring( currententry["ec"][1] )..","..tostring( currententry["ec"][2] ).."}, "..tostring( currententry["a"] )..", "..tostring( currententry["i"] )..", {"..tostring( responces ).."}, {"..tostring( subresponces ).."}, "..tostring( currententry["id"] )..", "..tostring( currententry["append"] ).." )"
+	local currentline = "pal:AddInfo( "..tostring( currententry["sf"] )..", "..tostring( currententry["sfl"] )..", {"..tostring( currententry["ec"][1] )..","..tostring( currententry["ec"][2] ).."}, "..tostring( currententry["a"] )..", "..tostring( currententry["i"] )..", {"..tostring( responces ).."}, {"..tostring( subresponces ).."}, "..tostring( currententry["id"] )..", "..tostring( currententry["append"] ).." )"
 if addresponcesfiledata == "" then --responce saveing
-addresponcesfiledata = addresponcesfiledata..currentdata
+addresponcesfiledata = addresponcesfiledata..currentline
 else
 addresponcesfiledata = addresponcesfiledata..string.char( 10 )..currentdata
    end
@@ -646,7 +646,7 @@ end
 for z = 1, #pal["info_database_removed"] do --deleted responces saveing
 	local currententry = pal["info_database_removed"][z]
 	local currentdata = "pal:RemoveInfo( "..currententry.." )"
-	if addresponcesfiledata == "" then
+if addresponcesfiledata == "" then
 addresponcesfiledata = addresponcesfiledata..currentdata
 else
 addresponcesfiledata = addresponcesfiledata..string.char( 10 )..currentdata

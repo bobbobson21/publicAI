@@ -1,1 +1,1 @@
-pal:SetNewInfo( {"|pal:NRT( 'hi' )|","|pal:NRT( 'hello' )|"}, {}, {0,0}, true, nil, {"Hi.","Hi user.","Hello","Hello user."}, {}, nil, nil )
+pal:SetNewInfo( {"|pal:NRT( 'hi' )|","|pal:NRT( 'hello' )|"}, {}, {0,0}, true, 0, {"Hi.","Hi user.","Hello","Hello user."}, {}, nil, nil )

@@ -78,51 +78,58 @@ end
 return true, strlen
 end
 
+function pal:MemGen( name, pronowns ) --connets names to pronows and then puts it into short term memory
+pal:AddSpellChecking( name, pronowns )
+if pal["gender_momory"] == nil then pal["gender_momory"] = {} end
+	pal["gender_momory"][#pal["gender_momory"] +1] = name
+	pal["gender_momory_time"] = 240 --time it takes to lose it's short term memory for pronowns should be 4 minutes
+end
+
+function pal:DegradeInfoOverXCycles( id, cyclesinfostayesinmemory ) --makes info eventually degrades to nothing use to simulates forgetfulness
+if RunSelfHooks( "PALOnDegradeInfoOverXCycles", {id,cyclesinfostayesinmemory} ) == false then return end
+for k, v in pairs( pal["info_degrade_level"] ) do
+if v["id"] == id then
+	pal["info_degrade_level"][k] = cyclesinfostayesinmemory -1
+      end
+   end
+end
+
 function pal:AddNewTagGroup( name, collection ) --a collection of tags which if refrenced like so @TAG_NAME, in the search for sections of added info will be replaced with collection
 if RunSelfHooks( "PALOnAddTagGroup", {name,collection} ) == false then return end
 	pal["searchfor_groups"][#pal["searchfor_groups"] +1] = {["groupname"]=name,["tags"]=collection}
 end
 
-function pal:DegradeInfoOverXCycles( id, cyclesinfostayesinmemory ) --makes info eventually degrades to nothing use to simulates forgetfulness
-if RunSelfHooks( "PALOnDegradeInfoOverXCycles", {id,cyclesinfostayesinmemory} ) == false then return end
-	local index = 0
-for z = 1, #result do
-if result[z]["id"] == id then
-	index = z
-   end
-end
-if pal["info_degrade_level"][index] == nil and index >= 1 then pal["info_degrade_level"][index] = cyclesinfostayesinmemory -1 end
-end
-
 function pal:RemoveInfo( id )
 if RunSelfHooks( "PALOnRemoveInfo", id ) == false then return end
 if inruntime == true then pal["info_database_removed" +1] = id end
-for z = 1, #pal["info_database"] do
-if id == pal["info_database"][z]["id"] then pal["info_database"][z] = nil end
+for k, v in pairs( pal["info_database"] ) do
+if id == v["id"] then pal["info_database"][k] = nil end
 end
    
-for z = 1, #pal["info_database_added"] do
-if id == pal["info_database_added"][z]["id"] then pal["info_database_added"][z] = nil end
+for k, v in pairs( pal["info_database"] ) do
+if id == v["id"] then pal["info_database_added"][k] = nil end
    end   
 end
 
 function pal:SetNewInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subresponces, id, append ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier even functions like "֍hi( true )"
 if pal:RunSelfHooks( "PALOnSetNewInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subresponces,id,append} ) == false then return end
-for z = 1, #searchfor do
+for k, v in pairs( searchfor ) do
 for y = 1, #pal["searchfor_groups"] do
-if searchfor[z] == "@"..pal["searchfor_groups"][y]["groupname"] then 
+if v == "@"..pal["searchfor_groups"][y]["groupname"] then 
+	searchfor[k] = nil
 for x = 1, #pal["searchfor_groups"][y]["tags"] do
-	searchfor[#searchfor +1] = pal["searchfor_groups"][y]["tags"][x]
+	searchfor[#searchfor +1] = "pal:NRT("..pal["searchfor_groups"][y]["tags"][x].."' )"
          end
 	  end
    end
 end
 
-for z = 1, #searchfor_prior do
+for k, v in pairs( searchfor_prior ) do
 for y = 1, #pal["searchfor_groups"] do
-if searchfor_prior[z] == "@"..pal["searchfor_groups"][y]["groupname"] then 
+if v == "@"..pal["searchfor_groups"][y]["groupname"] then 
+	searchfor_prior[k] = nil
 for x = 1, #pal["searchfor_groups"][y]["tags"] do
-	searchfor_prior[#searchfor_prior +1] = pal["searchfor_groups"][y]["tags"][x]
+	searchfor_prior[#searchfor_prior +1] = "pal:NRT("..pal["searchfor_groups"][y]["tags"][x].."' )"
          end
 	  end
    end
@@ -137,26 +144,28 @@ end
 
 function pal:SetNewInfoTbl( tbl ) --an unscure but fast way of adding info
 if RunSelfHooks( "PALOnSetNewInfoTbl", {tbl} ) == false then return end
-
-for z = 1, #searchfor do
+for k, v in pairs( searchfor ) do
 for y = 1, #pal["searchfor_groups"] do
-if searchfor[z] == "@"..pal["searchfor_groups"][y]["groupname"] then 
+if v == "@"..pal["searchfor_groups"][y]["groupname"] then 
+	searchfor[k] = nil
 for x = 1, #pal["searchfor_groups"][y]["tags"] do
-	searchfor[#searchfor +1] = pal["searchfor_groups"][y]["tags"][x]
+	searchfor[#searchfor +1] = "pal:NRT("..pal["searchfor_groups"][y]["tags"][x].."' )"
          end
 	  end
    end
 end
 
-for z = 1, #searchfor_prior do
+for k, v in pairs( searchfor_prior ) do
 for y = 1, #pal["searchfor_groups"] do
-if searchfor_prior[z] == "@"..pal["searchfor_groups"][y]["groupname"] then 
+if v == "@"..pal["searchfor_groups"][y]["groupname"] then
+	searchfor_prior[k] = nil
 for x = 1, #pal["searchfor_groups"][y]["tags"] do
-	searchfor_prior[#searchfor_prior +1] = pal["searchfor_groups"][y]["tags"][x]
+	searchfor_prior[#searchfor_prior +1] = "pal:NRT("..pal["searchfor_groups"][y]["tags"][x].."' )"
          end
 	  end
    end
 end
+
 	pal["info_database"][#pal["info_database"] +1] = tbl
 if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
 for z = 1, pal["info_database_removed"] do
@@ -166,22 +175,23 @@ end
 
 function pal:ReturnInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subresponces, id, append ) --format like so {"word","word","word"}, {"word","from","the","prior","text","responded","to"}, {0.15,0.001}, true, 1, {"hi","bye","gay"}, {ReturnInfo( DATA ),ReturnInfo( DATA )}, "code_for_editing_info", "appends_to_all_responces"
 if RunSelfHooks( "PALOnReturnInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subresponces,id,append} ) == false then return end
-
-for z = 1, #searchfor do
+for k, v in pairs( searchfor ) do
 for y = 1, #pal["searchfor_groups"] do
-if searchfor[z] == "@"..pal["searchfor_groups"][y]["groupname"] then 
+if v == "@"..pal["searchfor_groups"][y]["groupname"] then 
+	searchfor[k] = nil
 for x = 1, #pal["searchfor_groups"][y]["tags"] do
-	searchfor[#searchfor +1] = pal["searchfor_groups"][y]["tags"][x]
+	searchfor[#searchfor +1] = "pal:NRT("..pal["searchfor_groups"][y]["tags"][x].."' )"
          end
 	  end
    end
 end
 
-for z = 1, #searchfor_prior do
+for k, v in pairs( searchfor_prior ) do
 for y = 1, #pal["searchfor_groups"] do
-if searchfor_prior[z] == "@"..pal["searchfor_groups"][y]["groupname"] then 
+if v == "@"..pal["searchfor_groups"][y]["groupname"] then
+	searchfor_prior[k] = nil
 for x = 1, #pal["searchfor_groups"][y]["tags"] do
-	searchfor_prior[#searchfor_prior +1] = pal["searchfor_groups"][y]["tags"][x]
+	searchfor_prior[#searchfor_prior +1] = "pal:NRT("..pal["searchfor_groups"][y]["tags"][x].."' )"
          end
 	  end
    end
@@ -200,7 +210,7 @@ if RunSelfHooks( "PALOnRemoveAllInfo", {} ) == false then return end
 	pal["info_database"] = {}
 end
 
-function pal:GetInfoByIndex( index ) --finds info by the index which repasents it placement it the database
+function pal:GetInfoByIndex( index ) --finds info by the index which repasents its placement it the database
 	local result = pal["info_database"][index]
 if result == nil then return {} end
 return {["sf"]=result["sf"],["sfl"]=result["sfl"],["ec"]=result["ec"],["a"]=result["a"],["i"]=result["i"],["responces"]=result["responces"],["subresponces"]=result["subresponces"],["id"]=result["id"],["append"]=result["append"]}
@@ -208,29 +218,32 @@ end
 
 function pal:GetInfoById( id ) --finds info by id
 	local results = {}
-for z = 1, #result do
-if result[z]["id"] == id then
-	local result = pal["info_database"][z]
-	results[#results +1] = {["sf"]=result["sf"],["sfl"]=result["sfl"],["ec"]=result["ec"],["a"]=result["a"],["i"]=result["i"],["responces"]=result["responces"],["subresponces"]=result["subresponces"],["id"]=result["id"],["append"]=result["append"]}
+for k, v in pairs( pal["info_database"] ) do
+if v["id"] == id then
+	results[#results +1] = {["sf"]=v["sf"],["sfl"]=v["sfl"],["ec"]=v["ec"],["a"]=v["a"],["i"]=v["i"],["responces"]=v["responces"],["subresponces"]=v["subresponces"],["id"]=v["id"],["append"]=v["append"]}
    end
 end
 if #results <= 1 then return results[1] else return results end
 end
 
-function pal:GetInfoIndexById( id )
-	local result = pal["info_database"]
+function pal:GetInfoIndexById( id ) --finds info indexs by id
 	local results = {}
-for z = 1, #result do
-if result[z]["id"] == id then
-	results[#results +1] = z
+for k, v in pairs( pal["info_database"] ) do
+if v["id"] == id then
+	results[#results +1] = k --k should be index
    end
 end
 if #results <= 1 then return results[1] else return results end
 end
 
 function pal:AddSpellChecking( correct, ... ) --spellchecker
-if pal:RunSelfHooks( "PALOnAddSpellChecking", {correct,...} ) == false then return end
+if pal:RunSelfHooks( "PALOnAddSpellChecking", {correct,{...}} ) == false then return end
 	pal["spellchecking"][#pal["spellchecking"] +1] = {["c"]=correct,["i"]={...}}
+end
+
+function pal:RemoveSpellChecking( correct ) --spellchecker
+if pal:RunSelfHooks( "PALOnAddSpellChecking", {correct} ) == false then return end
+for k, v in pairs( pal["spellchecking"] ) do if v["c"] == correct then pal["spellchecking"][k] = nil end end
 end
 
 function pal:SetNewSynonymsGroup( id, ... ) --for grouping synonyms togethed so that one could be select via the id
@@ -334,6 +347,18 @@ if v <= 0 then pal["annoyance_responcecounter"][k] = nil end
    end
 end
 
+function pal:MemGenDecreese() --forgets which pronowns gose to who
+if pal["gender_momory_time"] == nil then return end
+	pal["gender_momory_time"] = pal["gender_momory_time"] -1
+	
+if pal["gender_momory_time"] <= 0 then
+	pal["gender_momory_time"] = nil
+for k, v in pairs( pal["gender_momory"] ) do
+pal:RemoveSpellChecking( v )
+     end
+   end
+end
+
 function pal:DegradeInfo() --dose the actually info degradeing
 for k, v in pairs( pal["info_degrade_level"] ) do
 	v = v -1
@@ -348,6 +373,7 @@ function pal:Loop() --runs every second but it only a simulation meaning anythin
 if pal:RunSelfHooks( "PALOnLoop", {} ) == false then return end
 pal:EmotionGravatate()  --remove here to remove emotion change
 pal:AnnoyanceDecreese()
+pal:MemGenDecreese()
 pal:DegradeInfo()
 --put any code here
 end
@@ -363,10 +389,10 @@ function pal:RunSpellCheck( input ) --fixes spelling issues in what theplayer sa
 if pal:RunSelfHooks( "PALOnRunSpellCheck", {input} ) == false then return end
 	local mstr = ( string.gsub( input, ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
 	local nul = 0
-for z = 1, #pal["spellchecking"] do
-for y = 1, #pal["spellchecking"][z]["i"] do
-	mstr, nul = string.gsub( mstr, pal["spellchecking"][z]["i"][y].." ", pal["spellchecking"][z]["c"].." " )
-if input == pal["spellchecking"][z]["i"][y] then mstr = pal["spellchecking"][z]["c"] end
+for k, v in pairs( pal["spellchecking"] ) do
+for y = 1, #v["i"] do
+	mstr, nul = string.gsub( mstr, v["i"][y].." ", v["c"].." " )
+if input == v["i"][y] then mstr = v["c"] end
    end
 end
 return mstr
@@ -429,8 +455,8 @@ if pal["info_database"] ~= nil then
 if searchin ~= nil then --checks to see if the text the player entered shares enougth words with the current infomation being searched thougth
 	pal["found_tag"]  = false
 	pal["found_tag_at"] = 0
-for z = 1, #searchin do
-	local text = searchin[z]
+for k, v in pairs( searchin ) do
+	local text = v
 if string.len( text ) <= 4 then text = text.." " end
 if string.sub( text, 1, 1 ) == pal["runfunctionkey"] and string.sub( text, string.len( text ), string.len( text ) ) == pal["runfunctionkey"] then
 	local run, err = load( "return "..string.sub( text, 2, string.len( text ) -1 ) )
@@ -462,8 +488,8 @@ end
 
 if searchin_prior ~= nil then --checks to see if the text the player entered previously shares enougth words with the current infomation being searched thougth
 	pal["found_tag"]  = false
-for z = 1, #searchin_prior do
-	local text = searchin_prior[z]
+for k, v in pairs( searchin_prior ) do
+	local text = v
 if string.len( text ) <= 4 then text = text.." " end
 if string.sub( text, 1, 1 ) == pal["runfunctionkey"] and string.sub( text, string.len( text ), string.len( text ) ) == pal["runfunctionkey"] then
 	local run, null = load( "return"..string.sub( text, 2, string.len( text ) -1 ) )

@@ -111,8 +111,8 @@ if id == v["id"] then pal["info_database_added"][k] = nil end
    end   
 end
 
-function pal:SetNewInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subresponces, id, append ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier even functions like "֍hi( true )"
-if pal:RunSelfHooks( "PALOnSetNewInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subresponces,id,append} ) == false then return end
+function pal:SetNewInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subinfo, id, append ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier even functions like "֍hi( true )"
+if pal:RunSelfHooks( "PALOnSetNewInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subinfo,id,append} ) == false then return end
 for k, v in pairs( searchfor ) do
 for y = 1, #pal["searchfor_groups"] do
 if v == "@"..pal["searchfor_groups"][y]["groupname"] then 
@@ -135,7 +135,7 @@ for x = 1, #pal["searchfor_groups"][y]["tags"] do
    end
 end
 
-	pal["info_database"][#pal["info_database"] +1] = {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subresponces"]=subresponces,["id"]=id,["append"]=append}
+	pal["info_database"][#pal["info_database"] +1] = {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subinfo"]=subinfo,["id"]=id,["append"]=append}
 if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
 for z = 1, #pal["info_database_removed"] do
 if pal["info_database_removed"][z] == id then pal["info_database_removed"][z] = nil end
@@ -173,8 +173,8 @@ if pal["info_database_removed"][z] == id then pal["info_database_removed"][z] = 
    end
 end
 
-function pal:ReturnInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subresponces, id, append ) --format like so {"word","word","word"}, {"word","from","the","prior","text","responded","to"}, {0.15,0.001}, true, 1, {"hi","bye","gay"}, {ReturnInfo( DATA ),ReturnInfo( DATA )}, "code_for_editing_info", "appends_to_all_responces"
-if RunSelfHooks( "PALOnReturnInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subresponces,id,append} ) == false then return end
+function pal:ReturnInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subinfo, id, append ) --format like so {"word","word","word"}, {"word","from","the","prior","text","responded","to"}, {0.15,0.001}, true, 1, {"hi","bye","gay"}, {ReturnInfo( DATA ),ReturnInfo( DATA )}, "code_for_editing_info", "appends_to_all_responces"
+if RunSelfHooks( "PALOnReturnInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subinfo,id,append} ) == false then return end
 for k, v in pairs( searchfor ) do
 for y = 1, #pal["searchfor_groups"] do
 if v == "@"..pal["searchfor_groups"][y]["groupname"] then 
@@ -197,7 +197,7 @@ for x = 1, #pal["searchfor_groups"][y]["tags"] do
    end
 end
 
-return {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subresponces"]=subresponces,["id"]=id,["append"]=append}
+return {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subinfo"]=subinfo,["id"]=id,["append"]=append}
 end
 
 function pal:RemoveAllInfo() --removes all the info and all memory of it ever exsisting
@@ -213,14 +213,14 @@ end
 function pal:GetInfoByIndex( index ) --finds info by the index which repasents its placement it the database
 	local result = pal["info_database"][index]
 if result == nil then return {} end
-return {["sf"]=result["sf"],["sfl"]=result["sfl"],["ec"]=result["ec"],["a"]=result["a"],["i"]=result["i"],["responces"]=result["responces"],["subresponces"]=result["subresponces"],["id"]=result["id"],["append"]=result["append"]}
+return {["sf"]=result["sf"],["sfl"]=result["sfl"],["ec"]=result["ec"],["a"]=result["a"],["i"]=result["i"],["responces"]=result["responces"],["subinfo"]=result["subinfo"],["id"]=result["id"],["append"]=result["append"]}
 end
 
 function pal:GetInfoById( id ) --finds info by id
 	local results = {}
 for k, v in pairs( pal["info_database"] ) do
 if v["id"] == id then
-	results[#results +1] = {["sf"]=v["sf"],["sfl"]=v["sfl"],["ec"]=v["ec"],["a"]=v["a"],["i"]=v["i"],["responces"]=v["responces"],["subresponces"]=v["subresponces"],["id"]=v["id"],["append"]=v["append"]}
+	results[#results +1] = {["sf"]=v["sf"],["sfl"]=v["sfl"],["ec"]=v["ec"],["a"]=v["a"],["i"]=v["i"],["responces"]=v["responces"],["subinfo"]=v["subinfo"],["id"]=v["id"],["append"]=v["append"]}
    end
 end
 if #results <= 1 then return results[1] else return results end
@@ -614,14 +614,14 @@ if outputdata["a"] ~= false then outputresponce = self:RunAnnoyanceTest( outputi
 	pal["emotion_level"][1] = math.max( 1, math.min( pal["emotion_grid_max_size"], pal["emotion_level"][1] ) ) --remove here to remove emotion change
 	pal["emotion_level"][2] = math.max( 1, math.min( pal["emotion_grid_max_size"], pal["emotion_level"][2] ) ) --remove here to remove emotion change
 
-if outputdata["subresponces"] ~= nil then --add sub responces
-for z = 1, #outputdata["subresponces"] do
-self:AddInfoTbl( outputdata["subresponces"][z] )
-   end
-end
-
 	pal["prior_input"] = input --used in the prior search
 	outputresponce = pal:RunLuaCodeInResponce( outputresponce )
+	
+if outputdata["subinfo"] ~= nil then --add sub responces this was move to after to make it easy to replace id'ed responces
+for z = 1, #outputdata["subinfo"] do
+self:AddInfoTbl( outputdata["subinfo"][z] )
+   end
+end
 	
 if pal:RunSelfHooks( "PALOnGotResponce", {outputresponce} ) == false then return end
 	
@@ -640,7 +640,7 @@ if pal:RunSelfHooks( "PALOnSaveInfo", {} ) == false then return end
 for z = 1, #pal["info_database_added"] do
 	local currententry = pal["info_database_added"][z]
 	local responces = ""
-	local subresponces = ""
+	local subinfo = ""
 
 for y = 1, currententry["responces"] do --reformats responces so thay can be saved with ease
 if responces == "" then
@@ -650,18 +650,18 @@ responces = responces..","..currententry[z]["responces"][y]
    end
 end
 
-for y = 1, pal["info_database_added"][z]["subresponces"] do --reformats sub info so thay can be saved with ease
-	local currententryB = currententry["subresponces"][y]
+for y = 1, pal["info_database_added"][z]["subinfo"] do --reformats sub info so thay can be saved with ease
+	local currententryB = currententry["subinfo"][y]
 	local currentdata = "{['sf']="..currententryB["sf"]..",['sfl']="..currententryB["sfl"]..",['ec']="..currententryB["ec"]..",['a']="..currententryB["a"]..",['i']="..currententryB["i"]..",['id']="..currententryB["id"]..",['append']="..currententryB["append"].."}"
-if subresponces == "" then
-subresponces = subresponces..currentdata
+if subinfo == "" then
+subinfo = subinfo..currentdata
 else
-subresponces = subresponces..","..currentdata
+subinfo = subinfo..","..currentdata
    end
 end
 	
 
-	local currentline = "pal:AddInfo( "..tostring( currententry["sf"] )..", "..tostring( currententry["sfl"] )..", {"..tostring( currententry["ec"][1] )..","..tostring( currententry["ec"][2] ).."}, "..tostring( currententry["a"] )..", "..tostring( currententry["i"] )..", {"..tostring( responces ).."}, {"..tostring( subresponces ).."}, "..tostring( currententry["id"] )..", "..tostring( currententry["append"] ).." )"
+	local currentline = "pal:AddInfo( "..tostring( currententry["sf"] )..", "..tostring( currententry["sfl"] )..", {"..tostring( currententry["ec"][1] )..","..tostring( currententry["ec"][2] ).."}, "..tostring( currententry["a"] )..", "..tostring( currententry["i"] )..", {"..tostring( responces ).."}, {"..tostring( subinfo ).."}, "..tostring( currententry["id"] )..", "..tostring( currententry["append"] ).." )"
 if addresponcesfiledata == "" then --responce saveing
 addresponcesfiledata = addresponcesfiledata..currentline
 else

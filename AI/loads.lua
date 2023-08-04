@@ -17,7 +17,7 @@ dofile( current_dir.."/AI/IDKresponces/pal_idkdata.lua" )
 
 dofile( current_dir.."/AI/annoyance/pal_annoyence_res.lua" )
 
-dofile( current_dir.."/AI/spellchecking/pal_speelchecker.lua" )
+dofile( current_dir.."/AI/spellchecking/pal_spellchecker.lua" )
 
 dofile( current_dir.."/AI/infomation/pal_infomodel.lua" )
 

@@ -78,8 +78,8 @@ end
 return true, strlen
 end
 
-function pal:MemGen( name, pronowns ) --connets names to pronows and then puts it into short term memory
-pal:AddSpellChecking( name, pronowns )
+function pal:MemGen( name, ... ) --connets names to pronows and then puts it into short term memory
+pal:AddSpellChecking( name, ... )
 if pal["gender_momory"] == nil then pal["gender_momory"] = {} end
 	pal["gender_momory"][#pal["gender_momory"] +1] = name
 	pal["gender_momory_time"] = 240 --time it takes to lose it's short term memory for pronowns should be 4 minutes
@@ -236,9 +236,9 @@ end
 if #results <= 1 then return results[1] else return results end
 end
 
-function pal:AddSpellChecking( correct, ... ) --spellchecker
-if pal:RunSelfHooks( "PALOnAddSpellChecking", {correct,{...}} ) == false then return end
-	pal["spellchecking"][#pal["spellchecking"] +1] = {["c"]=correct,["i"]={...}}
+function pal:AddSpellChecking( correct, tbl ) --spellchecker
+if pal:RunSelfHooks( "PALOnAddSpellChecking", {correct,tbl} ) == false then return end
+	pal["spellchecking"][#pal["spellchecking"] +1] = {["c"]=correct,["i"]=tbl}
 end
 
 function pal:RemoveSpellChecking( correct ) --spellchecker
@@ -246,9 +246,9 @@ if pal:RunSelfHooks( "PALOnAddSpellChecking", {correct} ) == false then return e
 for k, v in pairs( pal["spellchecking"] ) do if v["c"] == correct then pal["spellchecking"][k] = nil end end
 end
 
-function pal:SetNewSynonymsGroup( id, ... ) --for grouping synonyms togethed so that one could be select via the id
-if RunSelfHooks( "PALOnSetNewSynonymsGroup", {correct,...} ) == false then return end
-	pal["synonyms_groups"][id] = {...}
+function pal:SetNewSynonymsGroup( id, tbl ) --for grouping synonyms togethed so that one could be select via the id
+if RunSelfHooks( "PALOnSetNewSynonymsGroup", {correct,tbl} ) == false then return end
+	pal["synonyms_groups"][id] = tbl
 end
 
 function pal:GetSynonymsWord( id ) --gets a synonym from a synonym id
@@ -277,6 +277,20 @@ end
 
 function pal:EmotionLevelNotEquals( tbl ) 
 return ( tbl[1] ~= math.floor( 0.50 +pal["emotion_level"][1] ) or tbl[2] ~= math.floor( 0.50 +pal["emotion_level"][2] ) )
+end
+
+function pal:EmotionLevelEqualsOr( ... ) --give it a bunch of emotion points and if the emotion level = one of them it will return true
+	local ortable = {...}
+	local returnstate = false
+for z = 1, #ortable do if pal:EmotionLevelEquals( ortable[z] ) == true then returnstate = true end end
+return returnstate
+end
+
+function pal:EmotionLevelNotEqualsOr( ... ) --if the emotion level ~= any of the emotion points, it will return true
+	local ortable = {...}
+	local returnstate = true
+for z = 1, #ortable do if pal:EmotionLevelEquals( ortable[z] ) == true then returnstate = fase end end
+return returnstate
 end
 
 function pal:GetEmotiveWord() --words that describe what it thinks of the user
@@ -387,6 +401,7 @@ for z = 1, simlen do pal:Loop() end
 end
 
 function pal:RunSpellCheck( input ) --fixes spelling issues in what theplayer says so it is easyer to find the best responce to what the player says
+
 if pal:RunSelfHooks( "PALOnRunSpellCheck", {input} ) == false then return end
 	local mstr = ( string.gsub( input, ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
 	local nul = 0
@@ -432,13 +447,12 @@ if xy[2] ~= 0 then xy[2] = xy[2] /( math.abs( xy[1] ) +math.abs( xy[2] ) ) end
 
 	pal["emotion_level"][1]	= pal["emotion_level"][1] +( xy[1] *pal["emotion_sensitivity"] )
 	pal["emotion_level"][2] = pal["emotion_level"][2] +( xy[2] *pal["emotion_sensitivity"] )
-	pal["emotion_level"][1] = math.max( 1, math.min( pal["emotion_grid_max_size"], pal["emotion_level"][1] ) )
-	pal["emotion_level"][2] = math.max( 1, math.min( pal["emotion_grid_max_size"], pal["emotion_level"][2] ) )
-if pal:RunSelfHooks( "PALRunAjustEmotionToEmotiveKeyWordsNewEmotion", {input,{pal["emotion_level"][1],pal["emotion_level"][2]}} ) == false then return end
+if pal:RunSelfHooks( "PALRunAjustEmotionToEmotiveKeyWordsNewEmotion", {input,{math.floor( 0.50 +pal["emotion_level"][1] ),math.floor( 0.50 +pal["emotion_level"][2] )}} ) == false then return end
 end
 
 function pal:RunFindResponce( input )
 if pal:RunSelfHooks( "PALOnRunFindResponce", {input} ) == false then return end
+	input = string.lower( input )
 
 	pal["current_responce_importance"] = -999
 	pal["match_level_words_processed_old"] = -1
@@ -607,16 +621,12 @@ if str ~= nil and str ~= false then return str end
 return self:GetIDKresponce() 
 end
 
-print( pal["emotion_level"][1], pal["emotion_level"][2] )
-	
 	local outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )]..( outputdata["sentanceappending"] or "" )
 	
 if outputdata["a"] ~= false then outputresponce = self:RunAnnoyanceTest( outputindex, outputresponce ) end
 
 	pal["emotion_level"][1] = pal["emotion_level"][1] +outputdata["ec"][1]  --remove here to remove emotion change
 	pal["emotion_level"][2] = pal["emotion_level"][2] +outputdata["ec"][2]  --remove here to remove emotion change
-	pal["emotion_level"][1] = math.max( 1, math.min( pal["emotion_grid_max_size"], pal["emotion_level"][1] ) ) --remove here to remove emotion change
-	pal["emotion_level"][2] = math.max( 1, math.min( pal["emotion_grid_max_size"], pal["emotion_level"][2] ) ) --remove here to remove emotion change
 
 	pal["prior_input"] = input --used in the prior search
 	outputresponce = pal:RunLuaCodeInResponce( outputresponce )

@@ -19,7 +19,7 @@ cdc:close()
 	pal["emotion_grid"] = {}
 	pal["emotion_grid_max_size"] = 3
 	pal["emotion_sensitivity"] = 0.2
-	pal["emotion_gravatate_power"] = 0.03
+	pal["emotion_gravatate_power"] = 0.003
 	pal["idk_responces"] = {}
 	pal["annoyance_maxlevel"] = 4
 	pal["annoyance_responcecounter"] = {}
@@ -281,17 +281,17 @@ end
 
 function pal:GetEmotiveWord() --words that describe what it thinks of the user
 if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["words"] == nil then return "" end
-return pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["words"][math.random( 1, #pal["emotion_grid"][pal["emotion_level"][1]][pal["emotion_level"][2]]["words"] )]
+return pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["words"][math.random( 1, #pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["words"] )]
 end
 
 function pal:GetEmotiveClass() --words that describe how it is feeling in genral
 if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["emotionclass"] == nil then return "" end
-return pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["emotionclass"][math.random( 1, #pal["emotion_grid"][pal["emotion_level"][1]][pal["emotion_level"][2]]["emotionclass"] )]
+return pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["emotionclass"][math.random( 1, #pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["emotionclass"] )]
 end
 
 function pal:GetEmotiveEnd() --an emotive ending to a sentence
 if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["sentanceappending"] == nil then return "" end
-return pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["sentanceappending"][math.random( 1, #pal["emotion_grid"][pal["emotion_level"][1]][pal["emotion_level"][2]]["sentanceappending"] )]
+return pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["sentanceappending"][math.random( 1, #pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["sentanceappending"] )]
 end
 
 function pal:SetNewIDKresponces( responce ) --for when the ai dose not have a responce
@@ -330,8 +330,9 @@ pal:BuildEmotionGrid( pal["emotion_grid_max_size"] )
 function pal:EmotionGravatate() --allows for emotion to go back to normal levels
 	local x = pal["emotion_level_wanted"][1] -pal["emotion_level"][1]
 	local y = pal["emotion_level_wanted"][2] -pal["emotion_level"][2]
-	x = ( x /( x+y ) ) *pal["emotion_gravatate_power"]; y = ( y /( x+y ) ) *pal["emotion_gravatate_power"]
-	pal["emotion_level"][1] = pal["emotion_level"][1] +x
+if x ~= 0 then x = ( x /( math.abs( x ) +math.abs( y ) ) ) *pal["emotion_gravatate_power"] end
+if y ~= 0 then y = ( y /( math.abs( x ) +math.abs( y ) ) ) *pal["emotion_gravatate_power"] end
+    pal["emotion_level"][1] = pal["emotion_level"][1] +x
 	pal["emotion_level"][2] = pal["emotion_level"][2] +y
 end
 
@@ -426,8 +427,9 @@ if has ~= nil then
    end
 end
 
-	xy[1] = xy[1] /( xy[1] +xy[2] )
-	xy[2] = xy[2] /( xy[1] +xy[2] )
+if xy[1] ~= 0 then xy[1] = xy[1] /( math.abs( xy[1] ) +math.abs( xy[2] ) ) end
+if xy[2] ~= 0 then xy[2] = xy[2] /( math.abs( xy[1] ) +math.abs( xy[2] ) ) end
+
 	pal["emotion_level"][1]	= pal["emotion_level"][1] +( xy[1] *pal["emotion_sensitivity"] )
 	pal["emotion_level"][2] = pal["emotion_level"][2] +( xy[2] *pal["emotion_sensitivity"] )
 	pal["emotion_level"][1] = math.max( 1, math.min( pal["emotion_grid_max_size"], pal["emotion_level"][1] ) )
@@ -568,11 +570,11 @@ if string.sub( input, z, z ) == pal["runfunctionkey"] then
 if pointa == 0 then pointa = z else pointb = z end
 if pointa ~= 0 and pointb ~= 0 then
   
-	local exe, null = load( string.sub( input, pointa +1, pointb -1 ) )
+	local exe, null = load( "return "..string.sub( input, pointa +1, pointb -1 ) )
 	local result = exe()  
   
 if result ~= nil then
-	outstring = string.sub( outstring, 1, pointa -1 +stringdiffreance )..result..string.len( outstring, pointb +1 +stringdiffreance, string.len( outstring ) )
+	outstring = string.sub( outstring, 1, pointa -1 +stringdiffreance )..result..string.sub( outstring, pointb +1 +stringdiffreance, string.len( outstring ) )
 	stringdiffreance = string.len( outstring ) -string.len( input )	
 end
 	pointa, pointb = 0, 0
@@ -604,6 +606,8 @@ if outputindex == nil then
 if str ~= nil and str ~= false then return str end
 return self:GetIDKresponce() 
 end
+
+print( pal["emotion_level"][1], pal["emotion_level"][2] )
 	
 	local outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )]..( outputdata["sentanceappending"] or "" )
 	

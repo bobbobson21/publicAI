@@ -68,7 +68,7 @@ if #returns <= 1 then return returns[1] else return unpack( returns ) end --we o
 end
 
 function pal:NRT( tag ) --for tags you want it to seach for but only mark down the result and not desqalify it if result cant be found
-	local starts, ends = string.find( self:BRTGetTextToRespondTo(), tag, 1, true )
+	local starts, ends = string.find( pal:BRTGetTextToRespondTo(), tag, 1, true )
 	local strlen = 0
 if starts ~= nil then
 	pal["match_level_length_processed"] = pal["match_level_length_processed"] -string.len( tag )
@@ -86,7 +86,7 @@ if pal["gender_momory"] == nil then pal["gender_momory"] = {} end
 end
 
 function pal:DegradeInfoOverXCycles( id, cyclesinfostayesinmemory ) --makes info eventually degrades to nothing use to simulates forgetfulness
-if RunSelfHooks( "PALOnDegradeInfoOverXCycles", {id,cyclesinfostayesinmemory} ) == false then return end
+if pal:RunSelfHooks( "PALOnDegradeInfoOverXCycles", {id,cyclesinfostayesinmemory} ) == false then return end
 for k, v in pairs( pal["info_degrade_level"] ) do
 if v["id"] == id then
 	pal["info_degrade_level"][k] = cyclesinfostayesinmemory -1
@@ -95,12 +95,42 @@ if v["id"] == id then
 end
 
 function pal:AddNewTagGroup( name, collection ) --a collection of tags which if refrenced like so @TAG_NAME, in the search for sections of added info will be replaced with collection
-if RunSelfHooks( "PALOnAddTagGroup", {name,collection} ) == false then return end
+if pal:RunSelfHooks( "PALOnAddTagGroup", {name,collection} ) == false then return end
 	pal["searchfor_groups"][#pal["searchfor_groups"] +1] = {["groupname"]=name,["tags"]=collection}
 end
 
+function pal:LoadTagGroups( searchfor, searchfor_prior ) --puts the tag groups into the info
+if searchfor ~= nil then
+for k, v in pairs( searchfor ) do
+for y = 1, #pal["searchfor_groups"] do
+if v == "@"..pal["searchfor_groups"][y]["groupname"] then 
+	searchfor[k] = nil
+for x = 1, #pal["searchfor_groups"][y]["tags"] do
+	searchfor[#searchfor +1] = pal["runfunctionkey"].."pal:NRT("..pal["searchfor_groups"][y]["tags"][x].."' )"..pal["runfunctionkey"]
+		    end
+	     end
+      end
+   end
+end
+
+if searchfor_prior ~= nil then
+for k, v in pairs( searchfor_prior ) do
+for y = 1, #pal["searchfor_groups"] do
+if v == "@"..pal["searchfor_groups"][y]["groupname"] then 
+	searchfor_prior[k] = nil
+for x = 1, #pal["searchfor_groups"][y]["tags"] do
+	searchfor_prior[#searchfor_prior +1] = pal["runfunctionkey"].."pal:NRT("..pal["searchfor_groups"][y]["tags"][x].."' )"..pal["runfunctionkey"]
+	        end
+	     end
+      end
+   end
+end
+
+return searchfor, searchfor_prior
+end
+
 function pal:RemoveInfo( id )
-if RunSelfHooks( "PALOnRemoveInfo", id ) == false then return end
+if pal:RunSelfHooks( "PALOnRemoveInfo", id ) == false then return end
 if inruntime == true then pal["info_database_removed" +1] = id end
 for k, v in pairs( pal["info_database"] ) do
 if id == v["id"] then pal["info_database"][k] = nil end
@@ -113,95 +143,33 @@ end
 
 function pal:SetNewInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subinfo, id, append ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier even functions like "֍hi( true )"
 if pal:RunSelfHooks( "PALOnSetNewInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subinfo,id,append} ) == false then return end
-for k, v in pairs( searchfor ) do
-for y = 1, #pal["searchfor_groups"] do
-if v == "@"..pal["searchfor_groups"][y]["groupname"] then 
-	searchfor[k] = nil
-for x = 1, #pal["searchfor_groups"][y]["tags"] do
-	searchfor[#searchfor +1] = "pal:NRT("..pal["searchfor_groups"][y]["tags"][x].."' )"
-         end
-	  end
-   end
-end
-
-for k, v in pairs( searchfor_prior ) do
-for y = 1, #pal["searchfor_groups"] do
-if v == "@"..pal["searchfor_groups"][y]["groupname"] then 
-	searchfor_prior[k] = nil
-for x = 1, #pal["searchfor_groups"][y]["tags"] do
-	searchfor_prior[#searchfor_prior +1] = "pal:NRT("..pal["searchfor_groups"][y]["tags"][x].."' )"
-         end
-	  end
-   end
-end
-
+	searchfor, searchfor_prior = pal:LoadTagGroups( searchfor, searchfor_prior )
 	pal["info_database"][#pal["info_database"] +1] = {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subinfo"]=subinfo,["id"]=id,["append"]=append}
 if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
-for z = 1, #pal["info_database_removed"] do
-if pal["info_database_removed"][z] == id then pal["info_database_removed"][z] = nil end
+for k, v in pairs( pal["info_database_removed"] ) do
+if v == id then pal["info_database_removed"][k] = nil end
    end
 end
 
 function pal:SetNewInfoTbl( tbl ) --an unscure but fast way of adding info
-if RunSelfHooks( "PALOnSetNewInfoTbl", {tbl} ) == false then return end
-for k, v in pairs( searchfor ) do
-for y = 1, #pal["searchfor_groups"] do
-if v == "@"..pal["searchfor_groups"][y]["groupname"] then 
-	searchfor[k] = nil
-for x = 1, #pal["searchfor_groups"][y]["tags"] do
-	searchfor[#searchfor +1] = "pal:NRT("..pal["searchfor_groups"][y]["tags"][x].."' )"
-         end
-	  end
-   end
-end
-
-for k, v in pairs( searchfor_prior ) do
-for y = 1, #pal["searchfor_groups"] do
-if v == "@"..pal["searchfor_groups"][y]["groupname"] then
-	searchfor_prior[k] = nil
-for x = 1, #pal["searchfor_groups"][y]["tags"] do
-	searchfor_prior[#searchfor_prior +1] = "pal:NRT("..pal["searchfor_groups"][y]["tags"][x].."' )"
-         end
-	  end
-   end
-end
-
+if pal:RunSelfHooks( "PALOnSetNewInfoTbl", {tbl} ) == false then return end
+	a, b = pal:LoadTagGroups( tbl["sf"], tbl["sfl"] )
 	pal["info_database"][#pal["info_database"] +1] = tbl
+
 if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
-for z = 1, pal["info_database_removed"] do
-if pal["info_database_removed"][z] == id then pal["info_database_removed"][z] = nil end
+for k, v in pairs( pal["info_database_removed"] ) do
+if v == id then pal["info_database_removed"][k] = nil end
    end
 end
 
 function pal:ReturnInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subinfo, id, append ) --format like so {"word","word","word"}, {"word","from","the","prior","text","responded","to"}, {0.15,0.001}, true, 1, {"hi","bye","gay"}, {ReturnInfo( DATA ),ReturnInfo( DATA )}, "code_for_editing_info", "appends_to_all_responces"
-if RunSelfHooks( "PALOnReturnInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subinfo,id,append} ) == false then return end
-for k, v in pairs( searchfor ) do
-for y = 1, #pal["searchfor_groups"] do
-if v == "@"..pal["searchfor_groups"][y]["groupname"] then 
-	searchfor[k] = nil
-for x = 1, #pal["searchfor_groups"][y]["tags"] do
-	searchfor[#searchfor +1] = "pal:NRT("..pal["searchfor_groups"][y]["tags"][x].."' )"
-         end
-	  end
-   end
-end
-
-for k, v in pairs( searchfor_prior ) do
-for y = 1, #pal["searchfor_groups"] do
-if v == "@"..pal["searchfor_groups"][y]["groupname"] then
-	searchfor_prior[k] = nil
-for x = 1, #pal["searchfor_groups"][y]["tags"] do
-	searchfor_prior[#searchfor_prior +1] = "pal:NRT("..pal["searchfor_groups"][y]["tags"][x].."' )"
-         end
-	  end
-   end
-end
-
+if pal:RunSelfHooks( "PALOnReturnInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subinfo,id,append} ) == false then return end
+	searchfor, searchfor_prior = pal:LoadTagGroups( searchfor, searchfor_prior )
 return {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subinfo"]=subinfo,["id"]=id,["append"]=append}
 end
 
 function pal:RemoveAllInfo() --removes all the info and all memory of it ever exsisting
-if RunSelfHooks( "PALOnRemoveAllInfo", {} ) == false then return end
+if pal:RunSelfHooks( "PALOnRemoveAllInfo", {} ) == false then return end
 	pal["info_database"] = nil
 	pal["info_database_added"] = nil
 	pal["info_database_removed"] = nil
@@ -247,7 +215,7 @@ for k, v in pairs( pal["spellchecking"] ) do if v["c"] == correct then pal["spel
 end
 
 function pal:SetNewSynonymsGroup( id, tbl ) --for grouping synonyms togethed so that one could be select via the id
-if RunSelfHooks( "PALOnSetNewSynonymsGroup", {correct,tbl} ) == false then return end
+if pal:RunSelfHooks( "PALOnSetNewSynonymsGroup", {correct,tbl} ) == false then return end
 	pal["synonyms_groups"][id] = tbl
 end
 
@@ -401,7 +369,6 @@ for z = 1, simlen do pal:Loop() end
 end
 
 function pal:RunSpellCheck( input ) --fixes spelling issues in what theplayer says so it is easyer to find the best responce to what the player says
-
 if pal:RunSelfHooks( "PALOnRunSpellCheck", {input} ) == false then return end
 	local mstr = ( string.gsub( input, ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
 	local nul = 0
@@ -458,21 +425,21 @@ if pal:RunSelfHooks( "PALOnRunFindResponce", {input} ) == false then return end
 	pal["match_level_words_processed_old"] = -1
 	local currentresponceindex = -1
 
-for index = 1, #pal["info_database"] do --searches thougth all infomation in pal's info_database
 if pal["info_database"] ~= nil then
+for k, v in pairs( pal["info_database"] ) do --searches thougth all infomation in pal's info_database
 
 	pal["match_level_length_processed"] = 0
 	pal["match_level_words_processed"] = 0
 
-	local searchin = pal["info_database"][index]["sf"]
-	local searchin_prior = pal["info_database"][index]["sfl"]
-	local importance = pal["info_database"][index]["i"] or 0
+	local searchin = v["sf"]
+	local searchin_prior = v["sfl"]
+	local importance = v["i"] or 0
 
 if searchin ~= nil then --checks to see if the text the player entered shares enougth words with the current infomation being searched thougth
 	pal["found_tag"]  = false
 	pal["found_tag_at"] = 0
-for k, v in pairs( searchin ) do
-	local text = v
+for l, w in pairs( searchin ) do
+	local text = w
 if string.len( text ) <= 4 then text = text.." " end
 if string.sub( text, 1, 1 ) == pal["runfunctionkey"] and string.sub( text, string.len( text ), string.len( text ) ) == pal["runfunctionkey"] then
 	local run, err = load( "return "..string.sub( text, 2, string.len( text ) -1 ) )
@@ -504,8 +471,8 @@ end
 
 if searchin_prior ~= nil then --checks to see if the text the player entered previously shares enougth words with the current infomation being searched thougth
 	pal["found_tag"]  = false
-for k, v in pairs( searchin_prior ) do
-	local text = v
+for l, w in pairs( searchin_prior ) do
+	local text = w
 if string.len( text ) <= 4 then text = text.." " end
 if string.sub( text, 1, 1 ) == pal["runfunctionkey"] and string.sub( text, string.len( text ), string.len( text ) ) == pal["runfunctionkey"] then
 	local run, null = load( "return"..string.sub( text, 2, string.len( text ) -1 ) )
@@ -539,7 +506,7 @@ if importance >= pal["current_responce_importance"] then --checks acceptablity
 
 	pal["match_level_words_processed_old"] = pal["match_level_words_processed"] --updates minmal acceptablity level
 	pal["current_responce_importance"] = importance --updates minmal acceptablity level
-	currentresponceindex = index
+	currentresponceindex = k
 
             end
          end
@@ -606,24 +573,24 @@ function pal:BuildResponceTo( input ) --USE THIS TO GET THE AI TO MAKE A RESPONC
 function pal:BRTGetTextToRespondTo() return master end
 if pal:RunSelfHooks( "PALOnBuildResponceTo", {input} ) == false then return end
 
-self:RunLoopSimulation()
+pal:RunLoopSimulation()
 
-	master = self:RunSpellCheck( master )
-self:RunAjustEmotionToEmotiveKeyWords( master ) --remove here to remove emotion change
+	master = pal:RunSpellCheck( master )
+pal:RunAjustEmotionToEmotiveKeyWords( master ) --remove here to remove emotion change
 
-	local outputindex = self:RunFindResponce( master )
-	local outputdata = self:GetInfoByIndex( outputindex )
+	local outputindex = pal:RunFindResponce( master )
+	local outputdata = pal:GetInfoByIndex( outputindex )
 
 function pal:BRTGetInfoIndex() return outputindex end
 if outputindex == nil then
 	local str = pal:RunSelfHooks( "PALOnIDKoutput", {input} )
 if str ~= nil and str ~= false then return str end
-return self:GetIDKresponce() 
+return pal:GetIDKresponce() 
 end
 
 	local outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )]..( outputdata["sentanceappending"] or "" )
 	
-if outputdata["a"] ~= false then outputresponce = self:RunAnnoyanceTest( outputindex, outputresponce ) end
+if outputdata["a"] ~= false then outputresponce = pal:RunAnnoyanceTest( outputindex, outputresponce ) end
 
 	pal["emotion_level"][1] = pal["emotion_level"][1] +outputdata["ec"][1]  --remove here to remove emotion change
 	pal["emotion_level"][2] = pal["emotion_level"][2] +outputdata["ec"][2]  --remove here to remove emotion change
@@ -633,7 +600,10 @@ if outputdata["a"] ~= false then outputresponce = self:RunAnnoyanceTest( outputi
 	
 if outputdata["subinfo"] ~= nil then --add sub responces this was move to after to make it easy to replace id'ed responces
 for z = 1, #outputdata["subinfo"] do
-self:AddInfoTbl( outputdata["subinfo"][z] )
+if outputdata["subinfo"][z] ~= nil then 
+	local t = outputdata["subinfo"][z]
+pal:SetNewInfoTbl( outputdata["subinfo"][z] )
+      end
    end
 end
 	

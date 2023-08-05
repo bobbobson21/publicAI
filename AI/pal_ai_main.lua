@@ -67,13 +67,13 @@ end
 if #returns <= 1 then return returns[1] else return unpack( returns ) end --we only use unpack here because there is no way you should need to loop througth returned data
 end
 
-function pal:NRT( tag ) --for tags you want it to seach for but only mark down the result and not desqalify it if result cant be found
-	local starts, ends = string.find( pal:BRTGetTextToRespondTo(), tag, 1, true )
-	local strlen = 0
+function pal:NRT( tag ) --for tags/words you want it to seach for but only mark down the result and not desqalify it if result cant be found
+	local starts, ends = string.find( pal:BRTGetTextToRespondTo(), tag, pal["found_tag_at"], true )
+	local strlen = pal["found_tag_at"]
 if starts ~= nil then
-	pal["match_level_length_processed"] = pal["match_level_length_processed"] -string.len( tag )
+	strlen = ( starts or pal["found_tag_at"] ) +string.len( tag )
+else
 	pal["match_level_words_processed"] = pal["match_level_words_processed"] -1
-	strlen = string.len( tag )
 end
 return true, strlen
 end
@@ -445,12 +445,12 @@ if string.sub( text, 1, 1 ) == pal["runfunctionkey"] and string.sub( text, strin
 	local run, err = load( "return "..string.sub( text, 2, string.len( text ) -1 ) )
 	local ft, fta = run()
 	pal["found_tag"] = ( ft == true )
-	pal["found_tag_at"] = pal["found_tag_at"] +( fta or 999999 )
+	pal["found_tag_at"] = ( fta or 999999 )
 else
-	local starts, ends = string.find( input, text, 1, true )
-if starts ~= nil then
+	local starts, ends = string.find( input, text, pal["found_tag_at"], true )
+if starts ~= nil and pal["found_tag_at"] >= pal["match_level_length_processed"] then
 	pal["found_tag"] = true
-	pal["found_tag_at"] = pal["found_tag_at"] +string.len( text )
+	pal["found_tag_at"] = starts +string.len( text )
    end
 end
 
@@ -461,12 +461,9 @@ if pal["found_tag_at"] >= pal["match_level_length_processed"] then
 	pal["match_level_words_processed"] = pal["match_level_words_processed"] +1
 else
 	pal["found_tag_at"] = -99999999
-end
-else
-	pal["found_tag_at"] = -99999999
-   end 
-end
-if pal["match_level_words_processed"] >= #searchin then pal["found_tag_at"] = -99999999 end
+         end 
+      end
+   end
 end
 
 if searchin_prior ~= nil then --checks to see if the text the player entered previously shares enougth words with the current infomation being searched thougth
@@ -478,12 +475,12 @@ if string.sub( text, 1, 1 ) == pal["runfunctionkey"] and string.sub( text, strin
 	local run, null = load( "return"..string.sub( text, 2, string.len( text ) -1 ) )
 	local ft, fta = run()
 	pal["found_tag"] = ( ft == true )
-	pal["found_tag_at"] = pal["found_tag_at"] +( fta or 0 )
+	pal["found_tag_at"] = ( fta or 999999 )
 else
-	local starts, ends = string.find( input, text, 1, true )
-if starts ~= nil then
-	pal["found_tag"]  = true
-	pal["found_tag_at"] = pal["found_tag_at"] +string.len( text )
+	local starts, ends = string.find( input, text, pal["found_tag_at"], true )
+if starts ~= nil and pal["found_tag_at"] >= pal["match_level_length_processed"] then
+	pal["found_tag"] = true
+	pal["found_tag_at"] = starts
    end
 end
 
@@ -491,14 +488,11 @@ if pal["found_tag"]  == true then
 if pal["found_tag_at"] >= pal["match_level_length_processed"] then
 	pal["match_level_length_processed"] = pal["found_tag_at"]
 	pal["match_level_words_processed"] = pal["match_level_words_processed"] +1
-else
-	pal["found_tag_at"] = -99999999
 end
 else
 	pal["found_tag_at"] = -99999999
-      end 
    end 
-end
+end 
 
 if pal["match_level_length_processed"] >= 1 then --checks acceptablity
 if pal["match_level_words_processed"] >= pal["match_level_words_processed_old"] then --checks acceptablity
@@ -508,6 +502,7 @@ if importance >= pal["current_responce_importance"] then --checks acceptablity
 	pal["current_responce_importance"] = importance --updates minmal acceptablity level
 	currentresponceindex = k
 
+               end
             end
          end
       end

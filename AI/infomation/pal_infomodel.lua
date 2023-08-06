@@ -1,3 +1,20 @@
+--[[-- notice -----------------------------------------------------------------
+This file contains everything the AI know about or has an opioion of.
+
+The file dose NOT evey inch of available resources to make responces as unique
+as possible as this is for testing and demostration.
+
+It Is recommended you make your own info model from the ground up.
+---------------------------------------------------------------------------]]--
+
+--[[-- test code DON'T put into circulation -----------------------------------
+
+---------------------------------------------------------------------------]]--
+
+
+pal:SetNewInfo( {"what","is","|pal:NRT( '+' )|","|pal:NRT( '-' )|","|pal:NRT( '>' )|","|pal:NRT( '<' )|","|pal:NRT( '/' )|","|pal:NRT( '*' )|",}, {}, {0,0}, false, 0, {"that is |pal:Sandbox():DoMaths()|"}, {}, nil, nil ) --UNSCURE MUST DESTROY IF USING FOR CONSUMSION OR CUSTOMERS
+pal:SetNewInfo( {"dose","|pal:NRT( '+' )|","|pal:NRT( '-' )|","|pal:NRT( '>' )|","|pal:NRT( '<' )|","|pal:NRT( '/' )|","|pal:NRT( '*' )|",}, {}, {0,0}, false, 0, {"|pal:Sandbox():CheckMaths()|"}, {}, nil, nil ) --UNSCURE MUST DESTROY IF USING FOR CONSUMSION OR CUSTOMERS
+
 pal:SetNewInfo( {"|pal:NRT( 'hi' )|","|pal:NRT( 'hello' )|"}, {}, {0,0}, true, 0, {"Hi.","Hi user.","Hello","Hello user."}, {}, nil, nil )
 pal:SetNewInfo( {"you","|pal:NRT( 'alive' )|","|pal:NRT( 'living' )|","|pal:NRT( 'real' )|"}, {}, {-0.70,0}, true, 0, {"No I am not really alive |pal:GetEmotiveWord()| user.","Sadly I do not live |pal:GetEmotiveWord()| user.","I am not alive.","I am not living."}, {}, nil, nil )
 

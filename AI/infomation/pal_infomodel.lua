@@ -8,11 +8,21 @@ It Is recommended you make your own info model from the ground up.
 ---------------------------------------------------------------------------]]--
 
 --[[-- test code DON'T put into circulation -----------------------------------
---test tag groups
---test SetNewSynonymsGroup
---test emotion class
+
+pal:AddNewTagGroup( "test_tags", {"test"} )
+pal:SetNewInfo( {"@test_tags"}, {}, {0,0}, true, 0, {"wow I did it I pased the test heck yer now to be blessed by the great blahaj"}, {}, nil, nil )
+
+pal:SetNewSynonymsGroup( "blahaj", {"blahaj the trans shark","shark god","the cute shark","the shark I want and deserve lol"} )
+pal:SetNewInfo( {"test"}, {}, {0,0}, true, 0, {"wow I did it I pased the test heck yer now to be blessed by the great blahaj"}, {}, nil, nil )
+
+--TEST SAVEING AND LOADING AS SOON AS POSSIBLE
+--TEST SAVEING AND LOADING AS SOON AS POSSIBLE
+--TEST SAVEING AND LOADING AS SOON AS POSSIBLE
+--TEST SAVEING AND LOADING AS SOON AS POSSIBLE
+
 ---------------------------------------------------------------------------]]--
 
+pal:SetNewInfo( {"you","|pal:NRT( 'feeling' )|","|pal:NRT( 'doing' )|","|pal:NRT( 'holding' )|"}, {}, {0,0}, true, 0, {"I am feeling |pal:GetEmotiveClass()|.","I feel like I am |pal:GetEmotiveClass()|.","I am feeling |pal:GetEmotiveClass()| user.","I feel like I am |pal:GetEmotiveClass()| user."}, {}, nil, nil )
 
 pal:SetNewInfo( {"what","is","|pal:NRT( '+' )|","|pal:NRT( '-' )|","|pal:NRT( '>' )|","|pal:NRT( '<' )|","|pal:NRT( '/' )|","|pal:NRT( '*' )|",}, {}, {0,0}, false, 0, {"that is |pal:Sandbox():DoMaths()|"}, {}, nil, nil ) --UNSCURE MUST DESTROY IF USING FOR CONSUMSION OR CUSTOMERS
 pal:SetNewInfo( {"dose","|pal:NRT( '+' )|","|pal:NRT( '-' )|","|pal:NRT( '>' )|","|pal:NRT( '<' )|","|pal:NRT( '/' )|","|pal:NRT( '*' )|",}, {}, {0,0}, false, 0, {"|pal:Sandbox():CheckMaths()|"}, {}, nil, nil ) --UNSCURE MUST DESTROY IF USING FOR CONSUMSION OR CUSTOMERS

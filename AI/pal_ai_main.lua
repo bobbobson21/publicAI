@@ -106,7 +106,7 @@ for y = 1, #pal["searchfor_groups"] do
 if v == "@"..pal["searchfor_groups"][y]["groupname"] then 
 	searchfor[k] = nil
 for x = 1, #pal["searchfor_groups"][y]["tags"] do
-	searchfor[#searchfor +1] = pal["runfunctionkey"].."pal:NRT("..pal["searchfor_groups"][y]["tags"][x].."' )"..pal["runfunctionkey"]
+	searchfor[#searchfor +1] = pal["runfunctionkey"].."pal:NRT( '"..pal["searchfor_groups"][y]["tags"][x].."' )"..pal["runfunctionkey"]
 		    end
 	     end
       end
@@ -119,7 +119,7 @@ for y = 1, #pal["searchfor_groups"] do
 if v == "@"..pal["searchfor_groups"][y]["groupname"] then 
 	searchfor_prior[k] = nil
 for x = 1, #pal["searchfor_groups"][y]["tags"] do
-	searchfor_prior[#searchfor_prior +1] = pal["runfunctionkey"].."pal:NRT("..pal["searchfor_groups"][y]["tags"][x].."' )"..pal["runfunctionkey"]
+	searchfor_prior[#searchfor_prior +1] = pal["runfunctionkey"].."pal:NRT( '"..pal["searchfor_groups"][y]["tags"][x].."' )"..pal["runfunctionkey"]
 	        end
 	     end
       end
@@ -141,10 +141,10 @@ if id == v["id"] then pal["info_database_added"][k] = nil end
    end   
 end
 
-function pal:SetNewInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subinfo, id, append ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier even functions like "֍hi( true )"
+function pal:SetNewInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subinfo, append, id ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier even functions like "֍hi( true )"
 if pal:RunSelfHooks( "PALOnSetNewInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subinfo,id,append} ) == false then return end
 	searchfor, searchfor_prior = pal:LoadTagGroups( searchfor, searchfor_prior )
-	pal["info_database"][#pal["info_database"] +1] = {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subinfo"]=subinfo,["id"]=id,["append"]=append}
+	pal["info_database"][#pal["info_database"] +1] = {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subinfo"]=subinfo,["append"]=append,["id"]=id}
 if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
 for k, v in pairs( pal["info_database_removed"] ) do
 if v == id then pal["info_database_removed"][k] = nil end
@@ -162,10 +162,10 @@ if v == id then pal["info_database_removed"][k] = nil end
    end
 end
 
-function pal:ReturnInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subinfo, id, append ) --format like so {"word","word","word"}, {"word","from","the","prior","text","responded","to"}, {0.15,0.001}, true, 1, {"hi","bye","gay"}, {ReturnInfo( DATA ),ReturnInfo( DATA )}, "code_for_editing_info", "appends_to_all_responces"
+function pal:ReturnInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subinfo, append, id ) --format like so {"word","word","word"}, {"word","from","the","prior","text","responded","to"}, {0.15,0.001}, true, 1, {"hi","bye","gay"}, {ReturnInfo( DATA ),ReturnInfo( DATA )}, "code_for_editing_info", "appends_to_all_responces"
 if pal:RunSelfHooks( "PALOnReturnInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subinfo,id,append} ) == false then return end
 	searchfor, searchfor_prior = pal:LoadTagGroups( searchfor, searchfor_prior )
-return {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subinfo"]=subinfo,["id"]=id,["append"]=append}
+return {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subinfo"]=subinfo,["append"]=append,["id"]=id,}
 end
 
 function pal:RemoveAllInfo() --removes all the info and all memory of it ever exsisting
@@ -440,17 +440,17 @@ if searchin ~= nil then --checks to see if the text the player entered shares en
 for l, w in pairs( searchin ) do
 	pal["found_tag"]  = false
 	local text = w
-if string.len( text ) <= 4 then text = text.." " end
 if string.sub( text, 1, 1 ) == pal["runfunctionkey"] and string.sub( text, string.len( text ), string.len( text ) ) == pal["runfunctionkey"] then
 	local run, err = load( "return "..string.sub( text, 2, string.len( text ) -1 ) )
 	local ft, fta = run()
 	pal["found_tag"] = ( ft == true )
 	pal["found_tag_at"] = ( fta or 999999 )
 else
-	local starts, ends = string.find( input, text, pal["found_tag_at"], true )
-if starts ~= nil then
+	local starts, ends = string.find( input, text.." ", pal["found_tag_at"], true )
+if starts == nil then starts, ends = string.find( input, " "..text, pal["found_tag_at"], true ) end
+if starts ~= nil or input == text then
 	pal["found_tag"] = true
-	pal["found_tag_at"] = starts +string.len( text )
+	pal["found_tag_at"] = ( starts or pal["found_tag_at"] ) +string.len( text ) +1
    end
 end
 
@@ -469,20 +469,21 @@ else
 end
 
 if searchin_prior ~= nil then --checks to see if the text the player entered previously shares enougth words with the current infomation being searched thougth
+	pal["found_tag_at"] = 0
 for l, w in pairs( searchin_prior ) do
 	pal["found_tag"]  = false
 	local text = w
-if string.len( text ) <= 4 then text = text.." " end
 if string.sub( text, 1, 1 ) == pal["runfunctionkey"] and string.sub( text, string.len( text ), string.len( text ) ) == pal["runfunctionkey"] then
 	local run, null = load( "return"..string.sub( text, 2, string.len( text ) -1 ) )
 	local ft, fta = run()
 	pal["found_tag"] = ( ft == true )
 	pal["found_tag_at"] = ( fta or 999999 )
 else
-	local starts, ends = string.find( input, text, pal["found_tag_at"], true )
-if starts ~= nil then
+	local starts, ends = string.find( input, text.." ", pal["found_tag_at"], true )
+if starts == nil then starts, ends = string.find( input, " "..text, pal["found_tag_at"], true ) end
+if starts ~= nil or input == text then
 	pal["found_tag"] = true
-	pal["found_tag_at"] = starts
+	pal["found_tag_at"] = ( starts or pal["found_tag_at"] ) +string.len( text ) +1
    end
 end
 

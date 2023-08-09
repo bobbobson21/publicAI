@@ -61,12 +61,22 @@ return randresptbl[math.random( 1, #randresptbl )]
 else
 	local randresptbl = {"No that is wrong.","You are wrong.","Wrong","That is wrong.","No that is wrong user.","You are wrong user.","Wrong user.","That is wrong user."}
 	
-pal:SetNewInfo( {"what","correct","answer",}, {}, {-0.70,0}, true, 0, {"The correct answer is "..tostring( result )..".","The correct answer was "..tostring( result )..".","It is "..tostring( result )..".","It was "..tostring( result ).."."}, {}, "MATH_AWNSER", nil )
+pal:SetNewInfo( {"what","correct","answer",}, {}, {-0.70,0}, true, 0, {"The correct answer is "..tostring( result )..".","The correct answer was "..tostring( result )..".","It is "..tostring( result )..".","It was "..tostring( result ).."."}, {}, nil, "MATH_AWNSER" )
 pal:DegradeInfoOverXCycles( "MATH_AWNSER", 180 )
 
 return randresptbl[math.random( 1, #randresptbl )]
    end
 end
 
--- leaning code will not been released untill all areas of pal_ai_main are tested and fixed if nessary and retested
--- getting tired of bug fixes and I dont want to have to fix the learing code untill all the other code is running right
+function sandbox:LearnAboutUser() 
+	local text = pal:BRTGetTextToRespondTo()
+
+
+
+end
+
+function sandbox:LearnGeneral() 
+	local text = pal:BRTGetTextToRespondTo()
+
+
+end

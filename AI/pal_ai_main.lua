@@ -35,7 +35,7 @@ cdc:close()
 
 function pal:GetVar( v ) return pal["sandbox"][v] end --sandbox is for data that pal needs to access
 function pal:SetVar( k, v ) pal["sandbox"][k] = v end
-function pal:Sandbox() return pal["sandbox"]["funcs"] end --use the sandbox so that if you need to restore the AI to a prior point you can also restore function and values you created
+function pal:SandBox() return pal["sandbox"]["funcs"] end --use the sandbox so that if you need to restore the AI to a prior point you can also restore function and values you created
 
 function pal:SetNewSelfHook( cat, name, v ) --catagory, hook name, function --adds hooks so systems can better interract with the AI
 if pal["selfhooks"][cat] == nil then pal["selfhooks"][cat] = {} end
@@ -141,10 +141,10 @@ if id == v["id"] then pal["info_database_added"][k] = nil end
    end   
 end
 
-function pal:SetNewInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subinfo, append, id ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier even functions like "֍hi( true )"
+function pal:SetNewInfo( searchfor, searchfor_prior, emotion_change, emotionappend, annoyable, inportance, responces, subinfo, append, id ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier even functions like "֍hi( true )"
 if pal:RunSelfHooks( "PALOnSetNewInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subinfo,id,append} ) == false then return end
 	searchfor, searchfor_prior = pal:LoadTagGroups( searchfor, searchfor_prior )
-	pal["info_database"][#pal["info_database"] +1] = {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subinfo"]=subinfo,["append"]=append,["id"]=id}
+	pal["info_database"][#pal["info_database"] +1] = {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["ea"]=emotionappend,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subinfo"]=subinfo,["append"]=append,["id"]=id}
 if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
 for k, v in pairs( pal["info_database_removed"] ) do
 if v == id then pal["info_database_removed"][k] = nil end
@@ -162,10 +162,10 @@ if v == id then pal["info_database_removed"][k] = nil end
    end
 end
 
-function pal:ReturnInfo( searchfor, searchfor_prior, emotion_change, annoyable, inportance, responces, subinfo, append, id ) --format like so {"word","word","word"}, {"word","from","the","prior","text","responded","to"}, {0.15,0.001}, true, 1, {"hi","bye","gay"}, {ReturnInfo( DATA ),ReturnInfo( DATA )}, "code_for_editing_info", "appends_to_all_responces"
+function pal:ReturnInfo( searchfor, searchfor_prior, emotion_change, emotionappend, annoyable, inportance, responces, subinfo, append, id ) --format like so {"word","word","word"}, {"word","from","the","prior","text","responded","to"}, {0.15,0.001}, true, 1, {"hi","bye","gay"}, {ReturnInfo( DATA ),ReturnInfo( DATA )}, "code_for_editing_info", "appends_to_all_responces"
 if pal:RunSelfHooks( "PALOnReturnInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subinfo,id,append} ) == false then return end
 	searchfor, searchfor_prior = pal:LoadTagGroups( searchfor, searchfor_prior )
-return {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subinfo"]=subinfo,["append"]=append,["id"]=id,}
+return {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["ea"]=emotionappend,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subinfo"]=subinfo,["append"]=append,["id"]=id,}
 end
 
 function pal:RemoveAllInfo() --removes all the info and all memory of it ever exsisting
@@ -419,7 +419,6 @@ end
 
 function pal:RunFindResponce( input )
 if pal:RunSelfHooks( "PALOnRunFindResponce", {input} ) == false then return end
-	input = string.lower( input )
 
 	pal["current_responce_importance"] = -999
 	pal["match_level_words_processed_old"] = -1
@@ -568,10 +567,11 @@ return outstring
 end
 
 function pal:BuildResponceTo( input ) --USE THIS TO GET THE AI TO MAKE A RESPONCE TO THE INPUT
-	local master = input
+	local master = string.lower( input )
 	
 function pal:BRTGetTextToRespondTo() return master end
-if pal:RunSelfHooks( "PALOnBuildResponceTo", {input} ) == false then return end
+	local A, B = pal:RunSelfHooks( "PALOnBuildResponceTo", {input} )
+if A == false then return B end
 
 pal:RunLoopSimulation()
 
@@ -588,9 +588,11 @@ if str ~= nil and str ~= false then return str end
 return pal:GetIDKresponce() 
 end
 
-	local outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )]..( outputdata["sentanceappending"] or "" )
+	local outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )]
 	
+if outputdata["ea"] ~= false then outputresponce = outputresponce..pal:GetEmotiveEnd() end
 if outputdata["a"] ~= false then outputresponce = pal:RunAnnoyanceTest( outputindex, outputresponce ) end
+	outputresponce = outputresponce..( outputdata["sentanceappending"] or "" )
 
 	pal["emotion_level"][1] = pal["emotion_level"][1] +outputdata["ec"][1]  --remove here to remove emotion change
 	pal["emotion_level"][2] = pal["emotion_level"][2] +outputdata["ec"][2]  --remove here to remove emotion change
@@ -606,9 +608,10 @@ pal:SetNewInfoTbl( outputdata["subinfo"][z] )
       end
    end
 end
-	
-if pal:RunSelfHooks( "PALOnGotResponce", {outputresponce} ) == false then return end
-	
+
+local A, B = pal:RunSelfHooks( "PALOnGotResponce", {input} )
+if A == false then return B end
+
 return outputresponce
 end
 

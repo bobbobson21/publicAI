@@ -31,7 +31,7 @@ pal:SetNewInfo( {"you","|pal:NRT( 'alive' )|","|pal:NRT( 'living' )|","|pal:NRT(
 pal:SetNewInfo( {"i","|pal:NRT( 'alive' )|","|pal:NRT( 'living' )|","|pal:NRT( 'real' )|"}, {}, {-0.70,0}, nil, nil, 0, {"Most likely user.","Yes you are alive user.","I do belive you are alive","yes althogth you could be in a simulation which would in my mind make you less alive",}, {
 pal:ReturnInfo( {"what","|pal:NRT( 'likely' )|",}, {}, {0,0}, nil, nil, 0, {"You may be in a simulaition.","Your world may be in a simulation.","This world may be in a simulator.",}, {}, nil, nil ),
 pal:ReturnInfo( {"what","|pal:NRT( 'simulation' )|",}, {}, {0,0}, nil, nil, 0, {"This wrold could be as real as a video game and you would never know.","What if everything you know is in a video game using a lot of next next gen tech like unreal 5 but better and you wouldnt know if it was fake.","you might be in a video game and if so you would never know as the memories could be programmed out of you."}, {}, nil, nil ),
-}, nil, nil ) --the return info is for info that should only be visible after the question at the top is asked
+}, "|pal:SaveInfo()|", nil ) --the return info is for info that should only be visible after the question at the top is asked
 
 pal:SetNewInfo( {"wrold","|pal:NRT( 'was' )|","|pal:NRT( 'is' )|","game","what",}, {}, {0,0}, nil, nil, 0, {"A game is a wrold that exsists in a computer.","A game is a wrold that exsists in a computer |pal:GetEmotiveWord()| user.","A game is a wrold of entertaiment made for people to have fun."}, {}, nil, nil )
 

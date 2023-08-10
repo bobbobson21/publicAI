@@ -151,14 +151,16 @@ if v == id then pal["info_database_removed"][k] = nil end
    end
 end
 
-function pal:SetNewInfoTbl( tbl ) --an unscure but fast way of adding info
+function pal:SetNewInfoTbl( tbl, denysaving ) --an unscure but fast way of adding info
 if pal:RunSelfHooks( "PALOnSetNewInfoTbl", {tbl} ) == false then return end
-	a, b = pal:LoadTagGroups( tbl["sf"], tbl["sfl"] )
+	tbl["sf"], tbl["sfl"] = pal:LoadTagGroups( tbl["sf"], tbl["sfl"] )
 	pal["info_database"][#pal["info_database"] +1] = tbl
 
+if denysaving ~= true then --this function has a deny saveing var because using it can result in the same info being saved more than once
 if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
 for k, v in pairs( pal["info_database_removed"] ) do
 if v == id then pal["info_database_removed"][k] = nil end
+      end
    end
 end
 
@@ -556,6 +558,9 @@ if pointa ~= 0 and pointb ~= 0 then
 if result ~= nil then
 	outstring = string.sub( outstring, 1, pointa -1 +stringdiffreance )..result..string.sub( outstring, pointb +1 +stringdiffreance, string.len( outstring ) )
 	stringdiffreance = string.len( outstring ) -string.len( input )	
+else
+	outstring = string.sub( outstring, 1, pointa -1 +stringdiffreance )..string.sub( outstring, pointb +1 +stringdiffreance, string.len( outstring ) )
+	stringdiffreance = string.len( outstring ) -string.len( input )	
 end
 	pointa, pointb = 0, 0
       end  
@@ -592,7 +597,7 @@ end
 	
 if outputdata["ea"] ~= false then outputresponce = outputresponce..pal:GetEmotiveEnd() end
 if outputdata["a"] ~= false then outputresponce = pal:RunAnnoyanceTest( outputindex, outputresponce ) end
-	outputresponce = outputresponce..( outputdata["sentanceappending"] or "" )
+	outputresponce = outputresponce..( outputdata["append"] or "" )
 
 	pal["emotion_level"][1] = pal["emotion_level"][1] +outputdata["ec"][1]  --remove here to remove emotion change
 	pal["emotion_level"][2] = pal["emotion_level"][2] +outputdata["ec"][2]  --remove here to remove emotion change
@@ -601,12 +606,13 @@ if outputdata["a"] ~= false then outputresponce = pal:RunAnnoyanceTest( outputin
 	outputresponce = pal:RunLuaCodeInResponce( outputresponce )
 	
 if outputdata["subinfo"] ~= nil then --add sub responces this was move to after to make it easy to replace id'ed responces
-for z = 1, #outputdata["subinfo"] do
+	for z = 1, #outputdata["subinfo"] do
 if outputdata["subinfo"][z] ~= nil then 
 	local t = outputdata["subinfo"][z]
-pal:SetNewInfoTbl( outputdata["subinfo"][z] )
-      end
+pal:SetNewInfoTbl( outputdata["subinfo"][z], ( pal["info_database"][outputindex]["subinfoadded"] == true ) )
    end
+end
+	pal["info_database"][outputindex]["subinfoadded"] = true
 end
 
 local A, B = pal:RunSelfHooks( "PALOnGotResponce", {input} )
@@ -628,31 +634,49 @@ for z = 1, #pal["info_database_added"] do
 	local currententry = pal["info_database_added"][z]
 	local responces = ""
 	local subinfo = ""
+	local sf = ""
+	local sfp = ""
 
-for y = 1, currententry["responces"] do --reformats responces so thay can be saved with ease
+for y = 1, #pal["info_database_added"][z]["sf"] do --reformats search data so thay can be saved with ease
+if sf == "" then
+	local currententryB = currententry["sf"][y]
+	sf = sf..currententry["sf"][y]
+else
+	sf = sf..","..currententry["sf"][y]
+   end
+end
+
+for y = 1, #pal["info_database_added"][z]["sfl"] do --reformats prior search data so thay can be saved with ease
+if sfp == "" then
+	local currententryB = currententry["sfl"][y]
+	sfp = sfp..currententry["sfl"][y]
+else
+	sfp = sfp..","..currententry["sfl"][y]
+   end
+end
+
+for y = 1, #currententry["responces"] do --reformats responces so thay can be saved with ease
 if responces == "" then
 responces = responces..currententry["responces"][y]
 else
-responces = responces..","..currententry[z]["responces"][y]
+responces = responces..","..currententry["responces"][y]
    end
 end
 
-for y = 1, pal["info_database_added"][z]["subinfo"] do --reformats sub info so thay can be saved with ease
+for y = 1, #pal["info_database_added"][z]["subinfo"] do --reformats sub info so thay can be saved with ease
 	local currententryB = currententry["subinfo"][y]
-	local currentdata = "{['sf']="..currententryB["sf"]..",['sfl']="..currententryB["sfl"]..",['ec']="..currententryB["ec"]..",['a']="..currententryB["a"]..",['i']="..currententryB["i"]..",['id']="..currententryB["id"]..",['append']="..currententryB["append"].."}"
 if subinfo == "" then
-subinfo = subinfo..currentdata
+	subinfo = subinfo..currententry["subinfo"][y]
 else
-subinfo = subinfo..","..currentdata
+	subinfo = subinfo..","..currententry["subinfo"][y]
    end
 end
-	
 
-	local currentline = "pal:AddInfo( "..tostring( currententry["sf"] )..", "..tostring( currententry["sfl"] )..", {"..tostring( currententry["ec"][1] )..","..tostring( currententry["ec"][2] ).."}, "..tostring( currententry["a"] )..", "..tostring( currententry["i"] )..", {"..tostring( responces ).."}, {"..tostring( subinfo ).."}, "..tostring( currententry["id"] )..", "..tostring( currententry["append"] ).." )"
+	local currentline = "pal:AddInfo( {"..tostring( sf ).."}, {"..tostring( sfp ).."}, {"..tostring( currententry["ec"][1] )..","..tostring( currententry["ec"][2] ).."}, "..tostring( currententry["a"] )..", "..tostring( currententry["i"] )..", {"..tostring( responces ).."}, {"..tostring( subinfo ).."}, "..tostring( currententry["id"] )..", "..tostring( currententry["append"] ).." )"
 if addresponcesfiledata == "" then --responce saveing
 addresponcesfiledata = addresponcesfiledata..currentline
 else
-addresponcesfiledata = addresponcesfiledata..string.char( 10 )..currentdata
+addresponcesfiledata = addresponcesfiledata..string.char( 10 )..currentline
    end
 end
 
@@ -666,17 +690,18 @@ addresponcesfiledata = addresponcesfiledata..string.char( 10 )..currentdata
    end
 end
 
-	local file = io.open( pal["save_directory"].."/".."main_save.dat", "w" )
-io.write( addresponcesfiledata )
-file:close()
 
+io.output( "main_save.dat" ) --we are doing files this way because the other way just kept giving me grife
+io.write( addresponcesfiledata )
+io.close()
+io.output(io.stdout)
 end
 
 function pal:LoadInfo()
 if pal:RunSelfHooks( "PALOnLoadInfo", {} ) == false then return end
-	local file =io.open( pal["save_directory"].."/".."main_save.dat" ,"r")
+	local file = io.open( "main_save.dat" ,"r")
 if file ~=nil then io.close( file ); file = true else file = false end
-if file == true then dofile( pal["save_directory"].."/".."main_save.dat" ) end
+if file == true then dofile( "main_save.dat" ) end
 end
 
 function pal:SetRestorePoint() --sets a restore point that we can undo to which is useful for siturations where you may have more then one pal AI but only have one pal file

@@ -62,7 +62,7 @@ return randresptbl[math.random( 1, #randresptbl )]
 else
 	local randresptbl = {"No that is wrong.","You are wrong.","Wrong","That is wrong.","No that is wrong user.","You are wrong user.","Wrong user.","That is wrong user."}
 	
-pal:SetNewInfo( {"what","correct","answer",}, {}, {-0.70,0}, true, 0, {"The correct answer is "..tostring( result )..".","The correct answer was "..tostring( result )..".","It is "..tostring( result )..".","It was "..tostring( result ).."."}, {}, nil, "MATH_AWNSER" )
+pal:SetNewInfo( {"what","correct","answer",}, nil, {-0.70,0}, false, nil, nil, {"The correct answer is "..tostring( result )..".","The correct answer was "..tostring( result )..".","It is "..tostring( result )..".","It was "..tostring( result ).."."}, nil, nil, "MATH_AWNSER" )
 pal:DegradeInfoOverXCycles( "MATH_AWNSER", 180 ) --this whay they dont ge the awnser unless they ask for it
 
 return randresptbl[math.random( 1, #randresptbl )]

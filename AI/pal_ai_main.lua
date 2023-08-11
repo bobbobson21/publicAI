@@ -26,10 +26,10 @@ cdc:close()
 	pal["annoyance_responces_attachment"] = {}
 	pal["annoyance_decreese_in"] = 15
 	pal["annoyance_responces"] = {}
+	pal["annoyance_effectemotionby"] = {-0.5,-0.5}
 	pal["searchfor_groups"] = {}
 	pal["sandbox"] = {["funcs"]={},}
 	pal["runfunctionkey"] = "|"
-	pal["save_directory"] = ( current_dir ).."/savdata"
 
 -- end of seting pal vars start of data control functions ----------------------------------------------------------------------------------------------------
 
@@ -86,11 +86,11 @@ if pal["gender_momory"] == nil then pal["gender_momory"] = {} end
 end
 
 function pal:DegradeInfoOverXCycles( id, cyclesinfostayesinmemory ) --makes info eventually degrades to nothing use to simulates forgetfulness
-if pal:RunSelfHooks( "PALOnDegradeInfoOverXCycles", {id,cyclesinfostayesinmemory} ) == false then return end
-for k, v in pairs( pal["info_database"] ) do
-if v["id"] == id then
-	pal["info_degrade_level"][k] = cyclesinfostayesinmemory -1
-      end
+	if pal:RunSelfHooks( "PALOnDegradeInfoOverXCycles", {id,cyclesinfostayesinmemory} ) == false then return end
+	for k, v in pairs( pal["info_database"] ) do
+	if v["id"] == id then
+		pal["info_degrade_level"][k] = cyclesinfostayesinmemory -1
+	  end
    end
 end
 
@@ -298,6 +298,19 @@ if level == 1 then return pal["annoyance_responces_attachment"][math.random( 1, 
 if level == 2 then return pal["annoyance_responces"][math.random( 1, #pal["annoyance_responces"] )] end
 end
 
+function pal:GetAnnoyanceLevel( inputindex ) --for if you ask the same question to many times
+	local annoyedlevel = pal["annoyance_responcecounter"][inputindex] or 0
+if annoyedlevel >= 1 then
+if annoyedlevel >= pal["annoyance_maxlevel"] then
+   return 2
+else
+   return 1
+   end
+else
+   return 0
+   end
+end
+
 function pal:SetPriorInput( text ) --sets the previous thing the player said
 if pal:RunSelfHooks( "PALOnSetPriorInput", {text} ) == false then return end
 	pal["prior_input"] = text
@@ -318,6 +331,8 @@ if x ~= 0 then x = ( x /( math.abs( x ) +math.abs( y ) ) ) *pal["emotion_gravata
 if y ~= 0 then y = ( y /( math.abs( x ) +math.abs( y ) ) ) *pal["emotion_gravatate_power"] end
     pal["emotion_level"][1] = pal["emotion_level"][1] +x
 	pal["emotion_level"][2] = pal["emotion_level"][2] +y
+	pal["emotion_level"][1] = math.min( math.max( 1, pal["emotion_level"][1] ), pal["emotion_grid_max_size"] ) --remove here to remove emotion change
+	pal["emotion_level"][2] = math.min( math.max( 1, pal["emotion_level"][2] ), pal["emotion_grid_max_size"] )
 end
 
 function pal:AnnoyanceDecreese() --allows for annoyence to war off over time
@@ -347,7 +362,7 @@ end
 function pal:DegradeInfo() --dose the actually info degradeing
 for k, v in pairs( pal["info_degrade_level"] ) do
 	pal["info_degrade_level"][k] = pal["info_degrade_level"][k] -1
-if v <= 0 then
+if pal["info_degrade_level"][k] <= 0 then
 	pal["info_database_removed"][#pal["info_database_removed"] +1] = pal["info_database"][k]["id"]
 	pal["info_database"][k], pal["info_degrade_level"][k] = nil, nil
       end
@@ -528,6 +543,11 @@ if pal:RunSelfHooks( "PALOnRunAnnoyanceTest", {inputindex, input, annoyedlevel} 
 	pal["annoyance_responcecounter"][inputindex] = math.min( annoyedlevel +1, pal["annoyance_maxlevel"] )
 
 if annoyedlevel >= 1 then
+	pal["emotion_level"][1] = pal["emotion_level"][1] +pal["annoyance_effectemotionby"][1]
+	pal["emotion_level"][2] = pal["emotion_level"][2] +pal["annoyance_effectemotionby"][2]
+	pal["emotion_level"][1] = math.min( math.max( 1, pal["emotion_level"][1] ), pal["emotion_grid_max_size"] ) --remove here to remove emotion change
+	pal["emotion_level"][2] = math.min( math.max( 1, pal["emotion_level"][2] ), pal["emotion_grid_max_size"] )
+
 if annoyedlevel >= pal["annoyance_maxlevel"] then
 	return pal:GetAnnoyanceRespoce( 2 )
 else
@@ -580,13 +600,14 @@ if A == false then return B end
 
 pal:RunLoopSimulation()
 
-	master = pal:RunSpellCheck( master )
+	master = pal:RunSpellCheck( master ) --stage one spellchecking
 pal:RunAjustEmotionToEmotiveKeyWords( master ) --remove here to remove emotion change
 
-	local outputindex = pal:RunFindResponce( master )
-	local outputdata = pal:GetInfoByIndex( outputindex )
+	local outputindex = pal:RunFindResponce( master ) --stage two find a suitable responce
+	local outputdata = pal:GetInfoByIndex( outputindex ) --fetch responce
 
 function pal:BRTGetInfoIndex() return outputindex end
+
 if outputindex == nil then
 	local str = pal:RunSelfHooks( "PALOnIDKoutput", {input} )
 if str ~= nil and str ~= false then return str end
@@ -595,12 +616,23 @@ end
 
 	local outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )]
 	
-if outputdata["ea"] ~= false then outputresponce = outputresponce..pal:GetEmotiveEnd() end
-if outputdata["a"] ~= false then outputresponce = pal:RunAnnoyanceTest( outputindex, outputresponce ) end
+if outputdata["ea"] ~= false then outputresponce = outputresponce.." "..pal:GetEmotiveEnd() end --appending of responce section --emotion appending
+if outputdata["a"] ~= false then outputresponce = pal:RunAnnoyanceTest( outputindex, outputresponce ) end --annoyence appending
+if pal:GetAnnoyanceLevel( outputindex ) == 2 then --end function if to annoyed appending
+	local str = pal:RunSelfHooks( "PALOnMaxAnnoyanceoutput", {input} )
+if str ~= nil and str ~= false then return str end
+return outputresponce
+end
 	outputresponce = outputresponce..( outputdata["append"] or "" )
 
+if outputdata["ec"] ~= nil then --remove here to remove emotion change
 	pal["emotion_level"][1] = pal["emotion_level"][1] +outputdata["ec"][1]  --remove here to remove emotion change
 	pal["emotion_level"][2] = pal["emotion_level"][2] +outputdata["ec"][2]  --remove here to remove emotion change
+	pal["emotion_level"][1] = math.min( math.max( 1, pal["emotion_level"][1] ), pal["emotion_grid_max_size"] ) --remove here to remove emotion change
+	pal["emotion_level"][2] = math.min( math.max( 1, pal["emotion_level"][2] ), pal["emotion_grid_max_size"] ) --remove here to remove emotion change
+end --remove here to remove emotion change
+
+function pal:BRTGetInfoIndex() return outputindex end
 
 	pal["prior_input"] = input --used in the prior search
 	outputresponce = pal:RunLuaCodeInResponce( outputresponce )
@@ -612,7 +644,7 @@ if outputdata["subinfo"][z] ~= nil then
 pal:SetNewInfoTbl( outputdata["subinfo"][z], ( pal["info_database"][outputindex]["subinfoadded"] == true ) )
    end
 end
-	pal["info_database"][outputindex]["subinfoadded"] = true
+	pal["info_database"][outputindex]["subinfoadded"] = true --ensure that the save system only logs the responce being added once
 end
 
 local A, B = pal:RunSelfHooks( "PALOnGotResponce", {input} )
@@ -630,49 +662,55 @@ if pal:RunSelfHooks( "PALOnSaveInfo", {} ) == false then return end
 
 	local addresponcesfiledata = "" --start of saveing responce file data
 
-for z = 1, #pal["info_database_added"] do
-	local currententry = pal["info_database_added"][z]
+for k, v in pairs( pal["info_database_added"] ) do
 	local responces = ""
 	local subinfo = ""
 	local sf = ""
 	local sfp = ""
 
-for y = 1, #pal["info_database_added"][z]["sf"] do --reformats search data so thay can be saved with ease
+if v["sf"] ~= nil then
+for y = 1, #v["sf"] do --reformats search data so thay can be saved with ease
 if sf == "" then
-	local currententryB = currententry["sf"][y]
-	sf = sf..currententry["sf"][y]
+	sf = sf.."'"..v["sf"][y].."'"
 else
-	sf = sf..","..currententry["sf"][y]
+	sf = sf..",".."'"..v["sf"][y].."'"
+      end
    end
 end
 
-for y = 1, #pal["info_database_added"][z]["sfl"] do --reformats prior search data so thay can be saved with ease
+if v["sfl"] ~= nil then
+for y = 1, #v["sfl"] do --reformats prior search data so thay can be saved with ease
 if sfp == "" then
-	local currententryB = currententry["sfl"][y]
-	sfp = sfp..currententry["sfl"][y]
+	sfp = sfp.."'"..v["sfl"][y].."'"
 else
-	sfp = sfp..","..currententry["sfl"][y]
+	sfp = sfp..",".."'"..v["sfl"][y].."'"
+      end
    end
 end
 
-for y = 1, #currententry["responces"] do --reformats responces so thay can be saved with ease
+if v["responces"] ~= nil then
+for y = 1, #v["responces"] do --reformats responces so thay can be saved with ease
 if responces == "" then
-responces = responces..currententry["responces"][y]
+responces = responces.."'"..v["responces"][y].."'"
 else
-responces = responces..","..currententry["responces"][y]
+responces = responces..",".."'"..v["responces"][y].."'"
+      end
    end
 end
 
-for y = 1, #pal["info_database_added"][z]["subinfo"] do --reformats sub info so thay can be saved with ease
-	local currententryB = currententry["subinfo"][y]
+if v["subinfo"] ~= nil then
+for y = 1, #v["subinfo"] do --reformats sub info so thay can be saved with ease
 if subinfo == "" then
-	subinfo = subinfo..currententry["subinfo"][y]
+	subinfo = subinfo.."'"..v["subinfo"][y].."'"
 else
-	subinfo = subinfo..","..currententry["subinfo"][y]
+	subinfo = subinfo..",".."'"..v["subinfo"][y].."'"
+      end
    end
 end
 
-	local currentline = "pal:AddInfo( {"..tostring( sf ).."}, {"..tostring( sfp ).."}, {"..tostring( currententry["ec"][1] )..","..tostring( currententry["ec"][2] ).."}, "..tostring( currententry["a"] )..", "..tostring( currententry["i"] )..", {"..tostring( responces ).."}, {"..tostring( subinfo ).."}, "..tostring( currententry["id"] )..", "..tostring( currententry["append"] ).." )"
+if v["ec"] == nil then v["ec"] = {0,0} end --pervents saveing issues
+
+	local currentline = "pal:AddInfo( {"..tostring( sf ).."}, {"..tostring( sfp ).."}, {"..tostring( v["ec"][1] )..","..tostring( v["ec"][2] ).."}, "..tostring( v["a"] )..", "..tostring( v["i"] )..", {"..tostring( responces ).."}, {"..tostring( subinfo ).."}, "..tostring( v["append"] )..", "..tostring( v["id"] ).." )"
 if addresponcesfiledata == "" then --responce saveing
 addresponcesfiledata = addresponcesfiledata..currentline
 else
@@ -680,9 +718,8 @@ addresponcesfiledata = addresponcesfiledata..string.char( 10 )..currentline
    end
 end
 
-for z = 1, #pal["info_database_removed"] do --deleted responces saveing
-	local currententry = pal["info_database_removed"][z]
-	local currentdata = "pal:RemoveInfo( "..currententry.." )"
+for k, v in pairs( pal["info_database_removed"] ) do
+	local currentdata = "pal:RemoveInfo( "..v.." )"
 if addresponcesfiledata == "" then
 addresponcesfiledata = addresponcesfiledata..currentdata
 else
@@ -690,11 +727,23 @@ addresponcesfiledata = addresponcesfiledata..string.char( 10 )..currentdata
    end
 end
 
+	local hasitbeendonebefore = {}
+for k, v in pairs( pal["info_degrade_level"] ) do
+	local currentdata = "pal:DegradeInfoOverXCyclesByIndex( "..tostring( pal["info_database"][k]["id"] )..","..tostring( v ).." )"
+if pal["info_database"][k] ~= nil and pal["info_database"][k]["id"] ~= nil and hasitbeendonebefore[pal["info_database"][k]["id"]] ~= true then
+	hasitbeendonebefore[pal["info_database"][k]["id"]] = true
+if addresponcesfiledata == "" then
+addresponcesfiledata = addresponcesfiledata..currentdata
+else
+addresponcesfiledata = addresponcesfiledata..string.char( 10 )..currentdata
+      end
+   end
+end
 
 io.output( "main_save.dat" ) --we are doing files this way because the other way just kept giving me grife
 io.write( addresponcesfiledata )
 io.close()
-io.output(io.stdout)
+io.output( io.stdout )
 end
 
 function pal:LoadInfo()
@@ -704,7 +753,7 @@ if file ~=nil then io.close( file ); file = true else file = false end
 if file == true then dofile( "main_save.dat" ) end
 end
 
-function pal:SetRestorePoint() --sets a restore point that we can undo to which is useful for siturations where you may have more then one pal AI but only have one pal file
+function pal:SetRestorePoint() --sets a restore point that we can undo to which is useful for siturations where you may have more then one pal AI but only have one pal core running
 if pal:RunSelfHooks( "PALOnSetRestorePoint", {} ) == false then return end
 if PAL_RESTORE_TABLE == nil then PAL_RESTORE_TABLE = {} end
 

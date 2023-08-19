@@ -79,13 +79,58 @@ end
 
 function sandbox:LearnGeneral() 
 	local text = pal:BRTGetTextToRespondTo()
-
+	local infoid = "LEARNED_GENERAL_INFO"
+	local learningactavityies = {"make","build","create","destroy","remove"," do "," an "," a "," the ",}
+	local howtodoit = {"via","by","using","with","to do so","all you have to do is","some"}
+	local choppoint, chopword = 0, ""
+	local wasabletolearn = false
+	
 if sandbox:SwareWordLearningPervention() == true then
 	local randresptbl = {"sorry user I wil have to ingore what you just said as it has a sware word.","I will have to ingore this.","I am programmed not to do anything involving sware words.","You swared. I cant learn things with sware words.","Swareing will pervent me from remembering that."} --responecs to finding out the player swore while it is learning
 return randresptbl[math.random( 1, #randresptbl )] 
 end
 
+	local doonece = false
+for z = 1, #howtodoit do
+	local starts, ends = string.find( text, howtodoit[z], 1, true )
+if starts ~= nil and doonece ~= true then --we dont want the risk of it runnig twice 
+	doonece = true
+	wasabletolearn = true
+	
+	local beforeprimarycut = string.sub( text, 1, starts -1 ) --everything befor the howtodoit word
+	local afterprimarycut = string.sub( text, ends +1, string.len( text ) ) --everything after the howtodoit
+	
+for y = 1, #learningactavityies do
+	local startsb, endsb = string.find( beforeprimarycut, learningactavityies[y], 1, true ) --finds out what the player is learning
+if startsb ~= nil and endsb >= choppoint then
+	choppoint, chopword = startsb, learningactavityies[y]
+   end
+end
 
+if string.sub( afterprimarycut, string.len( afterprimarycut ), string.len( afterprimarycut ) ) == "." then afterprimarycut = string.sub( afterprimarycut, 1, string.len( afterprimarycut ) -1 ) end --makes ending a sentance easy
+	local result = {afterprimarycut..".",afterprimarycut.." user.",afterprimarycut.." |pal:GetEmotiveWord()| user."}
+	local searcharea = string.sub( choppoint, 1, starts -1 )
+	local searchcontent = {}
+	local lastsearchpoint = 1
+	
+for z = 1, string.len( searcharea ) do --converts all words in the searcharea into the own NRT tags
+if string.sub( searcharea, z, z ) == " " then
+	searchcontent[#searchcontent +1] = "pal:NRT( '"..string.sub( searcharea, lastsearchpoint, z -1 ).."' )"
+	lastsearchpoint = z +1
+   end
+end
+
+pal:SetNewInfo( searchcontent, nil, nil, nil, nil, nil, result, nil, nil, infoid ) --adds the learned info
+
+   end
+end
+
+if wasabletolearn == true then
+local randresptbl = {"Got it.","Yep ok.","Understood","I will remember that.","Noted","Got it user.","Yep ok user.","Understood user","I will remember that user.","Noted user.","My power grows with more information gordon."} --respons with a clarafcation ask
+   return randresptbl[math.random( 1, #randresptbl )] --IT LEARND SOMETHING
+else
+   return pal:GetIDKresponce() --IT DIDNT HAVE A CLUE WHAT THE USER WAS SPEAKING ABOUT
+   end
 end
 
 function sandbox:LearnAboutUser() 
@@ -93,7 +138,7 @@ function sandbox:LearnAboutUser()
 	local findtext = {"favourite","like","best","most liked","have","most hated","hate","most dislike","dislike","hate the most","job"} --what is the AI learning about the player
 	local choppoint, chopword = 0, ""
 	local responce = ""
-	local infoid = "USER_INFO"
+	local infoid = "LEARNED_USER_INFO"
 
 if sandbox:SwareWordLearningPervention() == true then
 	local randresptbl = {"sorry user I wil have to ingore what you just said as it has a sware word.","I will have to ingore this.","I am programmed not to do anything involving sware words.","You swared. I cant learn things with sware words.","Swareing will pervent me from remembering that."} --responecs to finding out the player swore while it is learning
@@ -101,7 +146,7 @@ return randresptbl[math.random( 1, #randresptbl )]
 end
 
 for z = 1, #findtext do
-	local starts ends = string.find( text, findtext[z], 1, true )
+	local starts, ends = string.find( text, findtext[z], 1, true )
 if ends ~= nil and ends >= choppoint then choppoint,chopword = ends, findtext[z] end
 end
 if string.sub( text, choppoint +1, choppoint +3 ) == "is" then choppoint = choppoint +3 end
@@ -132,7 +177,7 @@ local randresptbl = {"Are you sure this is your new "..chopword.." thing.","Do y
    end
 end
 
-pal:SetNewInfo( {"what","my",chopword}, {"that would be"..responce,"I belive it is"..responce,"that would be"..responce}, {-0.70,0}, true, 0, {}, {}, nil, infoid )
+pal:SetNewInfo( {"what","my",chopword}, nil, nil, nil, nil, nil, {"that would be"..responce,"I belive it is"..responce,"that would be"..responce}, nil, nil, append )
 	local randresptbl = {"Got it.","I will remember this.","Noted","Thanks for telling me that.","My power grows with more information gordon.",""}
 return randresptbl[math.random( 1, #randresptbl )]
 end

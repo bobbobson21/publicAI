@@ -592,62 +592,58 @@ return outstring
 end
 
 function pal:BuildResponceTo( input ) --USE THIS TO GET THE AI TO MAKE A RESPONCE TO THE INPUT
-	local master = string.lower( input )
+	local master = pal:RunSpellCheck( string.lower( input ) ) --stage one: spellchecking
+function pal:BRTGetTextToRespondTo() return master end --spell checking is done before this so that functions like the NRT do not have to continusely do spellchecking
 	
-function pal:BRTGetTextToRespondTo() return master end
-	local A, B = pal:RunSelfHooks( "PALOnBuildResponceTo", {input} )
+	local A, B = pal:RunSelfHooks( "PALOnBuildResponceTo", {master} )
 if A == false then return B end
 
-pal:RunLoopSimulation()
+pal:RunLoopSimulation() --stage two: this makes it so that the loop runs every second kinda
+pal:RunAjustEmotionToEmotiveKeyWords( master ) --stage three: remove here to remove emotion change
 
-	master = pal:RunSpellCheck( master ) --stage one spellchecking
-pal:RunAjustEmotionToEmotiveKeyWords( master ) --remove here to remove emotion change
-
-	local outputindex = pal:RunFindResponce( master ) --stage two find a suitable responce
-	local outputdata = pal:GetInfoByIndex( outputindex ) --fetch responce
+	local outputindex = pal:RunFindResponce( master ) --stage four: find a suitable set responce
+	local outputdata = pal:GetInfoByIndex( outputindex ) --stage four: fetch set responce
 
 function pal:BRTGetInfoIndex() return outputindex end
 
-if outputindex == nil then
-	local str = pal:RunSelfHooks( "PALOnIDKoutput", {input} )
+if outputindex == nil then --if no responce could be found to what the user says run this code
+	local str = pal:RunSelfHooks( "PALOnIDKoutput", {master} )
 if str ~= nil and str ~= false then return str end
 return pal:GetIDKresponce() 
 end
 
-	local outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )]
+	local outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )] --stage five: pick a responce out of the set
 	
-if outputdata["ea"] ~= false then outputresponce = outputresponce.." "..pal:GetEmotiveEnd() end --appending of responce section --emotion appending
-if outputdata["a"] ~= false then outputresponce = pal:RunAnnoyanceTest( outputindex, outputresponce ) end --annoyence appending
-if pal:GetAnnoyanceLevel( outputindex ) == 2 then --end function if to annoyed appending
+if outputdata["ea"] ~= false then outputresponce = outputresponce.." "..pal:GetEmotiveEnd() end --stage six: appending of responce section --emotion appending
+if outputdata["a"] ~= false then outputresponce = pal:RunAnnoyanceTest( outputindex, outputresponce ) end --stage six: annoyence appending
+if pal:GetAnnoyanceLevel( outputindex ) == 2 then --stage six: end function if to annoyed appending
 	local str = pal:RunSelfHooks( "PALOnMaxAnnoyanceoutput", {input} )
 if str ~= nil and str ~= false then return str end
 return outputresponce
 end
-	outputresponce = outputresponce..( outputdata["append"] or "" )
+	outputresponce = outputresponce..( outputdata["append"] or "" ) --stage six
 
-if outputdata["ec"] ~= nil then --remove here to remove emotion change
-	pal["emotion_level"][1] = pal["emotion_level"][1] +outputdata["ec"][1]  --remove here to remove emotion change
-	pal["emotion_level"][2] = pal["emotion_level"][2] +outputdata["ec"][2]  --remove here to remove emotion change
-	pal["emotion_level"][1] = math.min( math.max( 1, pal["emotion_level"][1] ), pal["emotion_grid_max_size"] ) --remove here to remove emotion change
-	pal["emotion_level"][2] = math.min( math.max( 1, pal["emotion_level"][2] ), pal["emotion_grid_max_size"] ) --remove here to remove emotion change
-end --remove here to remove emotion change
+if outputdata["ec"] ~= nil then --stage seven: remove here to remove emotion change
+	pal["emotion_level"][1] = pal["emotion_level"][1] +outputdata["ec"][1]  --stage seven: remove here to remove emotion change
+	pal["emotion_level"][2] = pal["emotion_level"][2] +outputdata["ec"][2]  --stage seven: remove here to remove emotion change
+	pal["emotion_level"][1] = math.min( math.max( 1, pal["emotion_level"][1] ), pal["emotion_grid_max_size"] ) --stage seven: remove here to remove emotion change
+	pal["emotion_level"][2] = math.min( math.max( 1, pal["emotion_level"][2] ), pal["emotion_grid_max_size"] ) --stage seven: remove here to remove emotion change
+end --stage seven: remove here to remove emotion change
 
-function pal:BRTGetInfoIndex() return outputindex end
-
-	pal["prior_input"] = input --used in the prior search
+	pal["prior_input"] = master --stage eight: alllows us to search througth what the player said before what there currently saying 
 	outputresponce = pal:RunLuaCodeInResponce( outputresponce )
 	
-if outputdata["subinfo"] ~= nil then --add sub responces this was move to after to make it easy to replace id'ed responces
+if outputdata["subinfo"] ~= nil then --stage nine: add sub responces this was move to after to make it easy to replace id'ed responces
 	for z = 1, #outputdata["subinfo"] do
 if outputdata["subinfo"][z] ~= nil then 
 	local t = outputdata["subinfo"][z]
 pal:SetNewInfoTbl( outputdata["subinfo"][z], ( pal["info_database"][outputindex]["subinfoadded"] == true ) )
    end
 end
-	pal["info_database"][outputindex]["subinfoadded"] = true --ensure that the save system only logs the responce being added once
+	pal["info_database"][outputindex]["subinfoadded"] = true --stage nine: ensure that the save system only logs the responce being added once
 end
 
-local A, B = pal:RunSelfHooks( "PALOnGotResponce", {input} )
+local A, B = pal:RunSelfHooks( "PALOnGotResponce", {master} )
 if A == false then return B end
 
 return outputresponce

@@ -82,7 +82,6 @@ function sandbox:LearnGeneral()
 	local infoid = "LEARNED_GENERAL_INFO"
 	local learningactavityies = {"make","build","create","destroy","remove"," do "," an "," a "," the ",}
 	local howtodoit = {"via","by","using","with","to do so","all you have to do is","some"}
-	local choppoint, chopword = 0, ""
 	local wasabletolearn = false
 	
 if sandbox:SwareWordLearningPervention() == true then
@@ -97,30 +96,23 @@ if starts ~= nil and doonece ~= true then --we dont want the risk of it runnig t
 	doonece = true
 	wasabletolearn = true
 	
-	local beforeprimarycut = string.sub( text, 1, starts -1 ) --everything befor the howtodoit word
-	local afterprimarycut = string.sub( text, ends +1, string.len( text ) ) --everything after the howtodoit
-	
-for y = 1, #learningactavityies do
-	local startsb, endsb = string.find( beforeprimarycut, learningactavityies[y], 1, true ) --finds out what the player is learning
-if startsb ~= nil and endsb >= choppoint then
-	choppoint, chopword = startsb, learningactavityies[y]
-   end
-end
+	local beforeprimarycut = string.sub( text, 1, starts -2 ) --everything befor the howtodoit word
+	local afterprimarycut = string.sub( text, ends +2, string.len( text ) ) --everything after the howtodoit
 
 if string.sub( afterprimarycut, string.len( afterprimarycut ), string.len( afterprimarycut ) ) == "." then afterprimarycut = string.sub( afterprimarycut, 1, string.len( afterprimarycut ) -1 ) end --makes ending a sentance easy
 	local result = {afterprimarycut..".",afterprimarycut.." user.",afterprimarycut.." |pal:GetEmotiveWord()| user."}
-	local searcharea = string.sub( choppoint, 1, starts -1 )
 	local searchcontent = {}
 	local lastsearchpoint = 1
 	
-for z = 1, string.len( searcharea ) do --converts all words in the searcharea into the own NRT tags
-if string.sub( searcharea, z, z ) == " " then
-	searchcontent[#searchcontent +1] = "pal:NRT( '"..string.sub( searcharea, lastsearchpoint, z -1 ).."' )"
+for z = 1, string.len( beforeprimarycut ) do --converts all words in the beforeprimarycut into the own NRT tags
+if string.sub( beforeprimarycut, z, z ) == " " or z == string.len( beforeprimarycut ) then
+	searchcontent[#searchcontent +1] = "|pal:NRT( '"..string.sub( beforeprimarycut, lastsearchpoint, z -1 ).."' )|"
+if z == string.len( beforeprimarycut ) then searchcontent[#searchcontent] = string.sub( beforeprimarycut, lastsearchpoint, z ) end
 	lastsearchpoint = z +1
    end
 end
 
-pal:SetNewInfo( searchcontent, nil, nil, nil, nil, nil, result, nil, nil, infoid ) --adds the learned info
+pal:SetNewInfo( searchcontent, nil, nil, nil, nil, 1, result, nil, nil, infoid ) --adds the learned info
 
    end
 end

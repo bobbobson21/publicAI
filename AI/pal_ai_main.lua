@@ -73,7 +73,7 @@ function pal:NRT( tag ) --for tags/words you want it to seach for but only mark 
 if starts ~= nil then
 	strlen = pal["found_tag_at"] +starts +string.len( tag )
 else
-	pal["match_level_words_processed"] = pal["match_level_words_processed"] -1
+	pal["match_level_words_processed"] = math.max( pal["match_level_words_processed"] -1, 0 )
 end
 return true, strlen
 end

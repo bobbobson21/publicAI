@@ -22,8 +22,8 @@ pal:AddNewInfo( {"test"}, {}, {0,0}, true, 0, {"wow I did it I pased the test he
 ---------------------------------------------------------------------------]]--
 
 
-pal:SetNewInfo( {"|pal:NRT( 'make' )|","|pal:NRT( 'build' )|","|pal:NRT( 'create' )|","|pal:NRT( 'destroy' )|","|pal:NRT( 'remove' )|","|pal:NRT( 'do' )|",}, nil, nil, false, false, nil, {"|pal:SandBox():LearnGeneral()|"}, nil, nil )
-pal:SetNewInfo( {"|pal:NRT( 'like' )|","|pal:NRT( 'favourite' )|","|pal:NRT( 'hate' )|","|pal:NRT( 'dislike' )|","|pal:NRT( 'loth' )|",}, nil, nil, false, false, nil,  {"|pal:SandBox():LearnAboutUser()|"} ,nil, nil )
+pal:SetNewInfo( {"you","|pal:NRT( 'make' )|","|pal:NRT( 'build' )|","|pal:NRT( 'create' )|","|pal:NRT( 'destroy' )|","|pal:NRT( 'remove' )|","|pal:NRT( 'do' )|",}, nil, nil, false, false, nil, {"|pal:SandBox():LearnGeneral()|"}, nil, nil )
+pal:SetNewInfo( {"i","|pal:NRT( 'like' )|","|pal:NRT( 'favourite' )|","|pal:NRT( 'hate' )|","|pal:NRT( 'dislike' )|","|pal:NRT( 'loth' )|",}, nil, nil, false, false, nil,  {"|pal:SandBox():LearnAboutUser()|"} ,nil, nil )
 
 pal:SetNewInfo( {"what","is","|pal:NRT( '+' )|","|pal:NRT( '-' )|","|pal:NRT( '>' )|","|pal:NRT( '<' )|","|pal:NRT( '/' )|","|pal:NRT( '*' )|",}, nil, nil, false, false, nil, {"that is |pal:SandBox():DoMaths()|"}, nil, nil, nil ) --UNSCURE MUST DESTROY IF USING FOR CONSUMSION OR CUSTOMERS
 pal:SetNewInfo( {"dose","|pal:NRT( '+' )|","|pal:NRT( '-' )|","|pal:NRT( '>' )|","|pal:NRT( '<' )|","|pal:NRT( '/' )|","|pal:NRT( '*' )|",}, nil, nil, false, false, nil, {"|pal:SandBox():CheckMaths()|"}, nil, nil, nil ) --UNSCURE MUST DESTROY IF USING FOR CONSUMSION OR CUSTOMERS

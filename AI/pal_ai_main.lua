@@ -667,6 +667,14 @@ pal:RunLoopSimulation()
 
 -- end of main ai loop and start of loading external data ----------------------------------------------------------------------------------------------------
 
+function pal:SetInRunTime( irt ) --just encase you want to turn it off to load content without the save system taking note
+	inruntime = irt
+end
+
+function pal:GetInRunTime() --just encase you want to turn it off to load content without the save system taking note
+return inruntime
+end
+
 function pal:SaveInfo() --saves all info added to AI after intal loading
 if pal:RunSelfHooks( "PALOnSaveInfo", {} ) == false then return end
 

@@ -128,7 +128,8 @@ end
 function sandbox:LearnAboutUser() 
 	local text = pal:BRTGetTextToRespondTo()
 	local findtext = {"favourite","like","best","most liked","have","most hated","hate","most dislike","dislike","hate the most","job"} --what is the AI learning about the player
-	local choppoint, chopword = 0, ""
+	local findtextafter = {"the ","a ","lot ","is ","then "}
+	local choppoint, choppointb, chopword = 0, string.len( text ), ""
 	local responce = ""
 	local infoid = "LEARNED_USER_INFO"
 
@@ -138,13 +139,27 @@ return randresptbl[math.random( 1, #randresptbl )]
 end
 
 for z = 1, #findtext do
-	local starts, ends = string.find( text, findtext[z], 1, true )
-if ends ~= nil and ends >= choppoint then choppoint,chopword = ends, findtext[z] end
+	local starts, ends = string.find( text, findtext[z], 1, true ) --finds the starting point of content it needs to learn
+if ends ~= nil and ends >= choppoint then choppoint, chopword = ends, findtext[z] end
 end
 if string.sub( text, choppoint +1, choppoint +3 ) == "is" then choppoint = choppoint +3 end
-	responce = string.sub( text, choppoint +1, string.len( text ) )
 
-if string.find( text, "most", 1, true ) == true then --if the user has said that this "something" is there most heated thing but after a whie they say "something else" is
+for z = 1, #findtextafter do --finds the ending point of content it needs to learn
+	local starts, ends = string.find( text, findtextafter[z], choppoint, true )
+if ends ~= nil and ends <= choppointb then choppointb = starts end
+end
+
+	local responce = string.sub( text, choppoint +1, choppointb -2 ) --content to be learnd
+	local mostcheck = false
+
+if string.find( chopword, "most", 1, true ) == nil then --checks for if something has been specifiend as most liked or hated then asks for clafcation if true
+for z = 1, #findtext do if findtext[z] == "most "..chopword then mostcheck, chopword = true, "most "..chopword end
+else
+	mostcheck = true
+end
+
+if mostcheck == true then --if the user has said that this "something" is there most heated thing but after a whie they say "something else" is
+	
 	infoid = chopword.."_USER_INFO_MOST" --this will take note of that and asks for which one is actually there most something thing 
 if pal:GetInfoIndexById( infoid ) ~= nil and math.random( -2, 1 ) == 1 then --adds some randomness to spruce it up
 
@@ -169,7 +184,7 @@ local randresptbl = {"Are you sure this is your new "..chopword.." thing.","Do y
    end
 end
 
-pal:SetNewInfo( {"what","my",chopword}, nil, nil, nil, nil, nil, {"that would be"..responce,"I belive it is"..responce,"that would be"..responce}, nil, nil, append )
+pal:SetNewInfo( {"pal:NRT( 'what' )","pal:NRT( 'is' )","pal:NRT( 'my' )","pal:NRT( 'do' )",chopword}, nil, nil, nil, nil, nil, {"that would be"..responce,"I belive it is"..responce,"that would be"..responce}, nil, nil, infoid )
 	local randresptbl = {"Got it.","I will remember this.","Noted","Thanks for telling me that.","My power grows with more information gordon.",""}
 return randresptbl[math.random( 1, #randresptbl )]
 end

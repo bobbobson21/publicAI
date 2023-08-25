@@ -16,8 +16,11 @@ pal:SetNewInfo( {"@test_tags"}, {}, {0,0}, true, 0, {"wow I did it I pased the t
 pal:AddNewSynonymsGroup( "blahaj", {"blahaj the trans shark","shark god","the cute shark","the shark I want and deserve lol"} )
 pal:AddNewInfo( {"test"}, {}, {0,0}, true, 0, {"wow I did it I pased the test heck yer now to be blessed by the great |pal:GetSynonymsWord( 'blahaj' )|"}, {}, nil, nil )
 
---TEST USER LEARNING
---ADD QUESTIONTIVE LEARNING AND A TRUTH FILTER OF SORTS
+   o TEST USER LEARNING
+   o ADD QUESTIONTIVE LEARNING (LEARNING FROM ASKING QUESTIONS) AND A TRUTH
+     FILTER OF SORTS
+   o maybe allow learing to understand lists like: wow,owo,non, and blam
+     and it could pick items from the list like non
 
 ---------------------------------------------------------------------------]]--
 

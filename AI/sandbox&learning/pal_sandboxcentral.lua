@@ -153,7 +153,7 @@ end
 	local mostcheck = false
 
 if string.find( chopword, "most", 1, true ) == nil then --checks for if something has been specifiend as most liked or hated then asks for clafcation if true
-for z = 1, #findtext do if findtext[z] == "most "..chopword then mostcheck, chopword = true, "most "..chopword end
+for z = 1, #findtext do if findtext[z] == "most "..chopword then mostcheck, chopword = true, "most "..chopword end end
 else
 	mostcheck = true
 end

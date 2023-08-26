@@ -16,14 +16,15 @@ pal:SetNewInfo( {"@test_tags"}, {}, {0,0}, true, 0, {"wow I did it I pased the t
 pal:AddNewSynonymsGroup( "blahaj", {"blahaj the trans shark","shark god","the cute shark","the shark I want and deserve lol"} )
 pal:AddNewInfo( {"test"}, {}, {0,0}, true, 0, {"wow I did it I pased the test heck yer now to be blessed by the great |pal:GetSynonymsWord( 'blahaj' )|"}, {}, nil, nil )
 
+   o ADD BETTER SPELLCHECKING (I created a program to do this and when its
+     done that should be added)
    o TEST USER LEARNING
-   o ADD QUESTIONTIVE LEARNING (LEARNING FROM ASKING QUESTIONS) AND A TRUTH
+   o ADD QUESTIONTIVE LEARNING (learning from asking questions) AND A TRUTH
      FILTER OF SORTS
-   o maybe allow learing to understand lists like: wow,owo,non, and blam
-     and it could pick items from the list like non
+   o MAYBE ALLOW LEARNING TO UNDERSTAND LISTS LIKE: wow,owo,non, and blam
+     AND IT COULD PICK ITEMS FROM THE LIST LIKE NON
 
 ---------------------------------------------------------------------------]]--
-
 
 pal:SetNewInfo( {"you","|pal:NRT( 'make' )|","|pal:NRT( 'build' )|","|pal:NRT( 'create' )|","|pal:NRT( 'destroy' )|","|pal:NRT( 'remove' )|","|pal:NRT( 'do' )|",}, nil, nil, false, false, nil, {"|pal:SandBox():LearnGeneral()|"}, nil, nil )
 pal:SetNewInfo( {"i","|pal:NRT( 'like' )|","|pal:NRT( 'favourite' )|","|pal:NRT( 'hate' )|","|pal:NRT( 'dislike' )|","|pal:NRT( 'loth' )|",}, nil, nil, false, false, nil,  {"|pal:SandBox():LearnAboutUser()|"} ,nil, nil )

@@ -140,7 +140,7 @@ end
 
 function pal:RemoveInfo( id ) -- removes info by id
 if pal:RunSelfHooks( "PALOnRemoveInfo", id ) == false then return end
-if inruntime == true then pal["info_database_removed" +1] = id end
+if inruntime == true then pal["info_database_removed"][#pal["info_database_removed"] +1] = id end
 for k, v in pairs( pal["info_database"] ) do
 if id == v["id"] then pal["info_database"][k] = nil end
 end

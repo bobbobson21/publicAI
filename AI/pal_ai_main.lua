@@ -88,7 +88,7 @@ function pal:NRT( tag ) --for tags/words you want it to seach for but only mark 
 if starts ~= nil then
 	strlen = pal["found_tag_at"] +string.len( tag )
 else
-	pal["match_level_words_processed"] = math.max( pal["match_level_words_processed"] -1, 0 )
+	pal["match_level_words_processed"] = math.max( pal["match_level_words_processed"] -1, -1 )
 end
 return true, strlen
 end
@@ -107,18 +107,6 @@ function pal:DegradeInfoOverXCycles( id, cyclesinfostayesinmemory ) --makes info
 		pal["info_degrade_level"][k] = cyclesinfostayesinmemory -1
 	  end
    end
-end
-
-function pal:RemoveInfo( id )
-if pal:RunSelfHooks( "PALOnRemoveInfo", id ) == false then return end
-if inruntime == true then pal["info_database_removed" +1] = id end
-for k, v in pairs( pal["info_database"] ) do
-if id == v["id"] then pal["info_database"][k] = nil end
-end
-   
-for k, v in pairs( pal["info_database_added"] ) do
-if id == v["id"] then pal["info_database_added"][k] = nil end
-   end   
 end
 
 function pal:SetNewInfo( searchfor, searchfor_prior, emotion_change, emotionappend, annoyable, inportance, responces, subinfo, append, id ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier even functions like "֍hi( true )"
@@ -150,6 +138,18 @@ if pal:RunSelfHooks( "PALOnReturnInfo", {searchfor,searchfor_prior,emotion_chang
 return {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["ea"]=emotionappend,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subinfo"]=subinfo,["append"]=append,["id"]=id,}
 end
 
+function pal:RemoveInfo( id ) -- removes info by id
+if pal:RunSelfHooks( "PALOnRemoveInfo", id ) == false then return end
+if inruntime == true then pal["info_database_removed" +1] = id end
+for k, v in pairs( pal["info_database"] ) do
+if id == v["id"] then pal["info_database"][k] = nil end
+end
+   
+for k, v in pairs( pal["info_database_added"] ) do
+if id == v["id"] then pal["info_database_added"][k] = nil end
+   end   
+end
+
 function pal:RemoveAllInfo() --removes all the info and all memory of it ever exsisting
 if pal:RunSelfHooks( "PALOnRemoveAllInfo", {} ) == false then return end
 	pal["info_database"] = nil
@@ -161,16 +161,20 @@ if pal:RunSelfHooks( "PALOnRemoveAllInfo", {} ) == false then return end
 end
 
 function pal:GetInfoByIndex( index ) --finds info by the index which repasents its placement it the database
-	local result = pal["info_database"][index]
-if result == nil then return {} end
-return {["sf"]=result["sf"],["sfl"]=result["sfl"],["ec"]=result["ec"],["a"]=result["a"],["i"]=result["i"],["responces"]=result["responces"],["subinfo"]=result["subinfo"],["id"]=result["id"],["append"]=result["append"]}
+	local resultin = pal["info_database"][index]
+	local resultout = {}
+if resultin == nil then return {} end
+for k, v in pairs( resultin ) do resultout[k] = v end --to keep the noraml info table safe from changes to the retuned info
+return resultout
 end
 
 function pal:GetInfoById( id ) --finds info by id
 	local results = {}
 for k, v in pairs( pal["info_database"] ) do
 if v["id"] == id then
-	results[#results +1] = {["sf"]=v["sf"],["sfl"]=v["sfl"],["ec"]=v["ec"],["a"]=v["a"],["i"]=v["i"],["responces"]=v["responces"],["subinfo"]=v["subinfo"],["id"]=v["id"],["append"]=v["append"]}
+	local resultout = {}
+for l, w in pairs( v ) do resultout[l] = w end
+	results[#results +1] = resultout
    end
 end
 return results
@@ -499,11 +503,11 @@ if pal["found_tag_at"] >= pal["match_level_length_processed"] then
 	pal["match_level_length_processed"] = pal["found_tag_at"]
 	pal["match_level_words_processed"] = pal["match_level_words_processed"] +1
 else
-	pal["found_tag_at"] = -99999999
+	--pal["found_tag_at"] = -99999999
 	pal["match_level_length_processed"] = -99999999
 end
 else
-	pal["found_tag_at"] = -99999999
+	--pal["found_tag_at"] = -99999999
 	pal["match_level_length_processed"] = -99999999
       end
    end
@@ -533,11 +537,11 @@ if pal["found_tag_at"] >= pal["match_level_length_processed"] then
 	pal["match_level_words_processed"] = pal["match_level_words_processed"] +1
 else
 	pal["found_tag_at"] = -99999999
-	pal["match_level_length_processed"] = -99999999
+	--pal["match_level_length_processed"] = -99999999
 end
 else
 	pal["found_tag_at"] = -99999999
-	pal["match_level_length_processed"] = -99999999
+	--pal["match_level_length_processed"] = -99999999
       end
    end 
 end 

@@ -127,11 +127,10 @@ end
 
 function sandbox:LearnAboutUser() 
 	local text = pal:BRTGetTextToRespondTo()
-	local findtext = {"favourite","like","best","most liked","have","most hated","hate","most dislike","dislike","hate the most","job"} --what is the AI learning about the player
-	local findtextafter = {"the ","a ","lot ","is ","then "}
+	local findtext = {"favourite","like","best","have","hated","hate","dislike","job"} --what is the AI learning about the player
+	local findtextafter = {"the ","a ","lot ","is ","then ","most "}
 	local choppoint, choppointb, chopword = 0, string.len( text ), ""
 	local responce = ""
-	local infoid = "LEARNED_USER_INFO"
 
 if sandbox:SwareWordLearningPervention() == true then
 	local randresptbl = {"sorry user I wil have to ingore what you just said as it has a sware word.","I will have to ingore this.","I am programmed not to do anything involving sware words.","You swared. I cant learn things with sware words.","Swareing will pervent me from remembering that."} --responecs to finding out the player swore while it is learning
@@ -149,7 +148,8 @@ for z = 1, #findtextafter do --finds the ending point of content it needs to lea
 if ends ~= nil and ends <= choppointb then choppointb = starts end
 end
 
-	local responce = string.sub( text, choppoint +2, choppointb -2 ) --content to be learnd
+	local infoid = chopword.."LEARNED_USER_INFO"
+	local responce = string.sub( text, choppoint +2, choppointb -1 ) --content to be learnd
 	local mostcheck = false
 
 if string.find( chopword, "most", 1, true ) == nil then --checks for if something has been specifiend as most liked or hated then asks for clafcation if true
@@ -184,7 +184,24 @@ local randresptbl = {"Are you sure this is your new "..chopword.." thing.","Do y
    end
 end
 
-pal:SetNewInfo( {"|pal:NRT( 'what' )|","|pal:NRT( 'is' )|","|pal:NRT( 'my' )|","|pal:NRT( 'do' )|",chopword}, nil, nil, nil, nil, nil, {"that would be"..responce,"I belive it is"..responce,"that would be"..responce}, nil, nil, infoid )
+
+	local learned_data = pal:GetInfoById( infoid ) --gets list of all prior leared data for catagory
+if learned_data[1] ~= nil then learned_data = learned_data[1]["learneddata"] end --gets list of all prior leared data for catagory
+	learned_data[#learned_data +1] = responce --add to list of leared data for catagory
+	
+	responce = ""
+for z = 1, #learned_data do --counstucs list of all learned_data as a human friendly responce 
+if z == 1 then responce = learned_data[z] end
+if z >= 2 and z ~= #learned_data then responce = responce..", "..learned_data[z] end
+if z == #learned_data and z ~= 1 then responce = responce.." and "..learned_data[z] end
+end
+
+	local tobesumited = pal:ReturnInfo( {"|pal:NRT( 'what' )|","|pal:NRT( 'is' )|","|pal:NRT( 'my' )|","|pal:NRT( 'do' )|",chopword}, nil, nil, nil, nil, nil, {"that would be "..responce,"I belive it is "..responce,"that would be "..responce}, nil, nil, infoid )
+	tobesumited["learneddata"] = learned_data
+
+pal:RemoveInfo( infoid )
+pal:SetNewInfoTbl( tobesumited )
+
 	local randresptbl = {"Got it.","I will remember this.","Noted","Thanks for telling me that.","My power grows with more information gordon.",}
 return randresptbl[math.random( 1, #randresptbl )]
 end

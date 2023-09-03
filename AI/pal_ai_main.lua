@@ -58,24 +58,35 @@ function pal:RunSelfHooks( cat, tbl ) --runs hooks
 	local selfuseid = "PALOn"
 if string.sub( cat, 1, string.len( selfuseid ) ) ~= selfuseid then return nil end --to make it only useable for pal functions as to not mess stuff up
 	local returns = {}
+	local mostcommonvalues = {}
 
 if pal["selfhooks"][cat] ~= nil then
 for k, v in pairs( pal["selfhooks"][cat] ) do
-	returns = nil
-	returns = {v( unpack( tbl ) )}
+	local temp = {v( table.unpack( tbl ) )} --runs the hook and collects the returns
+	
+for l, w in pairs( temp ) do
+if mostcommonvalues[l] == nil then mostcommonvalues[l] = {} end --l = value posistion
+if mostcommonvalues[l]["*"..tostring( w )] == nil then mostcommonvalues[l]["*"..tostring( w )] = 0 end --w = the value; * is used to pervent clashes with MCVR which stands for most common value result
+	mostcommonvalues[l]["*"..tostring( w )] = mostcommonvalues[l]["*"..tostring( w )] +1 --if value is detected increece its common level
+if mostcommonvalues[l]["MCVR"] == nil then mostcommonvalues[l]["MCVR"] = 0 end --PAL_MCVR_!£$%^&*()_qwerty is where we store the highest common level
+if mostcommonvalues[l]["*"..tostring( w )] >= mostcommonvalues[l]["MCVR"] then --if is most common for posistion
+	mostcommonvalues[l]["MCVR"] = mostcommonvalues[l]["*"..tostring( w )]
+	returns[l] = w --file under returns
+         end
+      end
    end
 end
 
-if #returns <= 1 then return returns[1] else return unpack( returns ) end --we only use unpack here because there is no way you should need to loop througth returned data
+return table.unpack( returns ) --we only return the most common values because thats the only one you will care about
 end
 
 -- end of hooks start of data/info control functions ---------------------------------------------------------------------------------------------------------
 
 function pal:NRT( tag ) --for tags/words you want it to seach for but only mark down the result and not desqalify it if result cant be found
-	local starts, ends = string.find( pal:BRTGetTextToRespondTo(), tag, pal["found_tag_at"], true )
+	local starts, ends = string.find( pal:BRTGetTextToRespondTo(), " "..tag.." ", pal["found_tag_at"], true )
 	local strlen = pal["found_tag_at"]
 if starts ~= nil then
-	strlen = pal["found_tag_at"] +starts +string.len( tag )
+	strlen = pal["found_tag_at"] +string.len( tag )
 else
 	pal["match_level_words_processed"] = math.max( pal["match_level_words_processed"] -1, 0 )
 end
@@ -105,7 +116,7 @@ for k, v in pairs( pal["info_database"] ) do
 if id == v["id"] then pal["info_database"][k] = nil end
 end
    
-for k, v in pairs( pal["info_database"] ) do
+for k, v in pairs( pal["info_database_added"] ) do
 if id == v["id"] then pal["info_database_added"][k] = nil end
    end   
 end
@@ -162,7 +173,7 @@ if v["id"] == id then
 	results[#results +1] = {["sf"]=v["sf"],["sfl"]=v["sfl"],["ec"]=v["ec"],["a"]=v["a"],["i"]=v["i"],["responces"]=v["responces"],["subinfo"]=v["subinfo"],["id"]=v["id"],["append"]=v["append"]}
    end
 end
-if #results <= 1 then return results[1] else return results end
+return results
 end
 
 function pal:GetInfoIndexById( id ) --finds info indexs by id
@@ -172,7 +183,7 @@ if v["id"] == id then
 	results[#results +1] = k --k should be index
    end
 end
-if #results <= 1 then return results[1] else return results end
+return results
 end
 
 function pal:AddNewTagGroup( name, collection ) --a collection of tags which if refrenced like so @TAG_NAME, in the search for sections of added info will be replaced with collection
@@ -452,7 +463,7 @@ function pal:RunFindResponce( input )
 if pal:RunSelfHooks( "PALOnRunFindResponce", {input} ) == false then return end
 
 	pal["current_responce_importance"] = -999
-	pal["match_level_words_processed_old"] = -1
+	pal["match_level_words_processed_old"] = -999
 	local currentresponceindex = -1
 
 if pal["info_database"] ~= nil then
@@ -468,7 +479,7 @@ for k, v in pairs( pal["info_database"] ) do --searches thougth all infomation i
 if searchin ~= nil then --checks to see if the text the player entered shares enougth words with the current infomation being searched thougth
 	pal["found_tag_at"] = 0
 for l, w in pairs( searchin ) do
-	pal["found_tag"]  = false
+	pal["found_tag"] = false
 	local text = w
 if string.sub( text, 1, 1 ) == pal["runfunctionkey"] and string.sub( text, string.len( text ), string.len( text ) ) == pal["runfunctionkey"] then
 	local run, err = load( "return "..string.sub( text, 2, string.len( text ) -1 ) )
@@ -476,14 +487,12 @@ if string.sub( text, 1, 1 ) == pal["runfunctionkey"] and string.sub( text, strin
 	pal["found_tag"] = ( ft == true )
 	pal["found_tag_at"] = ( fta or 999999 )
 else
-	local starts, ends = string.find( input, text.." ", pal["found_tag_at"], true )
-if starts == nil then starts, ends = string.find( input, " "..text, pal["found_tag_at"], true ) end
+	local starts, ends = string.find( input, " "..text.." ", pal["found_tag_at"], true )
 if starts ~= nil or input == text then
 	pal["found_tag"] = true
-	pal["found_tag_at"] = ( starts or pal["found_tag_at"] ) +string.len( text ) +1
+	pal["found_tag_at"] = pal["found_tag_at"] +string.len( text )
    end
 end
-
 
 if pal["found_tag"]  == true then 
 if pal["found_tag_at"] >= pal["match_level_length_processed"] then
@@ -491,9 +500,11 @@ if pal["found_tag_at"] >= pal["match_level_length_processed"] then
 	pal["match_level_words_processed"] = pal["match_level_words_processed"] +1
 else
 	pal["found_tag_at"] = -99999999
+	pal["match_level_length_processed"] = -99999999
 end
 else
 	pal["found_tag_at"] = -99999999
+	pal["match_level_length_processed"] = -99999999
       end
    end
 end
@@ -509,11 +520,10 @@ if string.sub( text, 1, 1 ) == pal["runfunctionkey"] and string.sub( text, strin
 	pal["found_tag"] = ( ft == true )
 	pal["found_tag_at"] = ( fta or 999999 )
 else
-	local starts, ends = string.find( input, text.." ", pal["found_tag_at"], true )
-if starts == nil then starts, ends = string.find( input, " "..text, pal["found_tag_at"], true ) end
+	local starts, ends = string.find( input, " "..text.." ", pal["found_tag_at"], true )
 if starts ~= nil or input == text then
 	pal["found_tag"] = true
-	pal["found_tag_at"] = ( starts or pal["found_tag_at"] ) +string.len( text ) +1
+	pal["found_tag_at"] = pal["found_tag_at"] +string.len( text )
    end
 end
 
@@ -523,9 +533,11 @@ if pal["found_tag_at"] >= pal["match_level_length_processed"] then
 	pal["match_level_words_processed"] = pal["match_level_words_processed"] +1
 else
 	pal["found_tag_at"] = -99999999
+	pal["match_level_length_processed"] = -99999999
 end
 else
 	pal["found_tag_at"] = -99999999
+	pal["match_level_length_processed"] = -99999999
       end
    end 
 end 
@@ -607,7 +619,7 @@ end
 
 function pal:BuildResponceTo( input ) --USE THIS TO GET THE AI TO MAKE A RESPONCE TO THE INPUT
 function pal:BRTGetTextToRespondToOrignal() return input end --added just encase someone wants the orignal text the player types
-	local master = pal:RunSpellCheck( string.lower( input ) ) --stage one: spellchecking
+	local master = " "..pal:RunSpellCheck( string.lower( input ) ).." " --stage one: spellchecking
 function pal:BRTGetTextToRespondTo() return master end --spell checking is done before this so that functions like the NRT do not have to continusely do spellchecking
 	
 	local A, B = pal:RunSelfHooks( "PALOnBuildResponceTo", {master} )

@@ -78,7 +78,7 @@ return false
 end
 
 function sandbox:LearnGeneral() 
-	local text = pal:BRTGetTextToRespondTo()
+	local text = string.sub( pal:BRTGetTextToRespondTo(), 2, string.len( pal:BRTGetTextToRespondTo() ) -1 )
 	local infoid = "LEARNED_GENERAL_INFO"
 	local learningactavityies = {"make","build","create","destroy","remove"," do "," an "," a "," the ",}
 	local howtodoit = {"via","by","using","with","to do so","all you have to do is","some"}
@@ -112,7 +112,7 @@ if z == string.len( beforeprimarycut ) then searchcontent[#searchcontent] = stri
    end
 end
 
-pal:SetNewInfo( searchcontent, nil, nil, nil, nil, 1, result, nil, nil, infoid ) --adds the learned info
+pal:SetNewInfo( searchcontent, nil, nil, nil, nil, nil, result, nil, nil, infoid ) --adds the learned info
 
    end
 end
@@ -149,7 +149,7 @@ for z = 1, #findtextafter do --finds the ending point of content it needs to lea
 if ends ~= nil and ends <= choppointb then choppointb = starts end
 end
 
-	local responce = string.sub( text, choppoint +1, choppointb -2 ) --content to be learnd
+	local responce = string.sub( text, choppoint +2, choppointb -2 ) --content to be learnd
 	local mostcheck = false
 
 if string.find( chopword, "most", 1, true ) == nil then --checks for if something has been specifiend as most liked or hated then asks for clafcation if true
@@ -161,7 +161,7 @@ end
 if mostcheck == true then --if the user has said that this "something" is there most heated thing but after a whie they say "something else" is
 	
 	infoid = chopword.."_USER_INFO_MOST" --this will take note of that and asks for which one is actually there most something thing 
-if pal:GetInfoIndexById( infoid ) ~= nil and math.random( -2, 1 ) == 1 then --adds some randomness to spruce it up
+if pal:GetInfoIndexById( infoid ) ~= nil then --adds some randomness to spruce it up
 
 pal:SetNewSelfHook( "PALOnBuildResponceTo", "OBTAIN_CLARAFCATION_ON_MOST_USER_DATA", function( input )
 	local randresptbl = {"Ok understood.","Got it.","Noted"} --infomes the player that it understands the clarafcation
@@ -178,14 +178,14 @@ end
 return false, randresptbl[math.random( 1, #randresptbl )]
 end)
 
-local randresptbl = {"Are you sure this is your new "..chopword.." thing.","Do you really think"..responce.."is your"..chopword.."think.",} --respons with a clarafcation ask
+local randresptbl = {"Are you sure this is your new "..chopword.." thing.","Do you really think "..responce.." is your "..chopword.." thing.",} --respons with a clarafcation ask
 	return randresptbl[math.random( 1, #randresptbl )] 
 
    end
 end
 
-pal:SetNewInfo( {"pal:NRT( 'what' )","pal:NRT( 'is' )","pal:NRT( 'my' )","pal:NRT( 'do' )",chopword}, nil, nil, nil, nil, nil, {"that would be"..responce,"I belive it is"..responce,"that would be"..responce}, nil, nil, infoid )
-	local randresptbl = {"Got it.","I will remember this.","Noted","Thanks for telling me that.","My power grows with more information gordon.",""}
+pal:SetNewInfo( {"|pal:NRT( 'what' )|","|pal:NRT( 'is' )|","|pal:NRT( 'my' )|","|pal:NRT( 'do' )|",chopword}, nil, nil, nil, nil, nil, {"that would be"..responce,"I belive it is"..responce,"that would be"..responce}, nil, nil, infoid )
+	local randresptbl = {"Got it.","I will remember this.","Noted","Thanks for telling me that.","My power grows with more information gordon.",}
 return randresptbl[math.random( 1, #randresptbl )]
 end
 

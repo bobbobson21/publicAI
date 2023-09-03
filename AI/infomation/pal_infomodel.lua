@@ -16,7 +16,6 @@ pal:SetNewInfo( {"@test_tags"}, {}, {0,0}, true, 0, {"wow I did it I pased the t
 pal:AddNewSynonymsGroup( "blahaj", {"blahaj the trans shark","shark god","the cute shark","the shark I want and deserve lol"} )
 pal:AddNewInfo( {"test"}, {}, {0,0}, true, 0, {"wow I did it I pased the test heck yer now to be blessed by the great |pal:GetSynonymsWord( 'blahaj' )|"}, {}, nil, nil )
 
-   o FINISH TESTING USER LEARNING
    o ADD QUESTIONTIVE LEARNING (learning from asking questions) AND A TRUTH
      FILTER OF SORTS
    o MAYBE ALLOW LEARNING TO UNDERSTAND LISTS LIKE: wow,owo,non, and blam
@@ -29,7 +28,7 @@ pal:AddNewInfo( {"test"}, {}, {0,0}, true, 0, {"wow I did it I pased the test he
 ---------------------------------------------------------------------------]]--
 
 pal:SetNewInfo( {"you","|pal:NRT( 'make' )|","|pal:NRT( 'build' )|","|pal:NRT( 'create' )|","|pal:NRT( 'destroy' )|","|pal:NRT( 'remove' )|","|pal:NRT( 'do' )|",}, nil, nil, false, false, nil, {"|pal:SandBox():LearnGeneral()|"}, nil, nil )
-pal:SetNewInfo( {"i","|pal:NRT( 'like' )|","|pal:NRT( 'favourite' )|","|pal:NRT( 'hate' )|","|pal:NRT( 'dislike' )|","|pal:NRT( 'loth' )|",}, nil, nil, false, false, nil,  {"|pal:SandBox():LearnAboutUser()|"} ,nil, nil )
+pal:SetNewInfo( {"|pal:NRT( 'my' )|","|pal:NRT( 'i' )|","|pal:NRT( 'like' )|","|pal:NRT( 'liked' )|","|pal:NRT( 'favourite' )|","|pal:NRT( 'hate' )|","|pal:NRT( 'dislike' )|","|pal:NRT( 'loth' )|",}, nil, nil, false, false, nil,  {"|pal:SandBox():LearnAboutUser()|"} ,nil, nil )
 
 pal:SetNewInfo( {"what","is","|pal:NRT( '+' )|","|pal:NRT( '-' )|","|pal:NRT( '>' )|","|pal:NRT( '<' )|","|pal:NRT( '/' )|","|pal:NRT( '*' )|",}, nil, nil, false, false, nil, {"that is |pal:SandBox():DoMaths()|"}, nil, nil, nil ) --UNSCURE MUST DESTROY IF USING FOR CONSUMSION OR CUSTOMERS
 pal:SetNewInfo( {"dose","|pal:NRT( '+' )|","|pal:NRT( '-' )|","|pal:NRT( '>' )|","|pal:NRT( '<' )|","|pal:NRT( '/' )|","|pal:NRT( '*' )|",}, nil, nil, false, false, nil, {"|pal:SandBox():CheckMaths()|"}, nil, nil, nil ) --UNSCURE MUST DESTROY IF USING FOR CONSUMSION OR CUSTOMERS

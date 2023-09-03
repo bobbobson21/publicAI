@@ -503,11 +503,11 @@ if pal["found_tag_at"] >= pal["match_level_length_processed"] then
 	pal["match_level_length_processed"] = pal["found_tag_at"]
 	pal["match_level_words_processed"] = pal["match_level_words_processed"] +1
 else
-	--pal["found_tag_at"] = -99999999
+	pal["found_tag_at"] = -99999999
 	pal["match_level_length_processed"] = -99999999
 end
 else
-	--pal["found_tag_at"] = -99999999
+	pal["found_tag_at"] = -99999999
 	pal["match_level_length_processed"] = -99999999
       end
    end
@@ -537,11 +537,11 @@ if pal["found_tag_at"] >= pal["match_level_length_processed"] then
 	pal["match_level_words_processed"] = pal["match_level_words_processed"] +1
 else
 	pal["found_tag_at"] = -99999999
-	--pal["match_level_length_processed"] = -99999999
+	pal["match_level_length_processed"] = -99999999
 end
 else
 	pal["found_tag_at"] = -99999999
-	--pal["match_level_length_processed"] = -99999999
+	pal["match_level_length_processed"] = -99999999
       end
    end 
 end 

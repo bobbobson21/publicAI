@@ -16,19 +16,21 @@ pal:SetNewInfo( {"@test_tags"}, {}, {0,0}, true, 0, {"wow I did it I pased the t
 pal:AddNewSynonymsGroup( "blahaj", {"blahaj the trans shark","shark god","the cute shark","the shark I want and deserve lol"} )
 pal:AddNewInfo( {"test"}, {}, {0,0}, true, 0, {"wow I did it I pased the test heck yer now to be blessed by the great |pal:GetSynonymsWord( 'blahaj' )|"}, {}, nil, nil )
 
-   o ADD QUESTIONTIVE LEARNING (learning from asking questions) AND A TRUTH
-     FILTER OF SORTS
-   o MAYBE ALLOW LEARNING TO UNDERSTAND LISTS LIKE: wow,owo,non, and blam
-     AND IT COULD PICK ITEMS FROM THE LIST LIKE NON
+   o FINISH OFF SYNONYMS INSERTION TOOL
    o ADD MORE INFO
+   o ADD QUESTIONTIVE LEARNING (learning from asking questions) AND A TRUTH --moved back because I am kind of tiered of dealing with learing code rn
+     FILTER OF SORTS FOR LEARNING SYSTEMS
+   o USE SYNONYMS INSERTION TOOL (do this last as we cant add the better
+     spellcheck because the file is two big so use the tools to make a smaller
+	 but still good spellchecker) 
    o USE BETTER SPELLCHECKING TOOLS (do this last as we cant add the better
      spellcheck because the file is two big so use the tools to make a smaller
 	 but still good spellchecker) 
 
 ---------------------------------------------------------------------------]]--
 
-pal:SetNewInfo( {"you","|pal:NRT( 'make' )|","|pal:NRT( 'build' )|","|pal:NRT( 'create' )|","|pal:NRT( 'destroy' )|","|pal:NRT( 'remove' )|","|pal:NRT( 'do' )|",}, nil, nil, false, false, nil, {"|pal:SandBox():LearnGeneral()|"}, nil, nil )
-pal:SetNewInfo( {"i","|pal:NRT( 'like' )|","|pal:NRT( 'liked' )|","|pal:NRT( 'favourite' )|","|pal:NRT( 'hate' )|","|pal:NRT( 'dislike' )|","|pal:NRT( 'loth' )|",}, nil, nil, false, false, nil,  {"|pal:SandBox():LearnAboutUser()|"} ,nil, nil )
+pal:SetNewInfo( {"you","|pal:NRT( 'make' )|","|pal:NRT( 'build' )|","|pal:NRT( 'create' )|","|pal:NRT( 'destroy' )|","|pal:NRT( 'remove' )|","|pal:NRT( 'do' )|",}, nil, nil, false, false, nil, {"|pal:SandBox():LearnGeneral()|"}, nil, nil, nil )
+pal:SetNewInfo( {"i","|pal:NRT( 'like' )|","|pal:NRT( 'liked' )|","|pal:NRT( 'favourite' )|","|pal:NRT( 'hate' )|","|pal:NRT( 'dislike' )|","|pal:NRT( 'loth' )|",}, nil, nil, false, false, nil,  {"|pal:SandBox():LearnAboutUser()|"}, nil, nil, nil )
 
 
 pal:SetNewInfo( {"what","is","|pal:NRT( '+' )|","|pal:NRT( '-' )|","|pal:NRT( '>' )|","|pal:NRT( '<' )|","|pal:NRT( '/' )|","|pal:NRT( '*' )|",}, nil, nil, false, false, nil, {"that is |pal:SandBox():DoMaths()|"}, nil, nil, nil ) --UNSCURE MUST DESTROY IF USING FOR CONSUMSION OR CUSTOMERS
@@ -39,10 +41,10 @@ pal:SetNewInfo( {"you","|pal:NRT( 'alive' )|","|pal:NRT( 'living' )|","|pal:NRT(
 pal:SetNewInfo( {"you","|pal:NRT( 'feel' )|","|pal:NRT( 'feeling' )|","|pal:NRT( 'doing' )|","|pal:NRT( 'holding' )|"}, nil, nil, nil, nil, 0, {"I am feeling |pal:GetEmotiveClass()|.","I feel like I am |pal:GetEmotiveClass()|.","I am feeling |pal:GetEmotiveClass()| user.","I feel like I am |pal:GetEmotiveClass()| user."}, nil, nil, nil )
 
 pal:SetNewInfo( {"i","|pal:NRT( 'alive' )|","|pal:NRT( 'living' )|","|pal:NRT( 'real' )|"}, {}, {-0.70,0}, nil, nil, 0, {"Most likely user.","Yes you are alive user.","I do belive you are alive","yes althogth you could be in a simulation which would in my mind make you less alive",}, {
-pal:ReturnInfo( {"what","|pal:NRT( 'likely' )|",}, nil, nil, nil, nil, nil, {"You may be in a simulaition.","Your world may be in a simulation.","This world may be in a simulator.",}, {}, nil, nil ),
-pal:ReturnInfo( {"what","|pal:NRT( 'simulation' )|",}, nil, nil, nil, nil, nil, {"This wrold could be as real as a video game and you would never know.","What if everything you know is in a video game using a lot of next next gen tech like unreal 5 but better and you wouldnt know if it was fake.","you might be in a video game and if so you would never know as the memories could be programmed out of you."}, nil, nil, nil ),
+pal:ReturnInfo( {"what","|pal:NRT( 'likely' )|"}, {"i","|pal:NRT( 'alive' )|","|pal:NRT( 'living' )|","|pal:NRT( 'real' )|"}, nil, nil, nil, nil, {"You may be in a simulaition.","Your world may be in a simulation.","This world may be in a simulator.",}, {}, nil, nil ),
+pal:ReturnInfo( {"what","|pal:NRT( 'simulation' )|"}, nil, nil, nil, nil, nil, {"This wrold could be as real as a video game and you would never know.","What if everything you know is in a video game using a lot of next next gen tech like unreal 5 but better and you wouldnt know if it was fake.","you might be in a video game and if so you would never know as the memories could be programmed out of you."}, nil, nil, nil ),
 }, nil, nil ) --the return info is for info that should only be visible after the question at the top is asked
 
-pal:SetNewInfo( {"wrold","|pal:NRT( 'was' )|","|pal:NRT( 'is' )|","game","what",}, nil, nil, nil, nil, nil, {"A game is a wrold that exsists in a computer.","A game is a wrold that exsists in a computer |pal:GetEmotiveWord()| user.","A game is a wrold of entertaiment made for people to have fun."}, nil, nil, nil )
+pal:SetNewInfo( {"what","wrold","game",}, nil, nil, nil, nil, nil, {"A game is a wrold that exsists in a computer.","A game is a wrold that exsists in a computer |pal:GetEmotiveWord()| user.","A game is a wrold of entertaiment made for people to have fun."}, nil, nil, nil )
 
 

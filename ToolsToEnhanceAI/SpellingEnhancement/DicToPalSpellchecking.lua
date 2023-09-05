@@ -38,7 +38,7 @@ if file == nil then return end
 	local endofprogressdata = 0
 	
 if string.sub( filedata, 1, string.len( saveprogresskey ) ) == saveprogresskey then
-for z = 1, 500 do --progress can not be save if it gose over 500 char
+for z = 1, 500 do --progress can not be save if it gose over 500 char so if the progress number is longer the the distance from the left to right side of this file baseicly
 if string.sub( filedata, z, z ) == string.char( 10 ) then
 if endofprogressdata == 0 then endofprogressdata = z end
    end

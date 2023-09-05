@@ -12,8 +12,8 @@ spellingbee.
 	
 	local stringchars = {["'"]=true,['"']=true} --we search the file for string because those usally have words that are not functions
 	local excludecharters = {"|","@","_"} --dont add string to outputfiledata if it has this char in it
-	local extfile =  "pal_infomodel.lua"
-	local outputfile = "wordextractorresults.txt"
+	local extfile =  "pal_infomodel.lua" --file to extract words from
+	local outputfile = "wordextractorresults.txt" --results
 	local outputfiledata = ""
 	
 -- end of setting start of main code -------------------------------------------------------------------------------------------------------------------------
@@ -32,7 +32,7 @@ for z = 1, string.len( excfiledata ) do
 	local letter = string.sub( excfiledata, z, z )
 if stringchars[letter] == true then
 if inlevelposs[letter] == nil then
-	inlevelposs[letter] = z --fould starting poing of string
+	inlevelposs[letter] = z --found starting poing of string
 else
 	local outputdata = string.sub( excfiledata, inlevelposs[letter] +1, z -1 ) --a string and string end point has been found
 
@@ -55,7 +55,7 @@ end
 end
 
 io.output( outputfile )
-io.write( outputfiledata ) --puts all the data back or back into the output file
+io.write( outputfiledata ) --puts all the data in or back into the output file
 io.close()
 
 io.output( io.stdout )

@@ -86,9 +86,11 @@ function pal:NRT( tag ) --for tags/words you want it to seach for but only mark 
 	local starts, ends = string.find( pal:BRTGetTextToRespondTo(), " "..tag.." ", pal["found_tag_at"], true )
 	local strlen = pal["found_tag_at"]
 if starts ~= nil then
-	strlen = pal["found_tag_at"] +string.len( tag )
+	strlen = strlen +string.len( tag )
 else
-	pal["match_level_words_processed"] = math.max( pal["match_level_words_processed"] -1, -1 )
+if pal["found_tag_at"] >= pal["match_level_length_processed"] then
+	pal["match_level_words_processed"] = pal["match_level_words_processed"] -1
+   end
 end
 return true, strlen
 end
@@ -498,7 +500,7 @@ if starts ~= nil or input == text then
    end
 end
 
-if pal["found_tag"]  == true then 
+if pal["found_tag"] == true then 
 if pal["found_tag_at"] >= pal["match_level_length_processed"] then
 	pal["match_level_length_processed"] = pal["found_tag_at"]
 	pal["match_level_words_processed"] = pal["match_level_words_processed"] +1
@@ -516,10 +518,10 @@ end
 if searchin_prior ~= nil then --checks to see if the text the player entered previously shares enougth words with the current infomation being searched thougth
 	pal["found_tag_at"] = 0
 for l, w in pairs( searchin_prior ) do
-	pal["found_tag"]  = false
+	pal["found_tag"] = false
 	local text = w
 if string.sub( text, 1, 1 ) == pal["runfunctionkey"] and string.sub( text, string.len( text ), string.len( text ) ) == pal["runfunctionkey"] then
-	local run, null = load( "return"..string.sub( text, 2, string.len( text ) -1 ) )
+	local run, err = load( "return "..string.sub( text, 2, string.len( text ) -1 ) )
 	local ft, fta = run()
 	pal["found_tag"] = ( ft == true )
 	pal["found_tag_at"] = ( fta or 999999 )
@@ -531,7 +533,7 @@ if starts ~= nil or input == text then
    end
 end
 
-if pal["found_tag"]  == true then 
+if pal["found_tag"] == true then 
 if pal["found_tag_at"] >= pal["match_level_length_processed"] then
 	pal["match_level_length_processed"] = pal["found_tag_at"]
 	pal["match_level_words_processed"] = pal["match_level_words_processed"] +1
@@ -543,7 +545,7 @@ else
 	pal["found_tag_at"] = -99999999
 	pal["match_level_length_processed"] = -99999999
       end
-   end 
+   end
 end 
 
 if pal["match_level_length_processed"] >= 1 then --checks acceptablity

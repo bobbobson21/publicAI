@@ -3,7 +3,7 @@ look at the comments in the pal_ai_main.lua to understand how most of the system
 
 look at the loads file to add your own files to the AI.
 
-the modual folder should contain things like learning code and running maths code and infomation should contain all of the data/memoryies it has and emotion should contain the emotions it simulates.
+the sandbox&learning folder should contain things like learning code and running maths code and infomation should contain all of the data/memoryies it has and emotion should contain the emotions it simulates.
 
 structure infomation files like how it is done below if you want the AI to be fast or contain a huge volume of information:
 huge volume > 5000

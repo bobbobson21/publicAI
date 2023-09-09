@@ -93,7 +93,16 @@ if pal["found_tag_at"] >= pal["match_level_length_processed"] then
    end
 end
 return true, strlen
-end
+end --also stands for non reqired tag
+
+function pal:MWTG( name ) --compares input to a tag group and if one tag is found in input it returns true and pal["found_tag_at"] +tag length
+if pal["searchfor_groups"][name] == nil then return false end
+for k, v in pairs( pal["searchfor_groups"][name] ) do
+	local starts, ends = string.find( pal:BRTGetTextToRespondTo(), " "..v.." ", pal["found_tag_at"], true )
+if starts ~= nil then return true, pal["found_tag_at"] +string.len( v ) end --if found say
+end   
+return false, pal["found_tag_at"] --if no tag is found it retuns false and ends
+end --also stands for match with tag group
 
 function pal:MemGen( name, ... ) --connets names to pronows and then puts it into short term memory
 pal:AddNewSpellChecking( name, ... )
@@ -103,18 +112,18 @@ if pal["gender_momory"] == nil then pal["gender_momory"] = {} end
 end
 
 function pal:DegradeInfoOverXCycles( id, cyclesinfostayesinmemory ) --makes info eventually degrades to nothing use to simulates forgetfulness
-	if pal:RunSelfHooks( "PALOnDegradeInfoOverXCycles", {id,cyclesinfostayesinmemory} ) == false then return end
-	for k, v in pairs( pal["info_database"] ) do
-	if v["id"] == id then
-		pal["info_degrade_level"][k] = cyclesinfostayesinmemory -1
+if pal:RunSelfHooks( "PALOnDegradeInfoOverXCycles", {id,cyclesinfostayesinmemory} ) == false then return end
+for k, v in pairs( pal["info_database"] ) do
+if v["id"] == id then
+	pal["info_degrade_level"][k] = cyclesinfostayesinmemory -1
 	  end
    end
 end
 
 function pal:SetNewInfo( searchfor, searchfor_prior, emotion_change, emotionappend, annoyable, inportance, responces, subinfo, append, id ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier even functions like "֍hi( true )"
 if pal:RunSelfHooks( "PALOnSetNewInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subinfo,id,append} ) == false then return end
-	searchfor, searchfor_prior = pal:LoadTagGroups( searchfor, searchfor_prior )
 	pal["info_database"][#pal["info_database"] +1] = {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["ea"]=emotionappend,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subinfo"]=subinfo,["append"]=append,["id"]=id}
+
 if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
 for k, v in pairs( pal["info_database_removed"] ) do
 if v == id then pal["info_database_removed"][k] = nil end
@@ -123,7 +132,6 @@ end
 
 function pal:SetNewInfoTbl( tbl, denysaving ) --an unscure but fast way of adding info
 if pal:RunSelfHooks( "PALOnSetNewInfoTbl", {tbl} ) == false then return end
-	tbl["sf"], tbl["sfl"] = pal:LoadTagGroups( tbl["sf"], tbl["sfl"] )
 	pal["info_database"][#pal["info_database"] +1] = tbl
 
 if denysaving ~= true then --this function has a deny saveing var because using it can result in the same info being saved more than once
@@ -136,7 +144,6 @@ end
 
 function pal:ReturnInfo( searchfor, searchfor_prior, emotion_change, emotionappend, annoyable, inportance, responces, subinfo, append, id ) --format like so {"word","word","word"}, {"word","from","the","prior","text","responded","to"}, {0.15,0.001}, true, 1, {"hi","bye","gay"}, {ReturnInfo( DATA ),ReturnInfo( DATA )}, "code_for_editing_info", "appends_to_all_responces"
 if pal:RunSelfHooks( "PALOnReturnInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subinfo,id,append} ) == false then return end
-	searchfor, searchfor_prior = pal:LoadTagGroups( searchfor, searchfor_prior )
 return {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["ea"]=emotionappend,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subinfo"]=subinfo,["append"]=append,["id"]=id,}
 end
 
@@ -194,42 +201,12 @@ end
 
 function pal:AddNewTagGroup( name, collection ) --a collection of tags which if refrenced like so @TAG_NAME, in the search for sections of added info will be replaced with collection
 if pal:RunSelfHooks( "PALOnAddNewTagGroup", {name,collection} ) == false then return end
-	pal["searchfor_groups"][#pal["searchfor_groups"] +1] = {["groupname"]=name,["tags"]=collection}
+	pal["searchfor_groups"][name] = collection
 end
 
 function pal:RemoveTagGroup( name ) --remove tag group
 if pal:RunSelfHooks( "PALOnRemoveTagGroup", {name} ) == false then return end
-for k, v in pairs( pal["searchfor_groups"] ) do if v["groupname"] == name then pal["searchfor_groups"][k] = nil end end
-end
-
-function pal:LoadTagGroups( searchfor, searchfor_prior ) --puts the tag groups into info being added or returned
-if searchfor ~= nil then
-for k, v in pairs( searchfor ) do
-for y = 1, #pal["searchfor_groups"] do
-if v == "@"..pal["searchfor_groups"][y]["groupname"] then 
-	searchfor[k] = nil
-for x = 1, #pal["searchfor_groups"][y]["tags"] do
-	searchfor[#searchfor +1] = pal["runfunctionkey"].."pal:NRT( '"..pal["searchfor_groups"][y]["tags"][x].."' )"..pal["runfunctionkey"]
-		    end
-	     end
-      end
-   end
-end
-
-if searchfor_prior ~= nil then
-for k, v in pairs( searchfor_prior ) do
-for y = 1, #pal["searchfor_groups"] do
-if v == "@"..pal["searchfor_groups"][y]["groupname"] then 
-	searchfor_prior[k] = nil
-for x = 1, #pal["searchfor_groups"][y]["tags"] do
-	searchfor_prior[#searchfor_prior +1] = pal["runfunctionkey"].."pal:NRT( '"..pal["searchfor_groups"][y]["tags"][x].."' )"..pal["runfunctionkey"]
-	        end
-	     end
-      end
-   end
-end
-
-return searchfor, searchfor_prior
+	pal["searchfor_groups"][name] = nil
 end
 
 function pal:AddNewSpellChecking( correct, tbl ) --spellchecker
@@ -481,7 +458,7 @@ for k, v in pairs( pal["info_database"] ) do --pulls thougth all infomation in p
 
 	pal["match_level_tags_processed"] = 0 --this data needs to not be lost in order for compareing results to add up
 
-if searchin ~= nil then --checks to see if the text the player entered shares enougth words with the current infomation being searched thougth
+if searchin ~= nil and next( searchin ) ~= nil then --checks to see if the text the player entered shares enougth words with the current infomation being searched thougth
 	pal["match_level_length_processed"] = 0 --this data needs to be lost for all compareing oparations
 	pal["found_tag_at"] = 0 --this data can not be lost unitll all input/level 1 compareing is complete but it dose need to be lost at the start 
 for l, w in pairs( searchin ) do
@@ -516,7 +493,7 @@ else
 end
 
 if pal["found_tag_at"] >= 0 and pal["match_level_length_processed"] >= 0 and pal["match_level_tags_processed"] >= 0 then --to pervent prior search if first search already failed as if we dont do this it could result in broken returns
-if searchin_prior ~= nil then --checks to see if the text the player entered previously shares enougth words with the current infomation being searched thougth
+if searchin_prior ~= nil and next( searchin_prior ) ~= nil then --checks to see if the text the player entered previously shares enougth words with the current infomation being searched thougth
 	local oldmatchleveltagsprocessed = pal["match_level_tags_processed"]
 	pal["match_level_length_processed"] = 0
 	pal["found_tag_at"] = 0

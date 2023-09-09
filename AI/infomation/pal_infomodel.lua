@@ -10,13 +10,13 @@ SynonymsGroups, TagGroups (not all but definetly some of the time) and MemGen
 
 --[[-- test code DON'T put into circulation -----------------------------------
 
-pal:AddNewTagGroup( "test_tags", {"test"} )
-pal:SetNewInfo( {"@test_tags"}, {}, {0,0}, true, 0, {"wow I did it I pased the test heck yer now to be blessed by the great blahaj"}, {}, nil, nil )
-
 pal:AddNewSynonymsGroup( "blahaj", {"blahaj the trans shark","shark god","the cute shark","the shark I want and deserve lol"} )
 pal:AddNewInfo( {"test"}, {}, {0,0}, true, 0, {"wow I did it I pased the test heck yer now to be blessed by the great |pal:GetSynonymsWord( 'blahaj' )|"}, {}, nil, nil )
 
-   o FINISH OFF SYNONYMS INSERTION TOOL
+pal:AddNewTagGroup( "test_tags", {"test"} )
+pal:SetNewInfo( {"|pal:MWTG( 'test_tags' )|"}, {}, {0,0}, false, true, 0, {"wow I did it I pased the test heck yer now to be blessed by the great blahaj"}, {}, nil, nil )
+
+
    o ADD MORE INFO (MAYBE MAKE A C# WEB SCRAPER MAYBE)
    o ADD QUESTIONTIVE LEARNING (learning from asking questions) AND A TRUTH --moved back because I am kind of tiered of dealing with learing code rn
      FILTER OF SORTS FOR LEARNING SYSTEMS
@@ -42,7 +42,6 @@ pal:SetNewInfo( {"|pal:EmotionLevelEqualsOr( {3,3}, {2,3}, {3,2} )|","you","|pal
 pal:SetNewInfo( {"|pal:EmotionLevelNotEqualsOr( {3,3}, {2,3}, {3,2} )|","you","|pal:NRT( 'hate' )|","|pal:NRT( 'dislike' )|","|pal:NRT( 'loth' )|","me",}, nil, {-0.70,-0.20}, nil, nil, nil, {"Yep","Yes","Correct mr annoying","spot on"}, nil, nil, nil )
 pal:SetNewInfo( {"|pal:EmotionLevelEqualsOr( {3,3}, {2,3}, {3,2} )|","why"}, {"you","me",}, nil, false, nil, nil, {"Because you have not upset me.","Your ok to talk to.","Your not being mean to me.","your kind."}, nil, nil, nil )
 pal:SetNewInfo( {"|pal:EmotionLevelNotEqualsOr( {3,3}, {2,3}, {3,2} )|","why"}, {"you","me",}, nil, {-0.70,-0.20}, nil, nil, {"Because you said something to upset me.","Because you reminded me of something bad.","Because yor are a |pal:GetEmotiveWord()| user."}, nil, nil, nil )
-
 
 pal:SetNewInfo( {"|pal:NRT( 'hi' )|","|pal:NRT( 'hello' )|"}, nil, nil, nil, nil, nil, {"Hi.","Hi user.","Hello","Hello user."}, nil, nil, nil )
 pal:SetNewInfo( {"you","|pal:NRT( 'alive' )|","|pal:NRT( 'living' )|","|pal:NRT( 'real' )|"}, nil, {-0.70,0}, nil, nil, 0, {"No I am not really alive |pal:GetEmotiveWord()| user.","Sadly I do not live |pal:GetEmotiveWord()| user.","I am not alive.","I am not living."}, nil, nil, nil )

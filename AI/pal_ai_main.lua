@@ -89,7 +89,7 @@ if starts ~= nil then
 	strlen = strlen +string.len( tag )
 else
 if pal["found_tag_at"] >= pal["match_level_length_processed"] then
-	pal["match_level_words_processed"] = pal["match_level_words_processed"] -1
+	pal["match_level_tags_processed"] = pal["match_level_tags_processed"] -1
    end
 end
 return true, strlen
@@ -273,11 +273,11 @@ if pal:RunSelfHooks( "PALOnAddNewEmotion", {gridlocation,emotivewords,wordsthatm
 end
 
 function pal:EmotionLevelEquals( tbl ) --can be used in responces to determin if this responce could or should have a chance of selection
-return ( tbl[1] == math.floor( 0.50 +pal["emotion_level"][1] ) and tbl[2] == math.floor( 0.50 +pal["emotion_level"][2] ) )
+return ( tbl[1] == math.floor( pal["emotion_level"][1] +0.50 ) and tbl[2] == math.floor( pal["emotion_level"][2] +0.50 ) )
 end
 
 function pal:EmotionLevelNotEquals( tbl ) 
-return ( tbl[1] ~= math.floor( 0.50 +pal["emotion_level"][1] ) or tbl[2] ~= math.floor( 0.50 +pal["emotion_level"][2] ) )
+return ( tbl[1] ~= math.floor( pal["emotion_level"][1] +0.50 ) or tbl[2] ~= math.floor( pal["emotion_level"][2] +0.50 ) )
 end
 
 function pal:EmotionLevelEqualsOr( ... ) --give it a bunch of emotion points and if the emotion level = one of them it will return true
@@ -290,7 +290,7 @@ end
 function pal:EmotionLevelNotEqualsOr( ... ) --if the emotion level ~= any of the emotion points, it will return true
 	local ortable = {...}
 	local returnstate = true
-for z = 1, #ortable do if pal:EmotionLevelEquals( ortable[z] ) == true then returnstate = fase end end
+for z = 1, #ortable do if pal:EmotionLevelEquals( ortable[z] ) == true then returnstate = false end end
 return returnstate
 end
 
@@ -469,74 +469,77 @@ function pal:RunFindResponce( input )
 if pal:RunSelfHooks( "PALOnRunFindResponce", {input} ) == false then return end
 
 	pal["current_responce_importance"] = -999
-	pal["match_level_words_processed_old"] = -999
+	pal["match_level_tags_processed_old"] = -999
 	local currentresponceindex = -1
 
 if pal["info_database"] ~= nil then
-for k, v in pairs( pal["info_database"] ) do --searches thougth all infomation in pal's info_database
-
-	pal["match_level_length_processed"] = 0
-	pal["match_level_words_processed"] = 0
+for k, v in pairs( pal["info_database"] ) do --pulls thougth all infomation in pal's info_database for it to be compare aginst
 
 	local searchin = v["sf"]
 	local searchin_prior = v["sfl"]
 	local importance = v["i"] or 0
 
+	pal["match_level_tags_processed"] = 0 --this data needs to not be lost in order for compareing results to add up
+
 if searchin ~= nil then --checks to see if the text the player entered shares enougth words with the current infomation being searched thougth
-	pal["found_tag_at"] = 0
+	pal["match_level_length_processed"] = 0 --this data needs to be lost for all compareing oparations
+	pal["found_tag_at"] = 0 --this data can not be lost unitll all input/level 1 compareing is complete but it dose need to be lost at the start 
 for l, w in pairs( searchin ) do
-	pal["found_tag"] = false
-	local text = w
-if string.sub( text, 1, 1 ) == pal["runfunctionkey"] and string.sub( text, string.len( text ), string.len( text ) ) == pal["runfunctionkey"] then
-	local run, err = load( "return "..string.sub( text, 2, string.len( text ) -1 ) )
+	pal["found_tag"] = false --this data need to be lost per tag check or it could cause isssues
+	local tag = w
+if string.sub( tag, 1, 1 ) == pal["runfunctionkey"] and string.sub( tag, string.len( tag ), string.len( tag ) ) == pal["runfunctionkey"] then --is tag in a function string if so run it
+	local run, err = load( "return "..string.sub( tag, 2, string.len( tag ) -1 ) ) -- runs function
 	local ft, fta = run()
-	pal["found_tag"] = ( ft == true )
-	pal["found_tag_at"] = ( fta or 999999 )
+	pal["found_tag"] = ( ft == true ) --did function say it found tag
+	pal["found_tag_at"] = ( fta or pal["found_tag_at"] ) --did function say where to start searching for the next tag
 else
-	local starts, ends = string.find( input, " "..text.." ", pal["found_tag_at"], true )
-if starts ~= nil or input == text then
-	pal["found_tag"] = true
-	pal["found_tag_at"] = pal["found_tag_at"] +string.len( text )
+	local starts, ends = string.find( input, " "..tag.." ", pal["found_tag_at"], true ) --if tag is not a function find it in player input as plain text
+if starts ~= nil or input == " "..tag.." " then
+	pal["found_tag"] = true --tag was found
+	pal["found_tag_at"] = pal["found_tag_at"] +string.len( tag ) --where to start the search for the next one
    end
 end
 
 if pal["found_tag"] == true then 
 if pal["found_tag_at"] >= pal["match_level_length_processed"] then
-	pal["match_level_length_processed"] = pal["found_tag_at"]
-	pal["match_level_words_processed"] = pal["match_level_words_processed"] +1
+	pal["match_level_length_processed"] = pal["found_tag_at"]  --if length processed <= 0 then current search will be disguarded and it also hels as an extra means to compare data
+	pal["match_level_tags_processed"] = pal["match_level_tags_processed"] +1 --tag found
 else
-	pal["found_tag_at"] = -99999999
-	pal["match_level_length_processed"] = -99999999
+	pal["found_tag_at"] = -99999999 --basiclly disguards current search if found tag at < length processed
+	pal["match_level_length_processed"] = -99999999 --basiclly disguards current search if found tag at < length processed
 end
 else
-	pal["found_tag_at"] = -99999999
-	pal["match_level_length_processed"] = -99999999
+	pal["found_tag_at"] = -99999999 --basiclly disguards current search if found tag == false
+	pal["match_level_length_processed"] = -99999999 --basiclly disguards current search if found tag == false
       end
    end
 end
 
+if pal["found_tag_at"] >= 0 and pal["match_level_length_processed"] >= 0 and pal["match_level_tags_processed"] >= 0 then --to pervent prior search if first search already failed as if we dont do this it could result in broken returns
 if searchin_prior ~= nil then --checks to see if the text the player entered previously shares enougth words with the current infomation being searched thougth
+	local oldmatchleveltagsprocessed = pal["match_level_tags_processed"]
+	pal["match_level_length_processed"] = 0
 	pal["found_tag_at"] = 0
 for l, w in pairs( searchin_prior ) do
 	pal["found_tag"] = false
-	local text = w
-if string.sub( text, 1, 1 ) == pal["runfunctionkey"] and string.sub( text, string.len( text ), string.len( text ) ) == pal["runfunctionkey"] then
-	local run, err = load( "return "..string.sub( text, 2, string.len( text ) -1 ) )
+	local tag = w
+if string.sub( tag, 1, 1 ) == pal["runfunctionkey"] and string.sub( tag, string.len( tag ), string.len( tag ) ) == pal["runfunctionkey"] then
+	local run, err = load( "return "..string.sub( tag, 2, string.len( tag ) -1 ) )
 	local ft, fta = run()
 	pal["found_tag"] = ( ft == true )
-	pal["found_tag_at"] = ( fta or 999999 )
+	pal["found_tag_at"] = ( fta or pal["found_tag_at"] )
 else
-	local starts, ends = string.find( input, " "..text.." ", pal["found_tag_at"], true )
-if starts ~= nil or input == text then
+	local starts, ends = string.find( pal["prior_input"], " "..tag.." ", pal["found_tag_at"], true )
+if starts ~= nil or pal["prior_input"] == " "..tag.." " then
 	pal["found_tag"] = true
-	pal["found_tag_at"] = pal["found_tag_at"] +string.len( text )
+	pal["found_tag_at"] = pal["found_tag_at"] +string.len( tag )
    end
 end
 
 if pal["found_tag"] == true then 
 if pal["found_tag_at"] >= pal["match_level_length_processed"] then
 	pal["match_level_length_processed"] = pal["found_tag_at"]
-	pal["match_level_words_processed"] = pal["match_level_words_processed"] +1
+	pal["match_level_tags_processed"] = pal["match_level_tags_processed"] +1
 else
 	pal["found_tag_at"] = -99999999
 	pal["match_level_length_processed"] = -99999999
@@ -544,15 +547,16 @@ end
 else
 	pal["found_tag_at"] = -99999999
 	pal["match_level_length_processed"] = -99999999
+         end
       end
    end
-end 
+end
 
 if pal["match_level_length_processed"] >= 1 then --checks acceptablity
-if pal["match_level_words_processed"] >= pal["match_level_words_processed_old"] then --checks acceptablity
+if pal["match_level_tags_processed"] >= pal["match_level_tags_processed_old"] then --checks acceptablity
 if importance >= pal["current_responce_importance"] then --checks acceptablity
 
-	pal["match_level_words_processed_old"] = pal["match_level_words_processed"] --updates minmal acceptablity level
+	pal["match_level_tags_processed_old"] = pal["match_level_tags_processed"] --updates minmal acceptablity level
 	pal["current_responce_importance"] = importance --updates minmal acceptablity level
 	currentresponceindex = k
 

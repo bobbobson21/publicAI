@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "udUd35GPLjSlGO5QGcwvY0iNxeoUF7zt4q7xKocVu8WMABhi5jst2sAnUF38B4xvu7qlUV2l1GQs6ao0ADjC9w==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\dsbkh\\.nuget\\packages\\htmlagilitypack\\1.11.53\\htmlagilitypack.1.11.53.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -3,7 +3,7 @@
 	"lovely",
 	"kind",
 	"helpful",
-	"lovely",
+	"love",
 	"good",
 	"caring",
 	}

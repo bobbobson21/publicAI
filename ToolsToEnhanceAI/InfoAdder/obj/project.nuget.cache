@@ -1,10 +1,20 @@
 {
   "version": 2,
-  "dgSpecHash": "udUd35GPLjSlGO5QGcwvY0iNxeoUF7zt4q7xKocVu8WMABhi5jst2sAnUF38B4xvu7qlUV2l1GQs6ao0ADjC9w==",
+  "dgSpecHash": "jm0HZP3xvvDGA3/7aWMZaUd3uDucm+mCc9spH1fVGtJ0Roc6ULuz9Ql4LMVbwmLPx648xktTqJEt4wnwm+togg==",
   "success": true,
   "projectFilePath": "C:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\dsbkh\\.nuget\\packages\\htmlagilitypack\\1.11.53\\htmlagilitypack.1.11.53.nupkg.sha512"
+    "C:\\Users\\dsbkh\\.nuget\\packages\\htmlagilitypack\\1.11.53\\htmlagilitypack.1.11.53.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\microsoft.identitymodel.abstractions\\6.19.0\\microsoft.identitymodel.abstractions.6.19.0.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\microsoft.identitymodel.logging\\6.19.0\\microsoft.identitymodel.logging.6.19.0.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\microsoft.identitymodel.tokens\\6.19.0\\microsoft.identitymodel.tokens.6.19.0.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\microsoft.win32.systemevents\\7.0.0\\microsoft.win32.systemevents.7.0.0.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\selenium.webdriver\\4.12.4\\selenium.webdriver.4.12.4.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\selenium.webdriver.chromedriver\\116.0.5845.9600\\selenium.webdriver.chromedriver.116.0.5845.9600.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\system.drawing.common\\7.0.0\\system.drawing.common.7.0.0.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\system.security.cryptography.cng\\4.5.0\\system.security.cryptography.cng.4.5.0.nupkg.sha512"
   ],
   "logs": []
 }

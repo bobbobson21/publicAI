@@ -71,7 +71,7 @@ namespace PalConvertion
             q = q + ",";
             foreach (string str in RemoveFromQTags)
             {
-                q.Replace(str+",", "");
+                q =  q.Replace(str+",", "");
             }
             q = q.Substring(0, q.Length-1);
             return q;
@@ -87,14 +87,22 @@ namespace PalConvertion
 
         public static string ConvetToPalData( string q, string a )
         {
-            a = a.Replace("\n", " "); //how it responds to stuff should not have new lines
             q = q.Replace("\n", " ");
+            a = a.Replace("\n", " "); //how it responds to stuff should not have new lines 
+
+            a = "'" + a + "'";
+            a = a.Replace(",", "', '");
+            a = a.Replace("|", "-");
+            a = a.Replace("'", "");
 
             double[] emotionlevel = CalulateEmotion( q+a, 0.25 );
 
             q = q.Replace(" ", ","); //turns words to tags
             q = QTagRemoval(q); //removes uneeded tags
             q = QToNRTTags(q);
+
+            a = (char)34+a+(char)34;
+            a = a.Replace(",", (char)34+", "+(char)34);
 
             return "pal:SetNewInfo( {"+q+"}, nil, {"+ emotionlevel[0].ToString()+","+ emotionlevel[1].ToString()+"}, nil, nil, nil,{"+a+"}, nil, nil, nil )";
         }

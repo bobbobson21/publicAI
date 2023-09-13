@@ -21,37 +21,48 @@ namespace program
             Console.WriteLine("output to:");
             string outfile = Console.ReadLine();
 
-            FileModify.SetFilePath( infile );
+            FileModify.SetFilePath(infile);
             List<string> infiledata = FileModify.GetFileData();
             List<string> outfiledata_rawA = new List<string>(); //just results without any modafcation wich will be needed
             List<string> outfiledata_rawB = new List<string>();
             List<string> outfiledata_rawC = new List<string>();
-            List<string> outfiledata_rawD = new List<string>();
-            List<string> outfiledata_rawE = new List<string>();
             List<string> outfiledata = new List<string>(); //just results without any modafcation wich will be needed
 
+            WebCollect.LoadBrowser();
             List<WebNode> scrapenodes = new List<WebNode>(); //content we want it to search for
-            scrapenodes.Add(new WebNode("div", "class", "q-box spacing_log_answer_content puppeteer_test_answer_content"));
+            scrapenodes.Add(new WebNode("div", "class", "q-box spacing_log_answer_content puppeteer_test_answer_content", -1));
 
             WebCollect.SetWebScrapeNodes(scrapenodes); //since all the searches will be done on google we will only need to do this once
 
             for (int i = 0; i < infiledata.Count; i++)
             {
                 WebCollect.SetWebTarget(WebCollect.ConvertToSearchForQuoraURL(infiledata[i]));
-                WebCollect.SetWebTarget(WebCollect.CollectLinks()[7]);
-                outfiledata_rawA[i] = WebCollect.Collect()[1]; //we need to make sure the outfile data and infile data = the same
-                outfiledata_rawB[i] = WebCollect.Collect()[2];
-                outfiledata_rawC[i] = WebCollect.Collect()[3];
-                outfiledata_rawD[i] = WebCollect.Collect()[4];
-                outfiledata_rawE[i] = WebCollect.Collect()[5];
+                string res = WebCollect.CollectLinks()[3];
+                WebCollect.SetWebTarget(res);
+                List<string> collectionpoint = WebCollect.Collect();
+                if (collectionpoint.Count >= 3)
+                {
+                    outfiledata_rawA.Add( collectionpoint[0] ); //we need to make sure the outfile data and infile data = the same
+                    outfiledata_rawB.Add( collectionpoint[1] );
+                    outfiledata_rawC.Add( collectionpoint[2] );
+                }
+                else 
+                {
+                    outfiledata_rawA.Add( "NULL" );
+                    Console.WriteLine( $"error item {i}/{infiledata[i]} could not be processed as suficent sample size could not be for pal could not be found" );
+                }
             }
 
-            for( int i = 0; i < infiledata.Count; i++ )
+            for (int i = 0; i < infiledata.Count; i++)
             {
-                string q = infiledata[i];
-                string a = outfiledata_rawA[i]+","+ outfiledata_rawB[i]+","+outfiledata_rawC[i]+","+outfiledata_rawD[i]+","+outfiledata_rawE[i];
+                if (outfiledata_rawA[i] != "NULL")
+                {
+                    string q = infiledata[i];
+                    string a = outfiledata_rawA[i] + "," + outfiledata_rawB[i] + "," + outfiledata_rawC[i];
 
-                outfiledata.Add( Pal.ConvetToPalData( q, a ) );
+                    outfiledata.Add(Pal.ConvetToPalData(q, a));
+
+                }
             }
 
             FileModify.SetFilePath(outfile);
@@ -59,5 +70,4 @@ namespace program
             Console.WriteLine("Done!!!");
         }
     }
-
 }

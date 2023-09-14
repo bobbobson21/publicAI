@@ -20,7 +20,11 @@ namespace WebInterraction
         private static List<WebNode> targetdata = new List<WebNode>(); //locks onto data with in site
         public static void SetWebScrapeNodes(List<WebNode> str) { targetdata = str; }
         public static List<WebNode> GetWebScrapeNodes() {return targetdata;}
-        
+
+        private static int maxcollectionattemnpts = 5; //locks onto site
+        public static void SetMaxCollectionAttempts(int att) { maxcollectionattemnpts = att; }
+        public static int GetMaxCollectionAttempts() { return maxcollectionattemnpts; }
+
         private static ChromeOptions bro_options;
         private static ChromeDriver bro_driver;
 
@@ -55,9 +59,12 @@ namespace WebInterraction
             List<HtmlNode> linkboxesB = new List<HtmlNode>();
             List<HtmlNode> linkboxesC = new List<HtmlNode>();
 
-            try { linkboxesA = code_htmldata.DocumentNode.SelectNodes("//a").ToList(); } catch { };
-            try { linkboxesB = code_htmldata.DocumentNode.SelectNodes("//div").ToList(); } catch { };
-            try { linkboxesC = code_htmldata.DocumentNode.SelectNodes("//link").ToList(); } catch { };
+            for (int i = 0; i <= maxcollectionattemnpts; i++)
+            {
+                try { linkboxesA = code_htmldata.DocumentNode.SelectNodes("//a").ToList(); i = maxcollectionattemnpts + 10; } catch { };
+                try { linkboxesB = code_htmldata.DocumentNode.SelectNodes("//div").ToList(); } catch { };
+                try { linkboxesC = code_htmldata.DocumentNode.SelectNodes("//link").ToList(); } catch { };
+            }
 
             foreach (var linkbox in linkboxesA)
             {
@@ -88,7 +95,12 @@ namespace WebInterraction
             foreach (WebNode Point in targetdata )
             {
                 List<HtmlNode> nodes = new List<HtmlNode>();
-                nodes = code_htmldata.DocumentNode.SelectNodes(Point.Output()).ToList();
+
+                for (int i = 0; i <= maxcollectionattemnpts; i++)
+                {
+                    try { nodes = code_htmldata.DocumentNode.SelectNodes(Point.Output()).ToList(); i = maxcollectionattemnpts + 10; } catch { };
+                }
+
                 foreach(HtmlNode node in nodes)
                 {
                     if (Point.OutputChildIndex() >= 0) { extracteddata.Add(node.ChildNodes[Point.OutputChildIndex()].InnerText); }

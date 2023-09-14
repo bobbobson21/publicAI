@@ -26,6 +26,8 @@ namespace program
             List<string> outfiledata_rawA = new List<string>(); //just results without any modafcation wich will be needed
             List<string> outfiledata_rawB = new List<string>();
             List<string> outfiledata_rawC = new List<string>();
+            List<string> outfiledata_rawD = new List<string>();
+            List<string> outfiledata_rawE = new List<string>();
             List<string> outfiledata = new List<string>(); //just results without any modafcation wich will be needed
 
             WebCollect.LoadBrowser();
@@ -37,7 +39,7 @@ namespace program
             for (int i = 0; i < infiledata.Count; i++)
             {
                 WebCollect.SetWebTarget(WebCollect.ConvertToSearchForQuoraURL(infiledata[i]));
-                string res = WebCollect.CollectLinks()[3];
+                string res = WebCollect.CollectLinks()[2];
                 WebCollect.SetWebTarget(res);
                 List<string> collectionpoint = WebCollect.Collect();
                 if (collectionpoint.Count >= 3)
@@ -51,6 +53,17 @@ namespace program
                     outfiledata_rawA.Add( "NULL" );
                     Console.WriteLine( $"error item {i}/{infiledata[i]} could not be processed as suficent sample size could not be for pal could not be found" );
                 }
+
+                if (collectionpoint.Count >= 5)
+                {
+                    outfiledata_rawD.Add(collectionpoint[3]); //we need to make sure the outfile data and infile data = the same
+                    outfiledata_rawE.Add(collectionpoint[4]);
+                }
+                else
+                {
+                    outfiledata_rawD.Add("NULL");
+                }
+
             }
 
             for (int i = 0; i < infiledata.Count; i++)
@@ -58,7 +71,12 @@ namespace program
                 if (outfiledata_rawA[i] != "NULL")
                 {
                     string q = infiledata[i];
-                    string a = outfiledata_rawA[i] + "," + outfiledata_rawB[i] + "," + outfiledata_rawC[i];
+                    List<string> a = new List<string>();
+                    a.Add(outfiledata_rawA[i]);
+                    a.Add(outfiledata_rawB[i]);
+                    a.Add(outfiledata_rawC[i]);
+
+                    if (outfiledata_rawD[i] != "NULL") { a.Add(outfiledata_rawD[i]);a.Add(outfiledata_rawE[i]);};
 
                     outfiledata.Add(Pal.ConvetToPalData(q, a));
 

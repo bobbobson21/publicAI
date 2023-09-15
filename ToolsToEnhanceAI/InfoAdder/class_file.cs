@@ -18,17 +18,24 @@ namespace FileInterraction
         public static List<string> GetFileData()
         {
             List<string> lines = new List<string>();
-            StreamReader file = new StreamReader( filepath );
-            string line = file.ReadLine();
-
-            while( line != null)
+            try
             {
-                lines.Add( line );
-                line = file.ReadLine();
-            }
+                StreamReader file = new StreamReader(filepath);
+                string line = file.ReadLine();
 
-            file.Close();
-            return lines;
+                while (line != null)
+                {
+                    lines.Add(line);
+                    line = file.ReadLine();
+                }
+
+                file.Close();
+                return lines;
+            }
+            catch
+            {
+                return lines;
+            }
         }
 
         public static void SetFileData( List<string> filedata )

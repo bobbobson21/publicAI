@@ -31,6 +31,9 @@ namespace WebInterraction
         public static void LoadBrowser()
         {
             bro_options = new ChromeOptions();
+            bro_options.AddArgument( "disable-logging" );
+            bro_options.AddArguments("mute-audio");
+            bro_options.AddArguments("disable-extensions");
             bro_options.AddArguments("headless");
             bro_driver = new ChromeDriver(bro_options);
         }

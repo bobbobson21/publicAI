@@ -17,8 +17,7 @@ pal:AddNewTagGroup( "test_tags", {"test"} )
 pal:SetNewInfo( {"|pal:MWTG( 'test_tags' )|"}, {}, {0,0}, false, true, 0, {"wow I did it I pased the test heck yer now to be blessed by the great blahaj"}, {}, nil, nil )
 
 
-   o ADD MORE INFO (MAYBE MAKE A C# WEB SCRAPER MAYBE)
-   o ADD QUESTIONTIVE LEARNING (learning from asking questions) AND A TRUTH --moved back because I am kind of tiered of dealing with learing code rn
+   o ADD QUESTIONTIVE LEARNING (learning from asking questions) AND A TRUTH
      FILTER OF SORTS FOR LEARNING SYSTEMS
    o USE SYNONYMS INSERTION TOOL (do this last as we cant add the better
      spellcheck because the file is two big so use the tools to make a smaller

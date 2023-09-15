@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OpenQA.Selenium.DevTools.V114.DOM;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +13,7 @@ namespace PalConvertion
         private static string[] hateCalm = {"annoying","problmatic","horrible","mean","pesting","bad","fucker","cunt","dick","bitch","ass","douch",};
         private static string[] loveCalm = {"lovely","kind","helpful","love","good","caring",};
         private static string[] loveAnger = {"lovely","kind","helpful","lovely","good","caring","annoying","problmatic","horrible","mean","pesting","bad","disappointment",};
-        private static string[] RemoveFromQTags = {"is","the","think","thougth","to","get"};
+        private static string[] RemoveFromQTags = {"is","the","think","thougth","to","get","a"};
 
         public static double[] CalulateEmotion( string scan, double emul )
         {
@@ -97,14 +98,23 @@ namespace PalConvertion
             q = q.Replace("\n", " ");
             string newa = "";
 
-            for (int i = 0; i < a.Count; i++)
+            int countend = a.Count;
+            for (int i = 0; i < countend; i++ )
             {
                 a[i] = a[i].Replace("\n", " "); //how it responds to stuff should not have new lines 
                 a[i] = a[i].Replace("|", "-");
                 a[i] = a[i].Replace("'", "");
+                a[i] = a[i].Replace( ((char)92).ToString(), "/" );
                 a[i] = a[i].Replace( ((char)34).ToString(), "");
-                newa = newa + (char)34 + a[i] + (char)34 +",";
 
+                string tempa = a[i];
+
+                if (tempa.Length >= 1 && tempa.Substring(tempa.Length - 1, 1) == ".") 
+                { 
+                    tempa = tempa.Substring(1, tempa.Length - 1); 
+                };
+                tempa = tempa + " |pal:GetEmotiveWord()| user.";
+                newa = newa + (char)34 + a[i] + (char)34 + "," + (char)34 + tempa + (char)34 + ",";
             }
 
             double[] emotionlevel = CalulateEmotion( q+ newa, 0.25 );

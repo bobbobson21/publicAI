@@ -22,5 +22,6 @@ dofile( current_dir.."/AI/spellchecking/pal_spellchecker.lua" )
 dofile( current_dir.."/AI/sandbox&learning/pal_sandboxcentral.lua" )
 
 dofile( current_dir.."/AI/infomation/pal_infomodel.lua" )
+dofile( current_dir.."/AI/infomation/pal_quorainfomodel.lua" ) --new one
 
 pal:SetRestorePoint()

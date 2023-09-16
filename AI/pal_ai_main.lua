@@ -105,7 +105,7 @@ return false, pal["found_tag_at"] --if no tag is found it retuns false and ends
 end --also stands for match with tag group
 
 function pal:MemGen( name, ... ) --connets names to pronows and then puts it into short term memory
-pal:AddNewSpellChecking( name, ... )
+pal:AddNewSpellChecking( name, {...} )
 if pal["gender_momory"] == nil then pal["gender_momory"] = {} end
 	pal["gender_momory"][#pal["gender_momory"] +1] = name
 	pal["gender_momory_time"] = 240 --time it takes to lose it's short term memory for pronowns should be 4 minutes
@@ -230,6 +230,7 @@ if pal:RunSelfHooks( "PALOnRemoveSynonymsGroup", {id} ) == false then return end
 end
 
 function pal:GetSynonymsWord( id ) --gets a synonym from a synonym id
+if pal["synonyms_groups"][id] == nil then return "" end
 return pal["synonyms_groups"][id][math.random( 1, #pal["synonyms_groups"][id] )]
 end
 
@@ -272,16 +273,19 @@ return returnstate
 end
 
 function pal:GetEmotiveWord() --words that describe what it thinks of the user
+if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )] == nil then return "" end
 if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["words"] == nil then return "" end
 return pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["words"][math.random( 1, #pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["words"] )]
 end
 
 function pal:GetEmotiveClass() --words that describe how it is feeling in genral
+if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )] == nil then return "" end
 if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["emotionclass"] == nil then return "" end
 return pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["emotionclass"][math.random( 1, #pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["emotionclass"] )]
 end
 
 function pal:GetEmotiveEnd() --an emotive ending to a sentence
+if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )] == nil then return "" end
 if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["sentanceappending"] == nil then return "" end
 return pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["sentanceappending"][math.random( 1, #pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["sentanceappending"] )]
 end
@@ -302,6 +306,8 @@ if level == 2 then pal["annoyance_responces"][#pal["annoyance_responces"] +1] = 
 end
 
 function pal:GetAnnoyanceRespoce( level ) --for if you ask the same question to many times
+if #pal["annoyance_responces_attachment"] <= 0 then return "ERROR: AI TRIED TO APPEND ANOYANCE BUT THERE IS NO ANNOYANCE DATA" end
+if #pal["annoyance_responces"] <= 0 then return "ERROR: AI TRIED TO MAKE AN ANNOYED RESPONCE BUT HAS NO ANNOYED RESPONCE DATA" end
 if level == 1 then return pal["annoyance_responces_attachment"][math.random( 1, #pal["annoyance_responces_attachment"] )] end
 if level == 2 then return pal["annoyance_responces"][math.random( 1, #pal["annoyance_responces"] )] end
 end

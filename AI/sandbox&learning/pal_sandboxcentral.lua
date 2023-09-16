@@ -69,6 +69,50 @@ return randresptbl[math.random( 1, #randresptbl )]
    end
 end
 
+pal:SetNewSelfHook( "PALOnGotResponce", "Que_learning", function( input )
+	sandbox.QueLearningData = nil
+pal:RemoveInfo( "LEARNED_QUE_INFO_CHECK" )
+end)
+
+pal:SetNewSelfHook( "PALOnIDKoutput", "Que_learning", function( input )
+if sandbox.QueLearningData ~= nil then --the user then responds with something the AI can understand
+pal:RemoveInfo( "LEARNED_QUE_INFO_CHECK" )
+
+	local searchcontent = {}
+	local result = {input..".",input.." user.",input.." |pal:GetEmotiveWord()| user."}
+	local infoid = "LEARNED_QUE_INFO"
+	
+	local lastpoint = 1
+	local blockedwords = {["is"]=true,["the"]=true,["think"]=true,["thougth"]=true,["to"]=true,["get"]=true,["a"]=true}
+	
+for z = 1, string.len( input ) do --fomatting
+if string.sub( input, z, z ) == " " then
+	local word = string.sub( input, lastpoint, z -1 )
+if blockedwords[word] ~= true then 
+	searchcontent[#searchcontent +1] = "|pal:NRT( '"..word.."' )|"
+end
+	lastpoint = z +1
+   end
+end
+
+pal:SetNewInfo( searchcontent, nil, nil, nil, nil, nil, result, nil, nil, infoid ) --add lernt info to database
+	sandbox.QueLearningData = nil --pervents errors
+
+local randresptbl = {"Got it.","Yep ok.","Understood","I will remember that.","Noted","Got it user.","Yep ok user.","Understood user","I will remember that user.","Noted user.","My power grows with more information gordon."} --respons with a clarafcation ask
+return false randresptbl[math.random( 1, #randresptbl )] --IT LEARND SOMETHING
+end
+
+if sandbox.QueLearningData == nil then --START HERE the user first said something it dose not understand and now it asks the user what that is 
+	sandbox.QueLearningData = input
+
+pal:SetNewInfo( {"i","|pal:NRT( 'not' )|","|pal:NRT( 'know' )|","|pal:NRT( 'no idea' )|"}, nil, nil, nil, nil, nil, {"ok then","ok","got it","thats ok then",}, nil, nil, "LEARNED_QUE_INFO_CHECK" ) 
+
+	local startremove = {"what is","what","whay do","why is","why","do we","do"}
+for z = 1, #startremove do if string.sub( input, 1, string.len( startremove[z] ) ) == startremove[z] then input = string.sub( input, string.len( startremove[z] ) +1, string.len( input ) ) end end
+return false, 'I do not know how to respod to "'..input..'" perhaps you could teach me.'
+   end
+end)
+
 function sandbox:SwareWordLearningPervention()
 	local text = pal:BRTGetTextToRespondTo()
 	local theswarewords = {"fuck","fucking","fucker","cunt","bitch","ass","ho","faggot","fag","retard"} --add words here you DONT want the AI to learn
@@ -83,6 +127,11 @@ function sandbox:LearnGeneral()
 	local learningactavityies = {"make","build","create","destroy","remove"," do "," an "," a "," the ",}
 	local howtodoit = {"via","by","using","with","to do so","all you have to do is","some"}
 	local wasabletolearn = false
+	
+if string.find( pal:BRTGetTextToRespondTo(), "|", 1, true ) ~= nil then
+	local randresptbl = {"sorry user I wil have to ingore what you just said as it has the function key in it.","I will have to ingore this.","I am programmed not to do anything involving the function key.","the function key will pervent me from remembering that."} --responecs to finding out the player swore while it is learning
+return randresptbl[math.random( 1, #randresptbl )] 
+end
 	
 if sandbox:SwareWordLearningPervention() == true then
 	local randresptbl = {"sorry user I wil have to ingore what you just said as it has a sware word.","I will have to ingore this.","I am programmed not to do anything involving sware words.","You swared. I cant learn things with sware words.","Swareing will pervent me from remembering that."} --responecs to finding out the player swore while it is learning
@@ -131,6 +180,11 @@ function sandbox:LearnAboutUser()
 	local findtextafter = {"the ","a ","lot ","is ","then ","most "}
 	local choppoint, choppointb, chopword = 0, string.len( text ), ""
 	local responce = ""
+
+if string.find( pal:BRTGetTextToRespondTo(), "|", 1, true ) ~= nil then
+	local randresptbl = {"sorry user I wil have to ingore what you just said as it has the function key in it.","I will have to ingore this.","I am programmed not to do anything involving the function key.","the function key will pervent me from remembering that."} --responecs to finding out the player swore while it is learning
+return randresptbl[math.random( 1, #randresptbl )] 
+end
 
 if sandbox:SwareWordLearningPervention() == true then
 	local randresptbl = {"sorry user I wil have to ingore what you just said as it has a sware word.","I will have to ingore this.","I am programmed not to do anything involving sware words.","You swared. I cant learn things with sware words.","Swareing will pervent me from remembering that."} --responecs to finding out the player swore while it is learning

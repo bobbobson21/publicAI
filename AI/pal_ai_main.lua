@@ -621,8 +621,8 @@ pal:RunAjustEmotionToEmotiveKeyWords( master ) --stage three: remove here to rem
 function pal:BRTGetInfoIndex() return outputindex end
 
 if outputindex == nil then --if no responce could be found to what the user says run this code
-	local str = pal:RunSelfHooks( "PALOnIDKoutput", {master} )
-if str ~= nil and str ~= false then return str end
+	local A, B = pal:RunSelfHooks( "PALOnIDKoutput", {master} )
+if A == false then return B end
 return pal:GetIDKresponce() 
 end
 

@@ -66,7 +66,7 @@ namespace program
                     outfiledata_rawC.Add("NULL");
 
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine( $"error item {i}/{infiledata[i]} could not be processed as suficent sample size could not be for pal could not be found" );
+                    Console.WriteLine( $"error item [{i}/{infiledata[i]}] could not be processed as suficent sample size could not be for pal could not be found" );
                     Console.ResetColor();
                 }
 

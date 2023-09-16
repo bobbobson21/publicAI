@@ -30,4 +30,4 @@
 
 	local sentanceappending = nil
 
-pal:AddNewEmotion( {1,1}, emotionalwords, wordstomaketheaifeelthis, emotionclass, sentanceappending )
+pal:AddNewEmotion( {3,1}, emotionalwords, wordstomaketheaifeelthis, emotionclass, sentanceappending )

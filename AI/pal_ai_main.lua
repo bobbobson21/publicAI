@@ -291,6 +291,25 @@ if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 
 return pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["sentanceappending"][math.random( 1, #pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["sentanceappending"] )]
 end
 
+function pal:SetEmotiiveGravity( point, gravity ) --sets its main emotion
+if pal:RunSelfHooks( "PALOnSetEmotiiveGravity", {point,gravity} ) == false then return end
+	pal["emotion_level"] = point
+	pal["emotion_level_wanted"], pal["emotion_gravatate_power"] = point, gravity
+end
+
+function pal:GetEmotiiveGravity()
+return pal["emotion_level_wanted"], pal["emotion_gravatate_power"]
+end
+
+function pal:SetEmotiveWordPower( num ) --sets how strong it reacts to words like sware words
+if pal:RunSelfHooks( "PALOnSetEmotiveWordPower", {num} ) == false then return end
+	pal["emotion_sensitivity"] = num
+end
+
+function pal:GetEmotiveWordPower()
+return pal["emotion_sensitivity"]
+end
+
 function pal:SetNewIDKresponces( responce ) --for when the ai dose not have a responce
 	pal["idk_responces"][#pal["idk_responces"] +1] = responce
 end

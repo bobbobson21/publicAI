@@ -306,6 +306,14 @@ if level == 1 then pal["annoyance_responces_attachment"][#pal["annoyance_responc
 if level == 2 then pal["annoyance_responces"][#pal["annoyance_responces"] +1] = responce end --at level 2 it will refuse to awnser questions
 end
 
+function pal:SetMaxAnnoyanceAmount( num )
+	pal["annoyance_maxlevel"] = num
+end
+
+function pal:GetMaxAnnoyanceAmount()
+return pal["annoyance_maxlevel"]
+end
+
 function pal:GetAnnoyanceRespoce( level ) --for if you ask the same question to many times
 if #pal["annoyance_responces_attachment"] <= 0 then return "ERROR: AI TRIED TO APPEND ANOYANCE BUT THERE IS NO ANNOYANCE DATA" end
 if #pal["annoyance_responces"] <= 0 then return "ERROR: AI TRIED TO MAKE AN ANNOYED RESPONCE BUT HAS NO ANNOYED RESPONCE DATA" end
@@ -413,6 +421,7 @@ end
 return mstr
 end
 
+--remove function below to get rid of emotion change
 function pal:RunAjustEmotionToEmotiveKeyWords( input ) --allows for to AI to feel hurt by the manner of which the player speeks
 if pal:RunSelfHooks( "PALOnRunAjustEmotionToEmotiveKeyWords", {input} ) == false then return end
 	local xy = {0,0}
@@ -446,6 +455,8 @@ if xy[2] ~= 0 then xy[2] = xy[2] /( math.abs( xy[1] ) +math.abs( xy[2] ) ) end
 
 	pal["emotion_level"][1]	= pal["emotion_level"][1] +( xy[1] *pal["emotion_sensitivity"] )
 	pal["emotion_level"][2] = pal["emotion_level"][2] +( xy[2] *pal["emotion_sensitivity"] )
+	pal["emotion_level"][1] = math.min( math.max( 1, pal["emotion_level"][1] ), pal["emotion_grid_max_size"] )
+	pal["emotion_level"][2] = math.min( math.max( 1, pal["emotion_level"][2] ), pal["emotion_grid_max_size"] )
 if pal:RunSelfHooks( "PALRunAjustEmotionToEmotiveKeyWordsNewEmotion", {input,{math.floor( 0.50 +pal["emotion_level"][1] ),math.floor( 0.50 +pal["emotion_level"][2] )}} ) == false then return end
 end
 

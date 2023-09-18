@@ -2,6 +2,7 @@
  o [how to add infomation to pal](#how-to-add-infomation-to-pal)  
  ^ [infomation](#infomation)  
  ^ [functions in infomation](#functions-in-infomation)  
+ ^ [IDK responces](#IDK-responces)
  
  o [how to deal with emotion and annoyance](#how-to-deal-with-emotion-and-annoyance)  
  ^ [emotions basics](#emotions-basics)  
@@ -86,7 +87,15 @@ functions you can use in responces/append:
  - pal:GetEmotiveClass() --how it is feeling in genral
  - pal:SetPriorInput( str ) --you can chage the prior input to whatever you want which is what the searchfor_prior gose through
 
-## I
+## IDK responces
+
+If pal is for whatever reason is not able to tie what you are saying to some info or if the probablity of a responce being selected is the same for all responces in all infomation then it retuns IDK responce.
+
+IDK responces stand for I dont know (what this use is say i absolutely can not make any sence of this) responces anyhow you can create idk respnces like so:
+
+```
+pal:SetNewIDKresponces( "I dont know text here" )
+```
 
 # how to deal with emotion and annoyance
 

@@ -28,6 +28,7 @@ cdc:close()
 	pal["annoyance_responces"] = {}
 	pal["annoyance_effectemotionby"] = {-0.5,-0.5}
 	pal["searchfor_groups"] = {}
+	pal["max_gender_momory_time"] = 240
 	pal["sandbox"] = {["funcs"]={},}
 	pal["runfunctionkey"] = "|"
 
@@ -104,11 +105,11 @@ end
 return false, pal["found_tag_at"] --if no tag is found it retuns false and ends
 end --also stands for match with tag group
 
-function pal:MemGen( name, ... ) --connets names to pronows and then puts it into short term memory
-pal:AddNewSpellChecking( name, {...} )
+function pal:MemGen( name, tbl ) --connets names to pronows and then puts it into short term memory
+pal:AddNewSpellChecking( name, tbl )
 if pal["gender_momory"] == nil then pal["gender_momory"] = {} end
 	pal["gender_momory"][#pal["gender_momory"] +1] = name
-	pal["gender_momory_time"] = 240 --time it takes to lose it's short term memory for pronowns should be 4 minutes
+	pal["gender_momory_time"] = pal["max_gender_momory_time"] --time it takes to lose it's short term memory for pronowns should be 4 minutes
 end
 
 function pal:DegradeInfoOverXCycles( id, cyclesinfostayesinmemory ) --makes info eventually degrades to nothing use to simulates forgetfulness
@@ -632,8 +633,9 @@ if A == false then return B end
 return pal:GetIDKresponce() 
 end
 
-	local outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )] --stage five: pick a responce out of the set
+	local outputresponce = "" --stage five: pick a responce out of the set
 	
+if outputdata["responces"] ~= nil then outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )] end
 if outputdata["ea"] ~= false then outputresponce = outputresponce.." "..pal:GetEmotiveEnd() end --stage six: appending of responce section --emotion appending
 if outputdata["a"] ~= false then outputresponce = pal:RunAnnoyanceTest( outputindex, outputresponce ) end --stage six: annoyence appending
 if pal:GetAnnoyanceLevel( outputindex ) == 2 then --stage six: end function if to annoyed appending

@@ -300,18 +300,18 @@ if #pal["idk_responces"] <= 0 then return "ERROR: AI TRIED TO MAKE AN IDK RESPON
 return pal["idk_responces"][math.random( 1, #pal["idk_responces"] )]
 end
 
-function pal:SetNewAnnoyanceRespoces( level, responce ) --for if you ask the same question to many times
-if pal:RunSelfHooks( "PALOnSetNewAnnoyanceRespoces", {level,responce} ) == false then return end
-if level == 1 then pal["annoyance_responces_attachment"][#pal["annoyance_responces_attachment"] +1] = responce end --at level 1 it will still awnser questions and stuff but it will tell you this is getting annoying
-if level == 2 then pal["annoyance_responces"][#pal["annoyance_responces"] +1] = responce end --at level 2 it will refuse to awnser questions
-end
-
 function pal:SetMaxAnnoyanceAmount( num )
 	pal["annoyance_maxlevel"] = num
 end
 
 function pal:GetMaxAnnoyanceAmount()
 return pal["annoyance_maxlevel"]
+end
+
+function pal:SetNewAnnoyanceRespoces( level, responce ) --for if you ask the same question to many times
+if pal:RunSelfHooks( "PALOnSetNewAnnoyanceRespoces", {level,responce} ) == false then return end
+if level == 1 then pal["annoyance_responces_attachment"][#pal["annoyance_responces_attachment"] +1] = responce end --at level 1 it will still awnser questions and stuff but it will tell you this is getting annoying
+if level == 2 then pal["annoyance_responces"][#pal["annoyance_responces"] +1] = responce end --at level 2 it will refuse to awnser questions
 end
 
 function pal:GetAnnoyanceRespoce( level ) --for if you ask the same question to many times

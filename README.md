@@ -142,6 +142,8 @@ This AI system come with a set of tools that allows you to make AIs really fast 
  - SpellingEnhancement generates most of the possible missspellings for a list of words and then outputs the results to a file as pal spellchecking data which makes AIs better at understanding english 
  - SynonymsGrouping give it a list of synonyms and it will output a synonyms file in pal data and it can also modify infomodel file data to use those synonyms which makes AIs seem more dynamic in there responces 
 
+Also you should open the source code of the tools to get a better uderstanding of what its for and what files it should be used with and changeing thoese file should you need to.
+
 ## why you should use fuctions in tags and responce
 Using functions allows for you to make some really cool additions to you AI for example you can do something like:
 

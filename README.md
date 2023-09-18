@@ -172,7 +172,7 @@ if string.find( input, "you", 1, true ) ~= nil then
 end)
 ```
 
- Also some genral advice for huge of small AIs is to nest info where possible and use DegradeInfoOverXCycles to remove it as ite can really help to optamize an AI with this.
+ Also some genral advice for huge or small AIs is to nest info where possible and use DegradeInfoOverXCycles to remove it as ite can really help to optamize an AI with this.
 # using
 
 you can feel free to use any of the code in this project as long as you credit the account BobBobson21

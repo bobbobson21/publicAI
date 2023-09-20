@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj": {}
+    "c:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj": {}
   },
   "projects": {
-    "C:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj": {
+    "c:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj",
+        "projectUniqueName": "c:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj",
         "projectName": "InfoAdder",
-        "projectPath": "C:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj",
+        "projectPath": "c:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj",
         "packagesPath": "C:\\Users\\dsbkh\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\obj\\",
+        "outputPath": "c:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

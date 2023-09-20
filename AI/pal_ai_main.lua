@@ -433,8 +433,8 @@ if pal:RunSelfHooks( "PALOnRunSpellCheck", {input} ) == false then return end
 	local nul = 0
 for k, v in pairs( pal["spellchecking"] ) do
 for y = 1, #v["i"] do
-	mstr, nul = string.gsub( mstr, v["i"][y].." ", v["c"].." " )
-if input == v["i"][y] then mstr = v["c"] end
+	mstr, nul = string.gsub( mstr, " "..v["i"][y].." ", " "..v["c"].." " )
+if input == " "..v["i"][y].." " then mstr = " "..v["c"].." " end
    end
 end
 return mstr
@@ -643,7 +643,7 @@ end
 
 function pal:BuildResponceTo( input ) --USE THIS TO GET THE AI TO MAKE A RESPONCE TO THE INPUT
 function pal:BRTGetTextToRespondToOrignal() return input end --added just encase someone wants the orignal text the player types
-	local master = " "..pal:RunSpellCheck( string.lower( input ) ).." " --stage one: spellchecking
+	local master = pal:RunSpellCheck( string.lower( " "..input.." " ) ) --stage one: spellchecking
 function pal:BRTGetTextToRespondTo() return master end --spell checking is done before this so that functions like the NRT do not have to continusely do spellchecking
 	
 	local A, B = pal:RunSelfHooks( "PALOnBuildResponceTo", {master} )

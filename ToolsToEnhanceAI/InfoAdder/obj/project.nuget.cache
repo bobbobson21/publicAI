@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "jm0HZP3xvvDGA3/7aWMZaUd3uDucm+mCc9spH1fVGtJ0Roc6ULuz9Ql4LMVbwmLPx648xktTqJEt4wnwm+togg==",
+  "dgSpecHash": "CLXj/h7b1WksuAYR+QRUu71KBdoIu+BvswIxzXWkHSLNuqrpxQq+Cq3v6IZLx41l+PPnbxp6e9Q5so9CU/7ZcA==",
   "success": true,
-  "projectFilePath": "C:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj",
+  "projectFilePath": "c:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\dsbkh\\.nuget\\packages\\htmlagilitypack\\1.11.53\\htmlagilitypack.1.11.53.nupkg.sha512",
     "C:\\Users\\dsbkh\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",

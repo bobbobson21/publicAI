@@ -2,7 +2,7 @@
  	local synfile =  "synonyms.txt" --file to extract words from
 	local outputfilesyn = "pal_synonyms.lua" --results
 	local outputfiledatasyn = ""
-	local outputfileinf = "pal_infomodel.lua" --results
+	local outputfileinf = "pal_quorainfomodel.lua" --results
 	local outputfiledatainf = ""
 	
 -- end of setting start of main code -------------------------------------------------------------------------------------------------------------------------

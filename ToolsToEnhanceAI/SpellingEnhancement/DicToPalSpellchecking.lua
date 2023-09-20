@@ -14,7 +14,7 @@
 	{["a"]=1,["s"]=2,["d"]=3,["f"]=4,["g"]=5,["h"]=6,["j"]=7,["k"]=8,["l"]=9,},
 	{["z"]=1,["x"]=2,["c"]=3,["v"]=4,["b"]=5,["n"]=6,}
 	}
-	
+	local dontaddletters = {":","'",'"',";","."}
 	
 	
 -- end of setting start of outputfile saveing and loading ----------------------------------------------------------------------------------------------------
@@ -65,6 +65,7 @@ for s in string.gmatch( dicfiledata, "[^%"..string.char( 10 ).."]+") do dicfiled
 for z = lastprogresspoint, string.len( dicfiledata ) do
 if string.sub( dicfiledata, z, z ) == string.char( 10 ) then
 	local correctword = string.sub( dicfiledata, lastpoint, z -1 )
+	local donotadd = false
 	local incorrectwords = ""
 	lastpoint = z +1
 
@@ -104,6 +105,7 @@ if dicfiledatablock[incorrectword] == nil then incorrectwords = incorrectwords..
    end
 end
 
+if incorrectwords ~= "" and string.len( correctword ) >= 3 then
 for y = 1, string.len( correctword ) do --spellchecking by not pressing a button
 	local letter = string.sub( correctword, y, y )
 	local priorletter = string.sub( correctword, y -1, y -1 )
@@ -115,6 +117,7 @@ end
 
 	correctword = "'"..correctword.."'"
 	outputfiledata = outputfiledata.."pal:AddNewSpellChecking( "..correctword..", {"..incorrectwords.."} )"..string.char( 10 ) --add to outputfiledata
+end
 
 	local currentpercent = math.ceil( ( z /string.len( dicfiledata ) ) *100 )
 

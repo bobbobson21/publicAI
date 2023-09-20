@@ -11,7 +11,7 @@ spellingbee.
 
 	
 	local stringchars = {["'"]=true,['"']=true} --we search the file for string because those usally have words that are not functions
-	local excludecharters = {"|","@","_"} --dont add string to outputfiledata if it has this char in it
+	local excludecharters = {"|","@","_","(",")","[","]","“","”","'","’",'"',":",";","1","2","3","4","5","6","7","8","9","0","..","!!","??","/","—","…"} --dont add string to outputfiledata if it has this char in it
 	local extfile =  "pal_infomodel.lua" --file to extract words from
 	local outputfile = "wordextractorresults.txt" --results
 	local outputfiledata = ""
@@ -43,9 +43,15 @@ end
 if outputdata ~= nil then
 for s in string.gmatch( outputdata, "[^%s]+" ) do --breaks string into words
 	local newword = string.lower( s )
+
+if string.sub( newword, string.len( newword ), string.len( newword ) ) == "!" then newword = string.sub( newword, 1, string.len( newword ) -1 ) end
+if string.sub( newword, string.len( newword ), string.len( newword ) ) == "?" then newword = string.sub( newword, 1, string.len( newword ) -1 ) end
+if string.sub( newword, string.len( newword ), string.len( newword ) ) == "," then newword = string.sub( newword, 1, string.len( newword ) -1 ) end
 if string.sub( newword, string.len( newword ), string.len( newword ) ) == "." then newword = string.sub( newword, 1, string.len( newword ) -1 ) end
 if string.find( outputfiledata, newword, 1, true ) == nil then --blocks repeats
+if string.find( outputdata, ".", 1, true ) == nil then
 outputfiledata = outputfiledata..newword..string.char( 10 ) --adds words to outputfiledata
+         end
       end
    end
 end

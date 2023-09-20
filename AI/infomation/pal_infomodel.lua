@@ -16,13 +16,6 @@ pal:AddNewInfo( {"test"}, {}, {0,0}, true, 0, {"wow I did it I pased the test he
 pal:AddNewTagGroup( "test_tags", {"test"} )
 pal:SetNewInfo( {"|pal:MWTG( 'test_tags' )|"}, {}, {0,0}, false, true, 0, {"wow I did it I pased the test heck yer now to be blessed by the great blahaj"}, {}, nil, nil )
 
-   o USE SYNONYMS INSERTION TOOL (do this last as we cant add the better
-     spellcheck because the file is two big so use the tools to make a smaller
-	 but still good spellchecker) 
-   o USE BETTER SPELLCHECKING TOOLS (do this last as we cant add the better
-     spellcheck because the file is two big so use the tools to make a smaller
-	 but still good spellchecker) 
-
 ---------------------------------------------------------------------------]]--
 
 pal:SetNewInfo( {"you","|pal:NRT( 'make' )|","|pal:NRT( 'build' )|","|pal:NRT( 'create' )|","|pal:NRT( 'destroy' )|","|pal:NRT( 'remove' )|","|pal:NRT( 'do' )|",}, nil, nil, false, false, nil, {"|pal:SandBox():LearnGeneral()|"}, nil, nil, nil )

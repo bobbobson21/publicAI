@@ -20,6 +20,8 @@ dofile( current_dir.."/AI/annoyance/pal_annoyence_res.lua" )
 dofile( current_dir.."/AI/spellchecking/pal_spellchecker.lua" )
 dofile( current_dir.."/AI/spellchecking/pal_spellchecker_2.lua" )
 
+dofile( current_dir.."/AI/synonyms/pal_synonyms.lua" )
+
 dofile( current_dir.."/AI/sandbox&learning/pal_sandboxcentral.lua" )
 
 dofile( current_dir.."/AI/infomation/pal_quorainfomodel.lua" ) --new one

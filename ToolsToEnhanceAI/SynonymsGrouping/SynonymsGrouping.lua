@@ -62,22 +62,30 @@ io.output( io.stdout )
 print( "grouped synonyms!!!" )
 
 if outputfiledatainf ~= "" then
+	local oldpercent = 0
+	local z = 0
+while z <= string.len( outputfiledatainf ) do
+	z = z +1
 
-for z = 1, string.len( outputfiledatainf ) *1000 do
 	local letter = string.sub( outputfiledatainf, z, z )
 if string.sub( outputfiledatainf, z, z ) == string.char( 10 ) then
 	local currentline = string.sub( outputfiledatainf, inf_loastpoint, z -1 )
-	local rstart, null = string.find( currentline, "{[^{]*$" )
+	local rstart = 0
+for x = 1, string.len( currentline ) do if string.sub( currentline, z, z ) == "{" then rstart = z +1 end end
 	local rend = string.len( currentline ) +1 -string.len( inf_endkey )
-
 if rstart ~= nil and string.sub( currentline, rend, string.len( currentline ) ) == inf_endkey then
 	rstart = rstart +inf_loastpoint -1
 	rend = rend +inf_loastpoint -1
+	local newpercent = math.floor( ( ( z/ string.len( outputfiledatainf ) ) *100 ) +0.50 )
+
+if oldpercent ~= newpercent then
+	oldpercent = newpercent
+print( "info file rewrite compleation is at %"..tostring( newpercent ) )
+end
+
 
 	local replacearea = string.sub( outputfiledatainf,  rstart, rend )
-for x = 1, #synfind do
-	replacearea = string.gsub( replacearea, synfind[x], "|pal:GetSynonymsWord( '"..syngroup[x].."' )|" )
-end
+for x = 1, #synfind do replacearea = string.gsub( replacearea, " "..synfind[x].." ", " |pal:GetSynonymsWord( '"..syngroup[x].."' )| " )	 end
 	outputfiledatainf = string.sub( outputfiledatainf, 1, rstart -1 )..replacearea..string.sub( outputfiledatainf, rend +1, string.len( outputfiledatainf ) )
 end
 

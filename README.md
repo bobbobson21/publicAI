@@ -68,7 +68,7 @@ pal:ReturnInfo( {"what","|pal:NRT( 'simulation' )|"}, nil, nil, nil, nil, nil, {
 ```
 
 ## functions in infomation
-To put a function into infomations it is very simple you simply type the function as if your were exacuteing it into a string in the responces table or in one of the searchfor tables you then need to wrap it in the function key(|) like so "|CunkOnEarthPumpUpTheJam( 'this is cunk on earth' )|" and it will run however in the searchfor tables the function keys have to be at both ends of any given string and a bool must be returned and if this bool is false then all responce from this infomation will not be allowed to be returned to the user.
+To put a function into infomation it is very simple all you have to do is type the function as if your were exacuteing it into a string in the responces table or in one of the searchfor tables you then need to wrap it in the function key(|) like so "|CunkOnEarthPumpUpTheJam( 'this is cunk on earth' )|" and it will run however in the searchfor tables the function keys have to be at both ends of any given string and a bool must be returned and if this bool is false then all responce from this infomation will not be allowed to be returned to the user.
 
 Also in the responce table if a string is returned from a function then that string will be made to repace the area the funtion took up otherwise the area will be replace with an empty string. 
 
@@ -132,10 +132,10 @@ pal:SetMaxAnnoyanceAmount( number )
 # how to make good AIs
 
 ## what makes a good AI
-A good publicAI ai has has lots of responces and uses AddNewSynonymsGroup also good AIs also have a lot of spellchecking data as well as usage of all the functions made for the searchfor and responces tables. Good AIs in genral are also capable of being good emotional support and of being cold when you are mean to them and good AIs should also claim to have there own wants or needs if used for a video game or so other purpose that gose beyond the realm of a text input.
+A good publicAI ai has has lots of responces and uses add new synonyms group also good AIs also have a lot of spellchecking data as well as usage of all the functions made for the searchfor and responces tables. Good AIs in genral are also capable of being good emotional support and of being cold when you are mean to them and good AIs should also claim to have there own wants or needs if used for a video game or so other purpose that gose beyond the realm of a text input.
 
 ## why you should use the tool and how to use the tools
-This AI system come with a set of tools that allows you to make AIs really fast and it also makes your AI much smarter which makes the tools very important and usful to AI development with public AI. A list of these tools (in the order they should most likely be used) is bellow:
+This AI system come with a set of tools that allows you to make AIs really fast and it also makes your AI much smarter which makes the tools very important and useful to AI development with public AI. A list of these tools (in the order they should most likely be used) is bellow:
 
  - InfoAdded --give it two files one a list of questions and two a place to put the result and it will use the first file to scrape awnser off the internet and once it is done it will all be formatted to infomation pal can understand and then put into the results file also this is the only thing to use c#  
  - WordExtractor --extracts words from pal info files (this is useful for the spellchecker)

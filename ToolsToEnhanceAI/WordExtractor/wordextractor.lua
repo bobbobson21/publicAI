@@ -49,7 +49,7 @@ if string.sub( newword, string.len( newword ), string.len( newword ) ) == "?" th
 if string.sub( newword, string.len( newword ), string.len( newword ) ) == "," then newword = string.sub( newword, 1, string.len( newword ) -1 ) end
 if string.sub( newword, string.len( newword ), string.len( newword ) ) == "." then newword = string.sub( newword, 1, string.len( newword ) -1 ) end
 if string.find( outputfiledata, newword, 1, true ) == nil then --blocks repeats
-if string.find( outputdata, ".", 1, true ) == nil then
+if string.find( newword, ".", 1, true ) == nil then
 outputfiledata = outputfiledata..newword..string.char( 10 ) --adds words to outputfiledata
          end
       end

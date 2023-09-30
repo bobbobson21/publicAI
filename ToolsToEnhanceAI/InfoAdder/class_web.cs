@@ -90,8 +90,8 @@ namespace WebInterraction
 
         public static List<string> Collect() //fire and grab the bounty
         {
-            List<string> extracteddata = new List<string>();
-            bro_driver.Navigate().GoToUrl(targetsite);
+            List<string> extracteddata = new List<string>(); //one line below it attempts to connect to website 3 time if it failes 3 times programe crashes so have good wifi and dont be downloading stuff
+            try { bro_driver.Navigate().GoToUrl(targetsite); } catch { try { bro_driver.Navigate().GoToUrl(targetsite); } catch { bro_driver.Navigate().GoToUrl(targetsite); } }
             var code_htmldata = new HtmlDocument();
             code_htmldata.LoadHtml(bro_driver.PageSource);
 

@@ -82,14 +82,22 @@ namespace PalConvertion
         public static string QTagSimplfiy( string q )
         {
             q = q.Replace("people", "you");
+            q = q.Replace("what's", "what is");
+            q = q.Replace("can't", "can not");
             q = q.Replace("what's", "what");
             return q;
         }
 
-        public static string QToNRTTags(string q)
+        public static string QToNRTTags(string q, int[] skip)
         {
             string[] tags = q.Split(",");
-            for (int i = 0; i < tags.Length; i++) { tags[i] = (char)34 + "|pal:NRT('" + tags[i] + "')|" + (char)34; };
+            for (int i = 0; i < tags.Length; i++)
+            {
+                if (skip.Contains(i) == false)
+                {
+                    tags[i] = (char)34 + "|pal:NRT('" + tags[i] + "')|" + (char)34;
+                }
+            }
             string result = string.Join( ",", tags );
             return result;
         }
@@ -107,6 +115,15 @@ namespace PalConvertion
             return addcurrentresult;
         }
 
+        public static string ARemoveQuoraJargon(string a)
+        {
+            if (a.EndsWith("…(more)") == true && a.LastIndexOf(".") >= 1)
+            {
+                a = a.Substring(0, a.LastIndexOf(".") );     
+            }
+            return a;
+        }
+
 
         public static string ConvetToPalData( string q, List<string> a )
         {
@@ -121,7 +138,7 @@ namespace PalConvertion
                 a[i] = a[i].Replace("'", "");
                 a[i] = a[i].Replace( ((char)92).ToString(), "/" );
                 a[i] = a[i].Replace( ((char)34).ToString(), "");
-
+                a[i] = ARemoveQuoraJargon(a[i]);
                 string tempa = a[i];
 
                 if (ATextRemovealIf(a[i] ) == true)
@@ -140,7 +157,8 @@ namespace PalConvertion
             q = q.Replace(" ", ","); //turns words to tags
             q = QTagSimplfiy(q);
             q = QTagRemoval(q); //removes uneeded tags
-            q = QToNRTTags(q);
+            int[] block = { 0, ( q.Split(",").Length -1 ) };
+            q = QToNRTTags(q, block );
 
             return "pal:SetNewInfo( {"+q+"}, nil, {"+ emotionlevel[0].ToString()+","+ emotionlevel[1].ToString()+"}, nil, nil, nil,{"+ newa + "}, nil, nil, nil )";
         }

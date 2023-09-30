@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj": {}
+    "C:\\Users\\dsbkh\\OneDrive\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj": {}
   },
   "projects": {
-    "c:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj": {
+    "C:\\Users\\dsbkh\\OneDrive\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj",
+        "projectUniqueName": "C:\\Users\\dsbkh\\OneDrive\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj",
         "projectName": "InfoAdder",
-        "projectPath": "c:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj",
+        "projectPath": "C:\\Users\\dsbkh\\OneDrive\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj",
         "packagesPath": "C:\\Users\\dsbkh\\.nuget\\packages\\",
-        "outputPath": "c:\\Users\\dsbkh\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\obj\\",
+        "outputPath": "C:\\Users\\dsbkh\\OneDrive\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -74,7 +74,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.400\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.401\\RuntimeIdentifierGraph.json"
         }
       }
     }

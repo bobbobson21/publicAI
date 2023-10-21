@@ -84,7 +84,7 @@ end)
 pal:SetNewSelfHook( "PALOnIDKoutput", "Que_learning", function( input )
 	input = string.sub( input, 2, string.len( input ) -1 )
 
-if string.find( pal:BRTGetTextToRespondTo(), "|", 1, true ) ~= nil then
+if string.find( pal:BRTGetTextToRespondTo(), pal["runfunctionkey"], 1, true ) ~= nil then
 	sandbox.QueLearningData = nil
 	local randresptbl = {"sorry user I wil have to ingore what you just said as it has the function key in it.","I will have to ingore this.","I am programmed not to do anything involving the function key.","the function key will pervent me from remembering that."} --responecs to finding out the player swore while it is learning
 return false, randresptbl[math.random( 1, #randresptbl )] 
@@ -154,7 +154,7 @@ function sandbox:LearnGeneral()
 	local howtodoit = {"via","by","using","with","to do so","all you have to do is","some"}
 	local wasabletolearn = false
 	
-if string.find( pal:BRTGetTextToRespondTo(), "|", 1, true ) ~= nil then
+if string.find( pal:BRTGetTextToRespondTo(), pal["runfunctionkey"], 1, true ) ~= nil then
 	local randresptbl = {"sorry user I wil have to ingore what you just said as it has the function key in it.","I will have to ingore this.","I am programmed not to do anything involving the function key.","the function key will pervent me from remembering that."} --responecs to finding out the player swore while it is learning
 return randresptbl[math.random( 1, #randresptbl )] 
 end
@@ -207,7 +207,7 @@ function sandbox:LearnAboutUser()
 	local choppoint, choppointb, chopword = 0, string.len( text ), ""
 	local responce = ""
 
-if string.find( pal:BRTGetTextToRespondTo(), "|", 1, true ) ~= nil then
+if string.find( pal:BRTGetTextToRespondTo(), pal["runfunctionkey"], 1, true ) ~= nil then
 	local randresptbl = {"sorry user I wil have to ingore what you just said as it has the function key in it.","I will have to ingore this.","I am programmed not to do anything involving the function key.","the function key will pervent me from remembering that."} --responecs to finding out the player swore while it is learning
 return randresptbl[math.random( 1, #randresptbl )] 
 end

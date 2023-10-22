@@ -51,11 +51,13 @@ if z <= extractpointA then extractpointA = z end
 if extractpointC == 0 then extractpointB = z end
    end
 end
+
+if extractpointA == 999999 or extractpointB == 0 or extractpointC == 0 then return "ERROR UNABLE TO CHECK MATHS" end
+
 	text = string.sub( text, extractpointA, extractpointB )
 	local exe, null = load( "return "..text )
 	local result = tostring( exe() )  
 
-if extractpointA == 999999 or extractpointB == 0 or extractpointC == 0 then return "ERROR UNABLE TO CHECK MATHS" end
 if result == string.sub( text, extractpointC, string.len( text ) ) then
 	local randresptbl = {"Yes that is correct.","You are right.","Correct","That is right.","Yes that is correct user.","You are right user.","Correct user.","That is right user."}
 return randresptbl[math.random( 1, #randresptbl )]

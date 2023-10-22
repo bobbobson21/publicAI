@@ -626,7 +626,7 @@ if pointa ~= 0 and pointb ~= 0 then
 	local result = exe()  
   
 if result ~= nil then
-	outstring = string.sub( outstring, 1, pointa -1 +stringdiffreance )..result..string.sub( outstring, pointb +1 +stringdiffreance, string.len( outstring ) )
+	outstring = string.sub( outstring, 1, pointa -1 +stringdiffreance )..tostring( result )..string.sub( outstring, pointb +1 +stringdiffreance, string.len( outstring ) )
 	stringdiffreance = string.len( outstring ) -string.len( input )	
 else
 	outstring = string.sub( outstring, 1, pointa -1 +stringdiffreance )..string.sub( outstring, pointb +1 +stringdiffreance, string.len( outstring ) )

@@ -1,20 +1,15 @@
 {
   "version": 2,
-  "dgSpecHash": "dAdymrCcNePkGL4XMnLJDLVndfnnTsQhqo6pW+nDOMIrKrxJYjkp/zCgOZigE5uzsZJMGWz/vB+r/DHaLzEoKw==",
+  "dgSpecHash": "mZS9aqGp12bqQ3pYHxMSE/qNpuS5SJ2uWY2GcPnrQZCSoVdfVq2sXYy4IUXma93FYA6pMcmWVfgEeU2z221eWg==",
   "success": true,
   "projectFilePath": "C:\\Users\\dsbkh\\OneDrive\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\dsbkh\\.nuget\\packages\\htmlagilitypack\\1.11.53\\htmlagilitypack.1.11.53.nupkg.sha512",
-    "C:\\Users\\dsbkh\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",
-    "C:\\Users\\dsbkh\\.nuget\\packages\\microsoft.identitymodel.abstractions\\6.19.0\\microsoft.identitymodel.abstractions.6.19.0.nupkg.sha512",
-    "C:\\Users\\dsbkh\\.nuget\\packages\\microsoft.identitymodel.logging\\6.19.0\\microsoft.identitymodel.logging.6.19.0.nupkg.sha512",
-    "C:\\Users\\dsbkh\\.nuget\\packages\\microsoft.identitymodel.tokens\\6.19.0\\microsoft.identitymodel.tokens.6.19.0.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\htmlagilitypack\\1.11.54\\htmlagilitypack.1.11.54.nupkg.sha512",
     "C:\\Users\\dsbkh\\.nuget\\packages\\microsoft.win32.systemevents\\7.0.0\\microsoft.win32.systemevents.7.0.0.nupkg.sha512",
     "C:\\Users\\dsbkh\\.nuget\\packages\\newtonsoft.json\\13.0.1\\newtonsoft.json.13.0.1.nupkg.sha512",
-    "C:\\Users\\dsbkh\\.nuget\\packages\\selenium.webdriver\\4.12.4\\selenium.webdriver.4.12.4.nupkg.sha512",
-    "C:\\Users\\dsbkh\\.nuget\\packages\\selenium.webdriver.chromedriver\\116.0.5845.9600\\selenium.webdriver.chromedriver.116.0.5845.9600.nupkg.sha512",
-    "C:\\Users\\dsbkh\\.nuget\\packages\\system.drawing.common\\7.0.0\\system.drawing.common.7.0.0.nupkg.sha512",
-    "C:\\Users\\dsbkh\\.nuget\\packages\\system.security.cryptography.cng\\4.5.0\\system.security.cryptography.cng.4.5.0.nupkg.sha512"
+    "C:\\Users\\dsbkh\\.nuget\\packages\\selenium.webdriver\\4.15.0\\selenium.webdriver.4.15.0.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\selenium.webdriver.chromedriver\\119.0.6045.10500\\selenium.webdriver.chromedriver.119.0.6045.10500.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\system.drawing.common\\7.0.0\\system.drawing.common.7.0.0.nupkg.sha512"
   ],
   "logs": []
 }

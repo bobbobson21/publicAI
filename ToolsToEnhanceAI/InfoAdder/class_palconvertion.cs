@@ -1,4 +1,4 @@
-﻿using OpenQA.Selenium.DevTools.V114.DOM;
+﻿using OpenQA.Selenium.DevTools.V119.DOM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -96,6 +96,10 @@ namespace PalConvertion
                 if (skip.Contains(i) == false)
                 {
                     tags[i] = (char)34 + "|pal:NRT('" + tags[i] + "')|" + (char)34;
+                }
+                else
+                {
+                    tags[i] = (char)34 + tags[i] + (char)34;
                 }
             }
             string result = string.Join( ",", tags );

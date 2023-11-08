@@ -36,9 +36,6 @@ C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\InfoAd
 C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\InfoAdder\bin\Debug\net6.0\InfoAdder.dll
 C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\InfoAdder\bin\Debug\net6.0\InfoAdder.pdb
 C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\InfoAdder\bin\Debug\net6.0\HtmlAgilityPack.dll
-C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\InfoAdder\bin\Debug\net6.0\Microsoft.IdentityModel.Abstractions.dll
-C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\InfoAdder\bin\Debug\net6.0\Microsoft.IdentityModel.Logging.dll
-C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\InfoAdder\bin\Debug\net6.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\InfoAdder\bin\Debug\net6.0\Microsoft.Win32.SystemEvents.dll
 C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\InfoAdder\bin\Debug\net6.0\Newtonsoft.Json.dll
 C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\InfoAdder\bin\Debug\net6.0\WebDriver.dll

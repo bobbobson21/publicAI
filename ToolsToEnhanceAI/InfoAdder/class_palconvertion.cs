@@ -134,8 +134,9 @@ namespace PalConvertion
             q = q.Replace("\n", " ");
             string newa = "";
 
-            int countend = a.Count;
-            for (int i = 0; i < countend; i++ )
+            if ( a.Count == 0 ) { return ""; }
+
+            for (int i = 0; i < a.Count; i++ )
             {
                 a[i] = a[i].Replace("\n", " "); //how it responds to stuff should not have new lines 
                 a[i] = a[i].Replace("|", "-");
@@ -164,6 +165,7 @@ namespace PalConvertion
             int[] block = { 0, ( q.Split(",").Length -1 ) };
             q = QToNRTTags(q, block );
 
+            if (newa == "") { return ""; }
             return "pal:SetNewInfo( {"+q+"}, nil, {"+ emotionlevel[0].ToString()+","+ emotionlevel[1].ToString()+"}, nil, nil, nil,{"+ newa + "}, nil, nil, nil )";
         }
 

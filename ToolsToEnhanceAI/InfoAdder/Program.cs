@@ -61,11 +61,16 @@ namespace program
                 List<string> ress = WebCollect.CollectLinks();
                 string res = "";
 
-                foreach (string result in ress)
+                for (int j = 0; j < 100; j++)
                 {
-                    bool blockresult = false;
-                    foreach (string blocked in blockedlinkes) { if (result.Contains( blocked ) == true || result == "https://www.quora.com/") { blockresult = true; break; }; }
-                    if (blockresult == false) { res = result; break; }
+                    foreach (string result in ress)
+                    {
+                        bool blockresult = false;
+                        foreach (string blocked in blockedlinkes) { if (result.Contains(blocked) == true || result == "https://www.quora.com/") { blockresult = true; break; }; }
+                        if (blockresult == false) { res = result; break; }
+                    }
+                    if (res != "") { break; }
+                    Thread.Sleep(100);
                 }
                 if (res == "" && ress.Count > 0) { res = ress[ress.Count -1]; }
 
@@ -73,7 +78,7 @@ namespace program
                 {
                     WebCollect.SetWebTarget(res);
                     List<string> collectionpoint = WebCollect.Collect();
-                    if (collectionpoint.Count >= 3)
+                    if (collectionpoint.Count >= 3 && collectionpoint[0] != "" && collectionpoint[1] != "" && collectionpoint[2] != "")
                     {
                         outfiledata_rawA.Add(collectionpoint[0]); //we need to make sure the outfile data and infile data = the same
                         outfiledata_rawB.Add(collectionpoint[1]);
@@ -84,13 +89,12 @@ namespace program
                         outfiledata_rawA.Add("NULL");
                         outfiledata_rawB.Add("NULL");
                         outfiledata_rawC.Add("NULL");
-
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine($"error item [{i}/{infiledata[i]}] could not be processed as suficent sample size could not be for pal could not be found");
                         Console.ResetColor();
                     }
 
-                    if (collectionpoint.Count >= 5)
+                    if (collectionpoint.Count >= 5 && collectionpoint[3] != "" && collectionpoint[4] != "")
                     {
                         outfiledata_rawD.Add(collectionpoint[3]); //we need to make sure the outfile data and infile data = the same
                         outfiledata_rawE.Add(collectionpoint[4]);
@@ -116,7 +120,7 @@ namespace program
 
             }
 
-            for (int i = 0; i < infiledata.Count; i++)
+            for (int i = 0; i < outfiledata_rawA.Count; i++)
             {
                 if (outfiledata_rawA[i] != "NULL")
                 {
@@ -128,7 +132,10 @@ namespace program
 
                     if (outfiledata_rawD[i] != "NULL") { a.Add(outfiledata_rawD[i]);a.Add(outfiledata_rawE[i]);};
 
-                    outfiledata.Add(Pal.ConvetToPalData(q, a));
+                    if (a.Count != 0)
+                    {
+                        outfiledata.Add(Pal.ConvetToPalData(q, a));
+                    }
 
                 }
             }

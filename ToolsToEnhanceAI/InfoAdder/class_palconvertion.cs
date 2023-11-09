@@ -165,7 +165,6 @@ namespace PalConvertion
             int[] block = { 0, ( q.Split(",").Length -1 ) };
             q = QToNRTTags(q, block );
 
-            if (newa == "") { return ""; }
             return "pal:SetNewInfo( {"+q+"}, nil, {"+ emotionlevel[0].ToString()+","+ emotionlevel[1].ToString()+"}, nil, nil, nil,{"+ newa + "}, nil, nil, nil )";
         }
 

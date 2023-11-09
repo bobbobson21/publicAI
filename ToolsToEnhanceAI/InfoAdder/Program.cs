@@ -134,7 +134,8 @@ namespace program
 
                     if (a.Count != 0)
                     {
-                        outfiledata.Add(Pal.ConvetToPalData(q, a));
+                        string data = Pal.ConvetToPalData(q, a);
+                        if (data != "") { outfiledata.Add(data); };
                     }
 
                 }

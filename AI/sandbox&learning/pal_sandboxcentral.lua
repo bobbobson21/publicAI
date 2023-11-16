@@ -74,7 +74,7 @@ end
 function sandbox:SwareWordLearningPervention()
 	local text = pal:BRTGetTextToRespondTo()
 	local theswarewords = {"fuck","fucking","fucker","cunt","bitch","ass","ho","faggot","fag","retard"} --add words here you DONT want the AI to learn
-for z = 1, #theswarewords do if string.find( text, theswarewords[z], 1, true ) ~= nil then return true end end
+for z = 1, #theswarewords do if string.find( text, theswarewords[z].." ", 1, true ) ~= nil and string.find( text, " "..theswarewords[z], 1, true ) ~= nil then return true end end
 return false
 end
 
@@ -130,7 +130,7 @@ return false, randresptbl[math.random( 1, #randresptbl )] --IT LEARND SOMETHING
 end
 
 if sandbox.QueLearningData == nil then --START HERE the user first said something it dose not understand and now it asks the user what that is
-	local neededwords = {"who","what","why"}
+	local neededwords = {"who","what","why","how"}
 	local foundneededword = false
 
 for z = 1,#neededwords do

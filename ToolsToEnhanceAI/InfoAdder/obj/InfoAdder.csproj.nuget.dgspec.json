@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\e017770n\\OneDrive - Staffordshire University\\non uni gits\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj": {}
+    "C:\\Users\\dsbkh\\OneDrive\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj": {}
   },
   "projects": {
-    "C:\\Users\\e017770n\\OneDrive - Staffordshire University\\non uni gits\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj": {
+    "C:\\Users\\dsbkh\\OneDrive\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\e017770n\\OneDrive - Staffordshire University\\non uni gits\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj",
+        "projectUniqueName": "C:\\Users\\dsbkh\\OneDrive\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj",
         "projectName": "InfoAdder",
-        "projectPath": "C:\\Users\\e017770n\\OneDrive - Staffordshire University\\non uni gits\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj",
-        "packagesPath": "C:\\Users\\e017770n\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\e017770n\\OneDrive - Staffordshire University\\non uni gits\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\obj\\",
+        "projectPath": "C:\\Users\\dsbkh\\OneDrive\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\InfoAdder.csproj",
+        "packagesPath": "C:\\Users\\dsbkh\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\dsbkh\\OneDrive\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\InfoAdder\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\e017770n\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\dsbkh\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -74,7 +74,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.306\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\7.0.401\\RuntimeIdentifierGraph.json"
         }
       }
     }

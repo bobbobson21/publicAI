@@ -40,15 +40,15 @@ function pal:SandBox() return pal["sandbox"]["funcs"] end --use the sandbox so t
 
 -- end of sandbox start of hooks -----------------------------------------------------------------------------------------------------------------------------
 
-function pal:SetNewSelfHook( cat, name, v ) --catagory, hook name, function --adds hooks so systems can better interract with the AI
+function pal:SetNewSelfHook( cat, id, v ) --catagory, hook id, function --adds hooks so systems can better interract with the AI
 if pal["selfhooks"][cat] == nil then pal["selfhooks"][cat] = {} end
-	pal["selfhooks"][cat][name] = v
+	pal["selfhooks"][cat][id] = v
 end
 
-function pal:RemoveSelfHook( cat, name )
+function pal:RemoveSelfHook( cat, id )
 if cat == nil then pal["selfhooks"] = nil;  pal["selfhooks"] = {}; return end
-if name == nil then pal["selfhooks"][cat] = nil; return end
-	pal["selfhooks"][cat][name] = nil
+if id == nil then pal["selfhooks"][cat] = nil; return end
+	pal["selfhooks"][cat][id] = nil
 end
 
 function pal:GetSelfHooksAsTable() --gets all the hooks
@@ -84,9 +84,9 @@ end
 -- end of hooks start of data/info control functions ---------------------------------------------------------------------------------------------------------
 
 function pal:NRT( tag ) --for tags/words you want it to seach for but only mark down the result and not desqalify it if result cant be found
-	local starts, ends = string.find( pal:BRTGetTextToRespondTo(), " "..tag.." ", pal["found_tag_at"], true )
+	local starts, ends = string.find( pal:BRTGetTextToRespondTo(), " "..tostring( tag ).." ", pal["found_tag_at"], true )
 	local strlen = pal["found_tag_at"]
-if starts ~= nil then
+if starts ~= nil or tag == true then
 	strlen = strlen +string.len( tag )
 else
 if pal["found_tag_at"] >= pal["match_level_length_processed"] then
@@ -96,20 +96,32 @@ end
 return true, strlen
 end --also stands for non reqired tag
 
-function pal:MWTG( name ) --compares input to a tag group and if one tag is found in input it returns true and pal["found_tag_at"] +tag length
-if pal["searchfor_groups"][name] == nil then return false end
-for k, v in pairs( pal["searchfor_groups"][name] ) do
+function pal:MWTG( id ) --compares input to a tag group and if one tag in the group is found in input it returns true and pal["found_tag_at"] +tag length --also stands for match with tag group
+if pal["searchfor_groups"][id] == nil then return false end
+for k, v in pairs( pal["searchfor_groups"][id] ) do
 	local starts, ends = string.find( pal:BRTGetTextToRespondTo(), " "..v.." ", pal["found_tag_at"], true )
 if starts ~= nil then return true, pal["found_tag_at"] +string.len( v ) end --if found say
 end   
 return false, pal["found_tag_at"] --if no tag is found it retuns false and ends
 end --also stands for match with tag group
 
-function pal:MemGen( name, tbl ) --connets names to pronows and then puts it into short term memory
-pal:AddNewSpellChecking( name, tbl )
+function pal:MemGen( id, tbl ) --connets ids to pronows and then puts it into short term memory
+pal:AddNewSpellChecking( id, tbl )
 if pal["gender_momory"] == nil then pal["gender_momory"] = {} end
-	pal["gender_momory"][#pal["gender_momory"] +1] = name
+	pal["gender_momory"][#pal["gender_momory"] +1] = id
 	pal["gender_momory_time"] = pal["max_gender_momory_time"] --time it takes to lose it's short term memory for pronowns should be 4 minutes
+end
+
+function pal:SetMaxPronounMemoryAssociationTime( seconds ) --time in seconds
+	pal["max_gender_momory_time"] = seconds
+end
+
+function pal:GetMaxPronounMemoryAssociationTime() --time in seconds
+return pal["max_gender_momory_time"]
+end
+
+function pal:GetPronounMemoryAssociationTime() --time in seconds
+return pal["gender_momory_time"] --not the max time
 end
 
 function pal:DegradeInfoOverXCycles( id, cyclesinfostayesinmemory ) --makes info eventually degrades to nothing use to simulates forgetfulness
@@ -200,14 +212,14 @@ end
 return results
 end
 
-function pal:AddNewTagGroup( name, collection ) --a collection of tags which if refrenced like so @TAG_NAME, in the search for sections of added info will be replaced with collection
-if pal:RunSelfHooks( "PALOnAddNewTagGroup", {name,collection} ) == false then return end
-	pal["searchfor_groups"][name] = collection
+function pal:AddNewTagGroup( id, collection ) --a collection of tags which if refrenced like so @TAG_id, in the search for sections of added info will be replaced with collection
+if pal:RunSelfHooks( "PALOnAddNewTagGroup", {id,collection} ) == false then return end
+	pal["searchfor_groups"][id] = collection
 end
 
-function pal:RemoveTagGroup( name ) --remove tag group
-if pal:RunSelfHooks( "PALOnRemoveTagGroup", {name} ) == false then return end
-	pal["searchfor_groups"][name] = nil
+function pal:RemoveTagGroup( id ) --remove tag group
+if pal:RunSelfHooks( "PALOnRemoveTagGroup", {id} ) == false then return end
+	pal["searchfor_groups"][id] = nil
 end
 
 function pal:AddNewSpellChecking( correct, tbl ) --spellchecker

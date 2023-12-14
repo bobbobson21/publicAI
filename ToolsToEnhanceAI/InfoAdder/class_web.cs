@@ -51,8 +51,16 @@ namespace WebInterraction
         }
 
         public static List<string> CollectLinks()
-        {   
-            bro_driver.Navigate().GoToUrl(targetsite);
+        {
+            while (true)
+            {
+                try
+                {
+                    bro_driver.Navigate().GoToUrl(targetsite);
+                    break;
+                }
+                catch {Thread.Sleep(30000);}
+            }
             var code_htmldata = new HtmlDocument();
             code_htmldata.LoadHtml(bro_driver.PageSource);
             List<string> linksstr = new List<string>();
@@ -88,8 +96,17 @@ namespace WebInterraction
 
         public static List<string> Collect() //fire and grab the bounty
         {
-            List<string> extracteddata = new List<string>(); //one line below it attempts to connect to website 3 time if it failes 3 times programe crashes so have good wifi and dont be downloading stuff
-            try { bro_driver.Navigate().GoToUrl(targetsite); } catch { try { bro_driver.Navigate().GoToUrl(targetsite); } catch { bro_driver.Navigate().GoToUrl(targetsite); } }
+            while (true)
+            {
+                try
+                {
+                    bro_driver.Navigate().GoToUrl(targetsite);
+                    break;
+                }
+                catch { Thread.Sleep(30000); }
+            }
+
+            List<string> extracteddata = new List<string>();
             var code_htmldata = new HtmlDocument();
             code_htmldata.LoadHtml(bro_driver.PageSource);
 

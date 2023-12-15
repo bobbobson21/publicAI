@@ -81,25 +81,25 @@ if keyboardaragmentindexes[3][letter] ~= nil then letterloc, letterrow = keyboar
 if letterloc ~= 0 then
 if keyboardaragmentkeys[letterrow][letterloc -1] ~= nil then --finding possible wrong buttons from that
 	local incorrectword = wordleft..keyboardaragmentkeys[letterrow][letterloc -1]..wordright
-if dicfiledatablock[incorrectword] == nil then incorrectwords = incorrectwords.."'"..incorrectword.."'," end
+if dicfiledatablock[incorrectword] == nil then incorrectwords = incorrectwords.."'"..incorrectword.."',"; dicfiledatablock[incorrectword] = true end
 end
 if keyboardaragmentkeys[letterrow][letterloc +1] ~= nil then
 	local incorrectword = wordleft..keyboardaragmentkeys[letterrow][letterloc +1]..wordright
-if dicfiledatablock[incorrectword] == nil then incorrectwords = incorrectwords.."'"..incorrectword.."'," end
+if dicfiledatablock[incorrectword] == nil then incorrectwords = incorrectwords.."'"..incorrectword.."',"; dicfiledatablock[incorrectword] = true end
 end
 
 if keyboardaragmentkeys[letterrow -1] ~= nil then
 if keyboardaragmentkeys[letterrow -1][letterloc] ~= nil then
 	local incorrectword = wordleft..keyboardaragmentkeys[letterrow -1][letterloc]..wordright
-if dicfiledatablock[incorrectword] == nil then incorrectwords = incorrectwords.."'"..incorrectword.."'," end
+if dicfiledatablock[incorrectword] == nil then incorrectwords = incorrectwords.."'"..incorrectword.."',"; dicfiledatablock[incorrectword] = true end
 end
 if keyboardaragmentkeys[letterrow -1][letterloc -1] ~= nil then
 	local incorrectword = wordleft..keyboardaragmentkeys[letterrow -1][letterloc -1]..wordright
-if dicfiledatablock[incorrectword] == nil then incorrectwords = incorrectwords.."'"..incorrectword.."'," end
+if dicfiledatablock[incorrectword] == nil then incorrectwords = incorrectwords.."'"..incorrectword.."',"; dicfiledatablock[incorrectword] = true end
 end
 if keyboardaragmentkeys[letterrow -1][letterloc +1] ~= nil then
 	local incorrectword = wordleft..keyboardaragmentkeys[letterrow -1][letterloc]..wordright
-if dicfiledatablock[incorrectword] == nil then incorrectwords = incorrectwords.."'"..incorrectword.."'," end
+if dicfiledatablock[incorrectword] == nil then incorrectwords = incorrectwords.."'"..incorrectword.."',"; dicfiledatablock[incorrectword] = true end
          end
       end
    end
@@ -111,7 +111,7 @@ for y = 1, string.len( correctword ) do --spellchecking by not pressing a button
 	local priorletter = string.sub( correctword, y -1, y -1 )
 	local incorrectword = string.sub( correctword, 1, y -1 )..string.sub( correctword, y +1, string.len( correctword ) )
 if letter ~= priorletter then --anoter pervention of repeats
-if dicfiledatablock[incorrectword] == nil then incorrectwords = incorrectwords.."'"..incorrectword.."'," end
+if dicfiledatablock[incorrectword] == nil then incorrectwords = incorrectwords.."'"..incorrectword.."',"; dicfiledatablock[incorrectword] = true end
    end
 end
 

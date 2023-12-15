@@ -676,9 +676,10 @@ return pal:GetIDKresponce()
 end
 
 	local outputresponce = "" --stage five: pick a responce out of the set
+	local emotiveending = pal:GetEmotiveEnd()
 	
 if outputdata["responces"] ~= nil then outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )] end
-if outputdata["ea"] ~= false then outputresponce = outputresponce.." "..pal:GetEmotiveEnd() end --stage six: appending of responce section --emotion appending
+if outputdata["ea"] ~= false and emotiveending ~= "" and emotiveending ~= nil then outputresponce = outputresponce.." "..emotiveending end --stage six: appending of responce section --emotion appending
 if outputdata["a"] ~= false then outputresponce = pal:RunAnnoyanceTest( outputindex, outputresponce ) end --stage six: annoyence appending
 if pal:GetAnnoyanceLevel( outputindex ) == 2 then --stage six: end function if to annoyed appending
 	local str = pal:RunSelfHooks( "PALOnMaxAnnoyanceoutput", {input} )

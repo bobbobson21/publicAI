@@ -47,29 +47,36 @@ namespace program
 
                 WebCollect.SetWebTarget(WebCollect.ConvertToSearchForWebsterURL(infiledata[i]));
                 List<string> data = WebCollect.Collect();
-                string addline = "";
 
                 if (data.Count >= 1)
                 {
-                    bool issmallfind = false;
-                    for (int o = 0; o < data.Count && o < 4; o++)
+                    string addline = infiledata[i] + ",";
+                    int minwordlength = 4;
+
+                    if (infiledata[i].Length > minwordlength)
                     {
-                        string outtext = data[o].Replace("\r\n", "");
-                        outtext = outtext.Replace(" ", "");
-                        if (outtext.Length < 3) { issmallfind = true; }
-                        addline = addline + infiledata[i] + "," + outtext + ",";
+                        for (int o = 0; o < data.Count && o < 4; o++)
+                        {
+                            string outtext = data[o].Replace("\r\n", "");
+                            outtext = outtext.Replace(" ", "");
+
+                            if ((outtext.Length > minwordlength || outtext.Contains(infiledata[i][0]) == true) && outtext.Contains("(") == false && outtext.Contains(")") == false)
+                            {
+                                addline = addline + outtext + ",";
+                            }
+                        }
                     }
 
-                    if (issmallfind == true)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"error item [{i}/{infiledata[i]}] possibly dose not have good synonyms so it is discarded");
-                        Console.ResetColor();
-                    }
-                    else
+                    if (infiledata[i].Length > minwordlength && addline != infiledata[i] + ",")
                     {
                         addline = addline.Substring(0, addline.Length - 1);
                         outfiledata.Add(addline);
+                    }
+                    else
+                    {
+                         Console.ForegroundColor = ConsoleColor.Red;
+                         Console.WriteLine($"error item [{i}/{infiledata[i]}] possibly dose not have good synonyms so it is discarded");
+                         Console.ResetColor();
                     }
                 }
                 else

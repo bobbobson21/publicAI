@@ -143,6 +143,7 @@ namespace program
 
             FileModify.SetFilePath(outfile);
             FileModify.SetFileData(outfiledata);
+            Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Done!!!");
         }
     }

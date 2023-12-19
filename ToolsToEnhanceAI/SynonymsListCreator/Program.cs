@@ -51,17 +51,16 @@ namespace program
 
                 if (data.Count >= 1)
                 {
-                    bool issmallin = infiledata[i].Length <= 4;
                     bool issmallfind = false;
                     for (int o = 0; o < data.Count && o < 4; o++)
                     {
                         string outtext = data[o].Replace("\r\n", "");
                         outtext = outtext.Replace(" ", "");
                         if (outtext.Length < 3) { issmallfind = true; }
-                        addline = addline + outtext + ",";
+                        addline = addline + infiledata[i] + "," + outtext + ",";
                     }
 
-                    if (issmallin == true && issmallfind == true)
+                    if (issmallfind == true)
                     {
                         Console.ForegroundColor = ConsoleColor.Red;
                         Console.WriteLine($"error item [{i}/{infiledata[i]}] possibly dose not have good synonyms so it is discarded");

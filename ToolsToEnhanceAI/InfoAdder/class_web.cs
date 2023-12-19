@@ -52,6 +52,8 @@ namespace WebInterraction
 
         public static List<string> CollectLinks()
         {
+            var code_htmldata = new HtmlDocument();
+
             while (true)
             {
                 try
@@ -61,8 +63,17 @@ namespace WebInterraction
                 }
                 catch {Thread.Sleep(30000);}
             }
-            var code_htmldata = new HtmlDocument();
-            code_htmldata.LoadHtml(bro_driver.PageSource);
+
+            while (true)
+            {
+                try
+                {
+                    code_htmldata.LoadHtml(bro_driver.PageSource);
+                    break;
+                }
+                catch { Thread.Sleep(30000); }
+            }
+
             List<string> linksstr = new List<string>();
             List<HtmlNode> linkboxesA = new List<HtmlNode>();
             List<HtmlNode> linkboxesB = new List<HtmlNode>();
@@ -96,6 +107,9 @@ namespace WebInterraction
 
         public static List<string> Collect() //fire and grab the bounty
         {
+            List<string> extracteddata = new List<string>();
+            var code_htmldata = new HtmlDocument();
+
             while (true)
             {
                 try
@@ -106,11 +120,17 @@ namespace WebInterraction
                 catch { Thread.Sleep(30000); }
             }
 
-            List<string> extracteddata = new List<string>();
-            var code_htmldata = new HtmlDocument();
-            code_htmldata.LoadHtml(bro_driver.PageSource);
+            while (true)
+            {
+                try
+                {
+                    code_htmldata.LoadHtml(bro_driver.PageSource);
+                    break;
+                }
+                catch { Thread.Sleep(30000); }
+            }
 
-            foreach (WebNode Point in targetdata )
+            foreach (WebNode Point in targetdata)
             {
                 List<HtmlNode> nodes = new List<HtmlNode>();
 

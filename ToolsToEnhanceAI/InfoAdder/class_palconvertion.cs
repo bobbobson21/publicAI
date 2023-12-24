@@ -105,7 +105,7 @@ namespace PalConvertion
             return result;
         }
 
-        public static bool ATextRemovealIf(string a) //returns a bool repasenting if and List<string> a entry should be removed
+        public static bool ATextRemovealIf(string a) //returns a bool repasenting if a List<string> entry should be removed
         {
             bool addcurrentresult = true;
             foreach (string check in RemoveAIf) //we dont want thing like I agree with the comnent above
@@ -133,8 +133,7 @@ namespace PalConvertion
             q = q.Replace("\n", " ");
             string newa = "";
 
-            if ( a.Count == 0 ) { return ""; }
-
+            if ( a.Count == 0 ) { return "NULL"; }
             for (int i = 0; i < a.Count; i++ )
             {
                 a[i] = a[i].Replace("\n", " "); //how it responds to stuff should not have new lines 
@@ -145,7 +144,7 @@ namespace PalConvertion
                 a[i] = ARemoveQuoraJargon(a[i]);
                 string tempa = a[i];
 
-                if (ATextRemovealIf(a[i] ) == true)
+                if (ATextRemovealIf(a[i]) == true) //true means we can add faulse means WE SHOULD NOT ADD
                 {
                     if (tempa.Length >= 1 && tempa.Substring(tempa.Length - 1, 1) == ".")
                     {
@@ -164,8 +163,8 @@ namespace PalConvertion
             int[] block = { 0, ( q.Split(",").Length -1 ) };
             q = QToNRTTags(q, block );
 
+            if (newa == "") { return "NULL"; }
             return "pal:SetNewInfo( {"+q+"}, nil, {"+ emotionlevel[0].ToString()+","+ emotionlevel[1].ToString()+"}, nil, nil, nil,{"+ newa + "}, nil, nil, nil )";
         }
-
     }
 }

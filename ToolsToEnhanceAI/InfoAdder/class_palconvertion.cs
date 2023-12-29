@@ -12,159 +12,159 @@ namespace PalConvertion
         private static string[] hateCalm = {"annoying","problmatic","horrible","mean","pesting","bad","fucker","cunt","dick","bitch","ass","douch",};
         private static string[] loveCalm = {"lovely","kind","helpful","love","good","caring",};
         private static string[] loveAnger = {"lovely","kind","helpful","lovely","good","caring","annoying","problmatic","horrible","mean","pesting","bad","disappointment",};
-        private static string[] RemoveFromQTags = {"is","the","think","thougth","to","get","a"};
+        private static string[] RemoveFromQTags = {"is","the","think","thougth","to","get","A"};
         private static string[] RemoveAIf = {"comment","comments","my"};
 
-        public static double[] CalulateEmotion( string scan, double emul )
+        public static double[] CalulateEmotion( string Scan, double EmotionMuliply )
         {
-            double[] emot = { 0,0 };
+            double[] EmotionLevel = { 0,0 };
 
-            foreach (string str in HateAnger) //checks to see if we should be angry by finding angry words and if we shold be
+            foreach (string Str in HateAnger) //checks to see if we should be angry by finding angry words and if we shold be
             {
-                if (scan.Contains(str) == true) //angry it will do the angryness below
+                if (Scan.Contains(Str) == true) //angry it will do the angryness below
                 {
-                    emot[0] = emot[0] - emul;
-                    emot[1] = emot[1] - emul;
+                    EmotionLevel[0] = EmotionLevel[0] - EmotionMuliply;
+                    EmotionLevel[1] = EmotionLevel[1] - EmotionMuliply;
                 }
 
             }
 
-            foreach (string str in hateCalm)
+            foreach (string Str in hateCalm)
             {
-                if (scan.Contains(str) == true)
+                if (Scan.Contains(Str) == true)
                 {
-                    emot[0] = emot[0] + emul;
-                    emot[1] = emot[1] - emul;
+                    EmotionLevel[0] = EmotionLevel[0] + EmotionMuliply;
+                    EmotionLevel[1] = EmotionLevel[1] - EmotionMuliply;
                 }
 
             }
 
-            foreach (string str in loveCalm)
+            foreach (string Str in loveCalm)
             {
-                if (scan.Contains(str) == true)
+                if (Scan.Contains(Str) == true)
                 {
-                    emot[0] = emot[0] + emul;
-                    emot[1] = emot[1] + emul;
+                    EmotionLevel[0] = EmotionLevel[0] + EmotionMuliply;
+                    EmotionLevel[1] = EmotionLevel[1] + EmotionMuliply;
                 }
 
             }
 
-            foreach (string str in loveAnger)
+            foreach (string Str in loveAnger)
             {
-                if (scan.Contains(str) == true)
+                if (Scan.Contains(Str) == true)
                 {
-                    emot[0] = emot[0] - emul;
-                    emot[1] = emot[1] + emul;
+                    EmotionLevel[0] = EmotionLevel[0] - EmotionMuliply;
+                    EmotionLevel[1] = EmotionLevel[1] + EmotionMuliply;
                 }
 
             }
 
-            if (emot[0] > 3) { emot[0] = 3; }; //clamping
-            if (emot[1] > 3) { emot[1] = 3; };
-            if (emot[0] < -3) { emot[0] = -3; };
-            if (emot[1] < -3) { emot[1] = -3; };
+            if (EmotionLevel[0] > 3) { EmotionLevel[0] = 3; }; //clamping
+            if (EmotionLevel[1] > 3) { EmotionLevel[1] = 3; };
+            if (EmotionLevel[0] < 1) { EmotionLevel[0] = 1; };
+            if (EmotionLevel[1] < 1) { EmotionLevel[1] = 1; };
 
-            return emot;
+            return EmotionLevel;
         }
 
-        public static string QTagRemoval( string q )
+        public static string QTagRemoval( string Q )
         {
-            q = q + ",";
-            foreach (string str in RemoveFromQTags)
+            Q = Q + ",";
+            foreach (string Str in RemoveFromQTags)
             {
-                q =  q.Replace(str+",", "");
+                Q =  Q.Replace(Str+",", "");
             }
-            q = q.Substring(0, q.Length-1);
-            return q;
+            Q = Q.Substring(0, Q.Length-1);
+            return Q;
         }
 
-        public static string QTagSimplfiy( string q )
+        public static string QTagSimplfiy( string Q )
         {
-            q = q.Replace("people", "you");
-            q = q.Replace("what's", "what is");
-            q = q.Replace("can't", "can not");
-            q = q.Replace("what's", "what");
-            return q;
+            Q = Q.Replace("people", "you");
+            Q = Q.Replace("what's", "what is");
+            Q = Q.Replace("can't", "can not");
+            Q = Q.Replace("what's", "what");
+            return Q;
         }
 
-        public static string QToNRTTags(string q, int[] skip)
+        public static string QToNRTTags(string Q, int[] Skip)
         {
-            string[] tags = q.Split(",");
-            for (int i = 0; i < tags.Length; i++)
+            string[] Tags = Q.Split(",");
+            for (int I = 0; I < Tags.Length; I++)
             {
-                if (skip.Contains(i) == false)
+                if (Skip.Contains(I) == false)
                 {
-                    tags[i] = (char)34 + "|pal:NRT('" + tags[i] + "')|" + (char)34;
+                    Tags[I] = (char)34 + "|pal:NRT('" + Tags[I] + "')|" + (char)34;
                 }
                 else
                 {
-                    tags[i] = (char)34 + tags[i] + (char)34;
+                    Tags[I] = (char)34 + Tags[I] + (char)34;
                 }
             }
-            string result = string.Join( ",", tags );
-            return result;
+            string Result = string.Join( ",", Tags );
+            return Result;
         }
 
-        public static bool ATextRemovealIf(string a) //returns a bool repasenting if a List<string> entry should be removed
+        public static bool ATextRemovealIf(string A) //returns A bool repasenting if A List<string> entry should be removed
         {
-            bool addcurrentresult = true;
+            bool AddCurrentResult = true;
             foreach (string check in RemoveAIf) //we dont want thing like I agree with the comnent above
             {
-                if (a.Contains(check) == true)
+                if (A.Contains(check) == true)
                 {
-                    addcurrentresult = false;
+                    AddCurrentResult = false;
                 }
             }
-            return addcurrentresult;
+            return AddCurrentResult;
         }
 
-        public static string ARemoveQuoraJargon(string a)
+        public static string ARemoveQuoraJargon(string A)
         {
-            if (a.EndsWith("…(more)") == true && a.LastIndexOf(".") >= 1)
+            if (A.EndsWith("…(more)") == true && A.LastIndexOf(".") >= 1)
             {
-                a = a.Substring(0, a.LastIndexOf(".") );     
+                A = A.Substring(0, A.LastIndexOf(".") );     
             }
-            return a;
+            return A;
         }
 
 
-        public static string ConvetToPalData( string q, List<string> a )
+        public static string ConvetToPalData( string Q, List<string> A )
         {
-            q = q.Replace("\n", " ");
-            string newa = "";
+            Q = Q.Replace("\n", " ");
+            string newA = "";
 
-            if ( a.Count == 0 ) { return "NULL"; }
-            for (int i = 0; i < a.Count; i++ )
+            if ( A.Count == 0 ) { return "NULL"; }
+            for (int I = 0; I < A.Count; I++ )
             {
-                a[i] = a[i].Replace("\n", " "); //how it responds to stuff should not have new lines 
-                a[i] = a[i].Replace("|", "-");
-                a[i] = a[i].Replace("'", "");
-                a[i] = a[i].Replace( ((char)92).ToString(), "/" );
-                a[i] = a[i].Replace( ((char)34).ToString(), "");
-                a[i] = ARemoveQuoraJargon(a[i]);
-                string tempa = a[i];
+                A[I] = A[I].Replace("\n", " "); //how it responds to stuff should not have new lines 
+                A[I] = A[I].Replace("|", "-");
+                A[I] = A[I].Replace("'", "");
+                A[I] = A[I].Replace( ((char)92).ToString(), "/" );
+                A[I] = A[I].Replace( ((char)34).ToString(), "");
+                A[I] = ARemoveQuoraJargon(A[I]);
+                string TempA = A[I];
 
-                if (ATextRemovealIf(a[i]) == true) //true means we can add faulse means WE SHOULD NOT ADD
+                if (ATextRemovealIf(A[I]) == true) //true means we can add faulse means WE SHOULD NOT ADD
                 {
-                    if (tempa.Length >= 1 && tempa.Substring(tempa.Length - 1, 1) == ".")
+                    if (TempA.Length >= 1 && TempA.Substring(TempA.Length - 1, 1) == ".")
                     {
-                        tempa = tempa.Substring(1, tempa.Length - 1);
+                        TempA = TempA.Substring(1, TempA.Length - 1);
                     };
-                    tempa = tempa + " |pal:GetEmotiveWord()| user.";
-                    newa = newa + (char)34 + a[i] + (char)34 + "," + (char)34 + tempa + (char)34 + ",";
+                    TempA = TempA + " |pal:GetEmotiveWord()| user.";
+                    newA = newA + (char)34 + A[I] + (char)34 + "," + (char)34 + TempA + (char)34 + ",";
                 }
             }
 
-            double[] emotionlevel = CalulateEmotion( q+ newa, 0.25 );
+            double[] EmotionLevel = CalulateEmotion( Q+ newA, 0.25 );
 
-            q = q.Replace(" ", ","); //turns words to tags
-            q = QTagSimplfiy(q);
-            q = QTagRemoval(q); //removes uneeded tags
-            int[] block = { 0, ( q.Split(",").Length -1 ) };
-            q = QToNRTTags(q, block );
+            Q = Q.Replace(" ", ","); //turns words to Tags
+            Q = QTagSimplfiy(Q);
+            Q = QTagRemoval(Q); //removes uneeded Tags
+            int[] Block = { 0, ( Q.Split(",").Length -1 ) };
+            Q = QToNRTTags(Q, Block );
 
-            if (newa == "") { return "NULL"; }
-            return "pal:SetNewInfo( {"+q+"}, nil, {"+ emotionlevel[0].ToString()+","+ emotionlevel[1].ToString()+"}, nil, nil, nil,{"+ newa + "}, nil, nil, nil )";
+            if (newA == "") { return "NULL"; }
+            return "pal:SetNewInfo( {"+Q+"}, nil, {"+ EmotionLevel[0].ToString()+","+ EmotionLevel[1].ToString()+"}, nil, nil, nil,{"+ newA + "}, nil, nil, nil )";
         }
     }
 }

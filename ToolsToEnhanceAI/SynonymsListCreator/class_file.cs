@@ -9,43 +9,43 @@ namespace FileInterraction
     class FileModify //static is love, static is good, static is god
     {
 
-        private static string filepath = "";
-        public static void SetFilePath( string str ){filepath = str;}
-        public static string GetFilePath(){return filepath;}
+        private static string FilePath = "";
+        public static void SetFilePath( string Str ){FilePath = Str;}
+        public static string GetFilePath(){return FilePath;}
 
         public static string CurrentDirectory {get;} = Directory.GetCurrentDirectory();
 
         public static List<string> GetFileData()
         {
-            List<string> lines = new List<string>();
+            List<string> Lines = new List<string>();
             try
             {
-                StreamReader file = new StreamReader(filepath);
-                string line = file.ReadLine();
+                StreamReader File = new StreamReader(FilePath);
+                string Line = File.ReadLine();
 
-                while (line != null)
+                while (Line != null)
                 {
-                    lines.Add(line);
-                    line = file.ReadLine();
+                    Lines.Add(Line);
+                    Line = File.ReadLine();
                 }
 
-                file.Close();
-                return lines;
+                File.Close();
+                return Lines;
             }
             catch
             {
-                return lines;
+                return Lines;
             }
         }
 
         public static void SetFileData( List<string> filedata )
         {
-            StreamWriter file = new StreamWriter(filepath);
-            foreach (string line in filedata)
+            StreamWriter File = new StreamWriter(FilePath);
+            foreach (string Line in filedata)
             {
-                file.WriteLine( line );
+                File.WriteLine( Line );
             }
-            file.Close ();
+            File.Close ();
         }
 
     }

@@ -17,132 +17,132 @@ namespace program
             Console.WriteLine($"starting from:{FileModify.CurrentDirectory}");
             Console.WriteLine("");
             Console.WriteLine("pull searches from:");
-            string infile = Console.ReadLine();
+            string InFile = Console.ReadLine();
             Console.WriteLine("output to:");
-            string outfile = Console.ReadLine();
+            string OutFile = Console.ReadLine();
 
-            FileModify.SetFilePath(infile);
-            List<string> infiledata = FileModify.GetFileData();
-            List<string> outfiledata_rawA = new List<string>(); //just results without any modafcation wich will be needed
-            List<string> outfiledata_rawB = new List<string>();
-            List<string> outfiledata_rawC = new List<string>();
-            List<string> outfiledata_rawD = new List<string>();
-            List<string> outfiledata_rawE = new List<string>();
-            List<string> outfiledata = new List<string>(); //just results without any modafcation wich will be needed
-            List<string> blockedlinkes = new List<string>();
+            FileModify.SetFilePath(InFile);
+            List<string> InFiledata = FileModify.GetFileData();
+            List<string> OutFileDataRawA = new List<string>(); //just results without any modafcation wich will be needed
+            List<string> OutFileDataRawB = new List<string>();
+            List<string> OutFileDataRawC = new List<string>();
+            List<string> OutFileDataRawD = new List<string>();
+            List<string> OutFileDataRawE = new List<string>();
+            List<string> OutFileData = new List<string>(); //just results without any modafcation wich will be needed
+            List<string> BlockedLinkes = new List<string>();
 
             WebCollect.LoadBrowser();
-            List<WebNode> scrapenodes = new List<WebNode>(); //content we want it to search for
-            scrapenodes.Add(new WebNode("div", "class", "q-box spacing_log_answer_content puppeteer_test_answer_content", -1));
+            List<WebNode> ScrapeNodes = new List<WebNode>(); //content we want it to search for
+            ScrapeNodes.Add(new WebNode("div", "class", "Question-box spacing_log_answer_content puppeteer_test_answer_content", -1));
 
-            blockedlinkes.Add("https://www.quora.com/about");
-            blockedlinkes.Add("https://www.quora.com/careers");
-            blockedlinkes.Add("https://www.quora.com/contact");
-            blockedlinkes.Add("https://www.quora.com/press");
-            blockedlinkes.Add("https://www.quora.com/profile");
+            BlockedLinkes.Add("https://www.quora.com/about");
+            BlockedLinkes.Add("https://www.quora.com/careers");
+            BlockedLinkes.Add("https://www.quora.com/contact");
+            BlockedLinkes.Add("https://www.quora.com/pPossibleAwnsersToQuestion");
+            BlockedLinkes.Add("https://www.quora.com/profile");
 
-            WebCollect.SetWebScrapeNodes(scrapenodes); //since all the searches will be done on google we will only need to do this once
+            WebCollect.SetWebScrapeNodes(ScrapeNodes); //since all the searches will be done on google we will only need to do this once
 
-            int old_percentage = 0;
+            int OldPercentage = 0;
 
-            for (int i = 0; i < infiledata.Count; i++)
+            for (int I = 0; I < InFiledata.Count; I++)
             {
-                int new_percentage = (int)((double)((double)i / infiledata.Count) *100);
-                if (new_percentage > old_percentage)
+                int NewPercentage = (int)((double)((double)I / InFiledata.Count) *100);
+                if (NewPercentage > OldPercentage)
                 {
-                    old_percentage = new_percentage;
+                    OldPercentage = NewPercentage;
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"current compleation percentage %{new_percentage}");
+                    Console.WriteLine($"current compleation percentage %{NewPercentage}");
                     Console.ResetColor();
                 }
 
-                WebCollect.SetWebTarget(WebCollect.ConvertToSearchForQuoraURL(infiledata[i]));
+                WebCollect.SetWebTarget(WebCollect.ConvertToSearchForQuoraURL(InFiledata[I]));
 
-                List<string> ress = WebCollect.CollectLinks();
-                string res = "";
+                List<string> PossibleAwnsersToQuestion = WebCollect.CollectLinks();
+                string ContainsAnAwnsersToQuestion = "";
 
                 for (int j = 0; j < 100; j++)
                 {
-                    foreach (string result in ress)
+                    foreach (string Result in PossibleAwnsersToQuestion)
                     {
-                        bool blockresult = false;
-                        foreach (string blocked in blockedlinkes) { if (result.Contains(blocked) == true || result == "https://www.quora.com/") { blockresult = true; break; }; }
-                        if (blockresult == false) { res = result; break; }
+                        bool BlockResult = false;
+                        foreach (string Blocked in BlockedLinkes) { if (Result.Contains(Blocked) == true || Result == "https://www.quora.com/") { BlockResult = true; break; }; }
+                        if (BlockResult == false) { ContainsAnAwnsersToQuestion = Result; break; }
                     }
-                    if (res != "") { break; }
+                    if (ContainsAnAwnsersToQuestion != "") { break; }
                     Thread.Sleep(100);
                 }
-                if (res == "" && ress.Count > 0) { res = ress[ress.Count -1]; }
+                if (ContainsAnAwnsersToQuestion == "" && PossibleAwnsersToQuestion.Count > 0) { ContainsAnAwnsersToQuestion = PossibleAwnsersToQuestion[PossibleAwnsersToQuestion.Count -1]; }
 
-                if (res != "")
+                if (ContainsAnAwnsersToQuestion != "")
                 {
-                    WebCollect.SetWebTarget(res);
-                    List<string> collectionpoint = WebCollect.Collect();
-                    if (collectionpoint.Count >= 3 && collectionpoint[0] != "" && collectionpoint[1] != "" && collectionpoint[2] != "")
+                    WebCollect.SetWebTarget(ContainsAnAwnsersToQuestion);
+                    List<string> CollectionOfAwnser = WebCollect.Collect();
+                    if (CollectionOfAwnser.Count >= 3 && CollectionOfAwnser[0] != "" && CollectionOfAwnser[1] != "" && CollectionOfAwnser[2] != "")
                     {
-                        outfiledata_rawA.Add(collectionpoint[0]); //we need to make sure the outfile data and infile data = the same
-                        outfiledata_rawB.Add(collectionpoint[1]);
-                        outfiledata_rawC.Add(collectionpoint[2]);
+                        OutFileDataRawA.Add(CollectionOfAwnser[0]); //we need to make sure the OutFile data and InFile data = the same
+                        OutFileDataRawB.Add(CollectionOfAwnser[1]);
+                        OutFileDataRawC.Add(CollectionOfAwnser[2]);
                     }
                     else
                     {
-                        outfiledata_rawA.Add("NULL");
-                        outfiledata_rawB.Add("NULL");
-                        outfiledata_rawC.Add("NULL");
+                        OutFileDataRawA.Add("NULL");
+                        OutFileDataRawB.Add("NULL");
+                        OutFileDataRawC.Add("NULL");
                         Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"error item [{i}/{infiledata[i]}] could not be processed as suficent sample size could not be for pal could not be found");
+                        Console.WriteLine($"error item [{I}/{InFiledata[I]}] could not be processed as suficent sample size could not be for pal could not be found");
                         Console.ResetColor();
                     }
 
-                    if (collectionpoint.Count >= 5 && collectionpoint[3] != "" && collectionpoint[4] != "")
+                    if (CollectionOfAwnser.Count >= 5 && CollectionOfAwnser[3] != "" && CollectionOfAwnser[4] != "")
                     {
-                        outfiledata_rawD.Add(collectionpoint[3]); //we need to make sure the outfile data and infile data = the same
-                        outfiledata_rawE.Add(collectionpoint[4]);
+                        OutFileDataRawD.Add(CollectionOfAwnser[3]); //we need to make sure the OutFile data and InFile data = the same
+                        OutFileDataRawE.Add(CollectionOfAwnser[4]);
                     }
                     else
                     {
-                        outfiledata_rawD.Add("NULL");
-                        outfiledata_rawE.Add("NULL");
+                        OutFileDataRawD.Add("NULL");
+                        OutFileDataRawE.Add("NULL");
                     }
                 }
                 else 
                 {
-                    outfiledata_rawA.Add("NULL");
-                    outfiledata_rawB.Add("NULL");
-                    outfiledata_rawC.Add("NULL");
-                    outfiledata_rawD.Add("NULL");
-                    outfiledata_rawE.Add("NULL");
+                    OutFileDataRawA.Add("NULL");
+                    OutFileDataRawB.Add("NULL");
+                    OutFileDataRawC.Add("NULL");
+                    OutFileDataRawD.Add("NULL");
+                    OutFileDataRawE.Add("NULL");
 
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"error item [{i}/{infiledata[i]}] find faliure");
+                    Console.WriteLine($"error item [{I}/{InFiledata[I]}] find faliure");
                     Console.ResetColor();
                 }
 
             }
 
-            for (int i = 0; i < outfiledata_rawA.Count; i++)
+            for (int I = 0; I < OutFileDataRawA.Count; I++)
             {
-                if (outfiledata_rawA[i] != "NULL")
+                if (OutFileDataRawA[I] != "NULL")
                 {
-                    string q = infiledata[i];
-                    List<string> a = new List<string>();
-                    a.Add(outfiledata_rawA[i]);
-                    a.Add(outfiledata_rawB[i]);
-                    a.Add(outfiledata_rawC[i]);
+                    string Question = InFiledata[I];
+                    List<string> Awnsers = new List<string>();
+                    Awnsers.Add(OutFileDataRawA[I]);
+                    Awnsers.Add(OutFileDataRawB[I]);
+                    Awnsers.Add(OutFileDataRawC[I]);
 
-                    if (outfiledata_rawD[i] != "NULL") { a.Add(outfiledata_rawD[i]);a.Add(outfiledata_rawE[i]);};
+                    if (OutFileDataRawD[I] != "NULL") { Awnsers.Add(OutFileDataRawD[I]);Awnsers.Add(OutFileDataRawE[I]);};
 
-                    if (a.Count != 0)
+                    if (Awnsers.Count != 0)
                     {
-                        string data = Pal.ConvetToPalData(q, a);
-                        if (data != "NULL") { outfiledata.Add(data); };
+                        string data = Pal.ConvetToPalData(Question, Awnsers);
+                        if (data != "NULL") { OutFileData.Add(data); };
                     }
 
                 }
             }
 
-            FileModify.SetFilePath(outfile);
-            FileModify.SetFileData(outfiledata);
+            FileModify.SetFilePath(OutFile);
+            FileModify.SetFileData(OutFileData);
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Done!!!");
         }

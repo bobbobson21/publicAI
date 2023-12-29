@@ -11,54 +11,54 @@ namespace WebInterraction
 {
     class WebCollect
     {
-        private static string targetsite = ""; //locks onto site
-        public static void SetWebTarget(string str) {targetsite = str;}
-        public static string GetWebTarget() {return targetsite;}
+        private static string TargetSite = ""; //locks onto site
+        public static void SetWebTarget(string Str) {TargetSite = Str;}
+        public static string GetWebTarget() {return TargetSite;}
 
-        private static List<WebNode> targetdata = new List<WebNode>(); //locks onto data with in site
-        public static void SetWebScrapeNodes(List<WebNode> str) { targetdata = str; }
-        public static List<WebNode> GetWebScrapeNodes() {return targetdata;}
+        private static List<WebNode> TargetData = new List<WebNode>(); //locks onto data with in site
+        public static void SetWebScrapeNodes(List<WebNode> Str) { TargetData = Str; }
+        public static List<WebNode> GetWebScrapeNodes() {return TargetData;}
 
-        private static int maxcollectionattemnpts = 5; //locks onto site
-        public static void SetMaxCollectionAttempts(int att) { maxcollectionattemnpts = att; }
-        public static int GetMaxCollectionAttempts() { return maxcollectionattemnpts; }
+        private static int MaxCollectionAttemnpts = 5; //locks onto site
+        public static void SetMaxCollectionAttempts(int Attempts) { MaxCollectionAttemnpts = Attempts; }
+        public static int GetMaxCollectionAttempts() { return MaxCollectionAttemnpts; }
 
-        private static ChromeOptions bro_options;
-        private static ChromeDriver bro_driver;
+        private static ChromeOptions BroOptions;
+        private static ChromeDriver BroDriver;
 
         public static void LoadBrowser()
         {
-            bro_options = new ChromeOptions();
-            bro_options.AddArgument( "disable-logging" );
-            bro_options.AddArguments("mute-audio");
-            bro_options.AddArguments("disable-extensions");
-            bro_options.AddArguments("headless");
-            bro_driver = new ChromeDriver(bro_options);
+            BroOptions = new ChromeOptions();
+            BroOptions.AddArgument( "disable-logging" );
+            BroOptions.AddArguments("mute-audio");
+            BroOptions.AddArguments("disable-extensions");
+            BroOptions.AddArguments("headless");
+            BroDriver = new ChromeDriver(BroOptions);
         }
 
-        public static string ConvertToSearchURL(string url)
+        public static string ConvertToSearchURL(string Url)
         {
-            url = url.Replace(" ", "+");
-            url = "https://www.google.com/search?q=" + url; //who uses bing other than for bing bot
-            return url;
+            Url = Url.Replace(" ", "+");
+            Url = "https://www.google.com/search?q=" + Url; //who uses bing other than for bing bot
+            return Url;
         }
 
-        public static string ConvertToSearchForQuoraURL(string url)
+        public static string ConvertToSearchForQuoraURL(string Url)
         {
-            url = url.Replace(" ", "%20");
-            url = "https://www.quora.com/search?q=" + url; //easiest site to extract awnsers from
-            return url;
+            Url = Url.Replace(" ", "%20");
+            Url = "https://www.quora.com/search?q=" + Url; //easiest site to extract awnsers from
+            return Url;
         }
 
         public static List<string> CollectLinks()
         {
-            var code_htmldata = new HtmlDocument();
+            var CodeHtmlData = new HtmlDocument();
 
             while (true)
             {
                 try
                 {
-                    bro_driver.Navigate().GoToUrl(targetsite);
+                    BroDriver.Navigate().GoToUrl(TargetSite);
                     break;
                 }
                 catch {Thread.Sleep(30000);}
@@ -68,53 +68,53 @@ namespace WebInterraction
             {
                 try
                 {
-                    code_htmldata.LoadHtml(bro_driver.PageSource);
+                    CodeHtmlData.LoadHtml(BroDriver.PageSource);
                     break;
                 }
                 catch { Thread.Sleep(30000); }
             }
 
-            List<string> linksstr = new List<string>();
-            List<HtmlNode> linkboxesA = new List<HtmlNode>();
-            List<HtmlNode> linkboxesB = new List<HtmlNode>();
-            List<HtmlNode> linkboxesC = new List<HtmlNode>();
+            List<string> LinksOut = new List<string>();
+            List<HtmlNode> LinkBoxesA = new List<HtmlNode>();
+            List<HtmlNode> LinkBoxesB = new List<HtmlNode>();
+            List<HtmlNode> LinkBoxesC = new List<HtmlNode>();
 
-            for (int i = 0; i <= maxcollectionattemnpts; i++)
+            for (int I = 0; I <= MaxCollectionAttemnpts; I++)
             {
-                try { linkboxesA = code_htmldata.DocumentNode.SelectNodes("//a").ToList(); i = maxcollectionattemnpts + 10; } catch { };
-                try { linkboxesB = code_htmldata.DocumentNode.SelectNodes("//div").ToList(); } catch { };
-                try { linkboxesC = code_htmldata.DocumentNode.SelectNodes("//link").ToList(); } catch { };
+                try { LinkBoxesA = CodeHtmlData.DocumentNode.SelectNodes("//a").ToList(); I = MaxCollectionAttemnpts + 10; } catch { };
+                try { LinkBoxesB = CodeHtmlData.DocumentNode.SelectNodes("//div").ToList(); } catch { };
+                try { LinkBoxesC = CodeHtmlData.DocumentNode.SelectNodes("//Link").ToList(); } catch { };
             }
 
-            foreach (var linkbox in linkboxesA)
+            foreach (var LinkBox in LinkBoxesA)
             {
-                string link = linkbox.GetAttributeValue("href", "NULL");
-                if (link != "NULL") { linksstr.Add(link.ToString()); }
+                string Link = LinkBox.GetAttributeValue("href", "NULL");
+                if (Link != "NULL") { LinksOut.Add(Link.ToString()); }
             }
-            foreach (var linkbox in linkboxesB)
+            foreach (var LinkBox in LinkBoxesB)
             {
-                string link = linkbox.GetAttributeValue("href", "NULL");
-                if (link != "NULL") { linksstr.Add(link.ToString()); }
+                string Link = LinkBox.GetAttributeValue("href", "NULL");
+                if (Link != "NULL") { LinksOut.Add(Link.ToString()); }
             }
-            foreach (var linkbox in linkboxesC)
+            foreach (var LinkBox in LinkBoxesC)
             {
-                string link = linkbox.GetAttributeValue("href", "NULL");
-                if (link != "NULL") { linksstr.Add(link.ToString()); }
+                string Link = LinkBox.GetAttributeValue("href", "NULL");
+                if (Link != "NULL") { LinksOut.Add(Link.ToString()); }
             }
-            return linksstr;
+            return LinksOut;
         }
 
 
         public static List<string> Collect() //fire and grab the bounty
         {
-            List<string> extracteddata = new List<string>();
-            var code_htmldata = new HtmlDocument();
+            List<string> ExtractedData = new List<string>();
+            var CodeHtmlData = new HtmlDocument();
 
             while (true)
             {
                 try
                 {
-                    bro_driver.Navigate().GoToUrl(targetsite);
+                    BroDriver.Navigate().GoToUrl(TargetSite);
                     break;
                 }
                 catch { Thread.Sleep(30000); }
@@ -124,51 +124,51 @@ namespace WebInterraction
             {
                 try
                 {
-                    code_htmldata.LoadHtml(bro_driver.PageSource);
+                    CodeHtmlData.LoadHtml(BroDriver.PageSource);
                     break;
                 }
                 catch { Thread.Sleep(30000); }
             }
 
-            foreach (WebNode Point in targetdata)
+            foreach (WebNode Point in TargetData)
             {
-                List<HtmlNode> nodes = new List<HtmlNode>();
+                List<HtmlNode> Nodes = new List<HtmlNode>();
 
-                for (int i = 0; i <= maxcollectionattemnpts; i++)
+                for (int I = 0; I <= MaxCollectionAttemnpts; I++)
                 {
-                    try { nodes = code_htmldata.DocumentNode.SelectNodes(Point.Output()).ToList(); i = maxcollectionattemnpts + 10; } catch { };
+                    try { Nodes = CodeHtmlData.DocumentNode.SelectNodes(Point.Output()).ToList(); I = MaxCollectionAttemnpts + 10; } catch { };
                 }
 
-                foreach(HtmlNode node in nodes)
+                foreach(HtmlNode Node in Nodes)
                 {
-                    if (Point.OutputChildIndex() >= 0) { extracteddata.Add(node.ChildNodes[Point.OutputChildIndex()].InnerText); }
-                    if (Point.OutputChildIndex() <= -1) { extracteddata.Add(node.InnerText); }
+                    if (Point.OutputChildIndex() >= 0) { ExtractedData.Add(Node.ChildNodes[Point.OutputChildIndex()].InnerText); }
+                    if (Point.OutputChildIndex() <= -1) { ExtractedData.Add(Node.InnerText); }
                 }
             }
-            return extracteddata;
+            return ExtractedData;
         }
     }
 
     public class WebNode
     {
-        private string w_type = "";
-        private string w_key = "";
-        private string w_value = "";
-        private int w_child = -1;
+        private string W_Type = "";
+        private string W_Key = "";
+        private string W_Value = "";
+        private int W_Child = -1;
         
         public WebNode(string type, string key, string value, int childindex )
         {
-            w_type = type; w_key = key; w_value = value;
+            W_Type = type; W_Key = key; W_Value = value;
         }
 
         public int OutputChildIndex() 
         {
-            return w_child;
+            return W_Child;
         }
 
         public string Output()
         {
-            return $"//{w_type}[@{w_key}='{w_value}']";
+            return $"//{W_Type}[@{W_Key}='{W_Value}']";
         }
     }
 }

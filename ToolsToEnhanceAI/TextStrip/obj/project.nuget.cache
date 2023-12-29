@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "dgSpecHash": "bx1dhLGP0VXJjZ22Jxb4RCIi+l133WUT/QoF5VOzCoEStGuPWxS9tKx3u5fLJigKK7Sq0/DPWTUpk0DObtE1uQ==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\dsbkh\\OneDrive\\Desktop\\github projects\\publicAI\\ToolsToEnhanceAI\\WebTextStrip\\texstrip.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\dsbkh\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\microsoft.netcore.targets\\1.1.0\\microsoft.netcore.targets.1.1.0.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\system.runtime\\4.3.0\\system.runtime.4.3.0.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\system.text.encoding\\4.3.0\\system.text.encoding.4.3.0.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\system.text.encoding.codepages\\8.0.0\\system.text.encoding.codepages.8.0.0.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\system.text.encoding.extensions\\4.3.0\\system.text.encoding.extensions.4.3.0.nupkg.sha512",
+    "C:\\Users\\dsbkh\\.nuget\\packages\\system.text.encodings.web\\8.0.0\\system.text.encodings.web.8.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

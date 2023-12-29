@@ -17,78 +17,78 @@ namespace program
             Console.WriteLine($"starting from:{FileModify.CurrentDirectory}");
             Console.WriteLine("");
             Console.WriteLine("pull searches from:");
-            string infile = Console.ReadLine();
+            string InFile = Console.ReadLine();
             Console.WriteLine("output to:");
-            string outfile = Console.ReadLine();
+            string OutFile = Console.ReadLine();
 
-            FileModify.SetFilePath(infile);
-            List<string> infiledata = FileModify.GetFileData();
-            List<string> outfiledata = new List<string>();
+            FileModify.SetFilePath(InFile);
+            List<string> InFileData = FileModify.GetFileData();
+            List<string> OutFileData = new List<string>();
 
             WebCollect.LoadBrowser();
 
-            List<WebNode> scrapenodes = new List<WebNode>(); //content we want it to search for
-            scrapenodes.Add(new WebNode("a", "class", "text-decoration-none", -1));
-            WebCollect.SetWebScrapeNodes(scrapenodes);
+            List<WebNode> ScrapeNodes = new List<WebNode>(); //content we want it to search for
+            ScrapeNodes.Add(new WebNode("a", "class", "text-decoration-none", -1));
+            WebCollect.SetWebScrapeNodes(ScrapeNodes);
 
-            int old_percentage = 0;
+            int OldPercentage = 0;
 
-            for (int i = 0; i < infiledata.Count; i++)
+            for (int I = 0; I < InFileData.Count; I++)
             {
 
-                int new_percentage = (int)((double)((double)i / infiledata.Count) * 100);
-                if (new_percentage > old_percentage)
+                int NewPercentage = (int)((double)((double)I / InFileData.Count) * 100);
+                if (NewPercentage > OldPercentage)
                 {
-                    old_percentage = new_percentage;
+                    OldPercentage = NewPercentage;
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"current compleation percentage %{new_percentage}");
+                    Console.WriteLine($"current compleation percentage %{NewPercentage}");
                     Console.ResetColor();
                 }
 
-                WebCollect.SetWebTarget(WebCollect.ConvertToSearchForWebsterURL(infiledata[i]));
-                List<string> data = WebCollect.Collect();
+                WebCollect.SetWebTarget(WebCollect.ConvertToSearchForWebsterURL(InFileData[I]));
+                List<string> Data = WebCollect.Collect();
 
-                if (data.Count >= 1)
+                if (Data.Count >= 1)
                 {
-                    string addline = infiledata[i] + ",";
-                    int minwordlength = 4;
+                    string AddLine = InFileData[I] + ",";
+                    int MinWordLength = 4;
 
-                    if (infiledata[i].Length > minwordlength)
+                    if (InFileData[I].Length > MinWordLength)
                     {
-                        for (int o = 0; o < data.Count && o < 4; o++)
+                        for (int O = 0; O < Data.Count && O < 4; O++)
                         {
-                            string outtext = data[o].Replace("\r\n", "");
-                            outtext = outtext.Replace(" ", "");
+                            string OutText = Data[O].Replace("\r\n", "");
+                            OutText = OutText.Replace(" ", "");
 
-                            if ((outtext.Length > minwordlength || outtext.Contains(infiledata[i][0]) == true) && outtext.Contains("(") == false && outtext.Contains(")") == false)
+                            if ((OutText.Length > MinWordLength || OutText.Contains(InFileData[I][0]) == true) && OutText.Contains("(") == false && OutText.Contains(")") == false)
                             {
-                                addline = addline + outtext + ",";
+                                AddLine = AddLine + OutText + ",";
                             }
                         }
                     }
 
-                    if (infiledata[i].Length > minwordlength && addline != infiledata[i] + ",")
+                    if (InFileData[I].Length > MinWordLength && AddLine != InFileData[I] + ",")
                     {
-                        addline = addline.Substring(0, addline.Length - 1);
-                        outfiledata.Add(addline);
+                        AddLine = AddLine.Substring(0, AddLine.Length - 1);
+                        OutFileData.Add(AddLine);
                     }
                     else
                     {
                          Console.ForegroundColor = ConsoleColor.Red;
-                         Console.WriteLine($"error item [{i}/{infiledata[i]}] possibly dose not have good synonyms so it is discarded");
+                         Console.WriteLine($"error item [{I}/{InFileData[I]}] possibly dose not have good synonyms so it is discarded");
                          Console.ResetColor();
                     }
                 }
                 else
                 {
                     Console.ForegroundColor = ConsoleColor.Red;
-                    Console.WriteLine($"error item [{i}/{infiledata[i]}] find faliure");
+                    Console.WriteLine($"error item [{I}/{InFileData[I]}] find faliure");
                     Console.ResetColor();
                 }
             }
 
-            FileModify.SetFilePath(outfile);
-            FileModify.SetFileData(outfiledata);
+            FileModify.SetFilePath(OutFile);
+            FileModify.SetFileData(OutFileData);
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine("Done!!!");
         }

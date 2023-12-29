@@ -138,6 +138,7 @@ A good publicAI ai has has lots of responces and uses add new synonyms group als
 This AI system come with a set of tools that allows you to make AIs really fast and it also makes your AI much smarter which makes the tools very important and useful to AI development with public AI. A list of these tools (in the order they should most likely be used) is bellow:
 
  - InfoAdded --give it two files one a list of questions and two a place to put the result and it will use the first file to scrape awnser off the internet and once it is done it will all be formatted to infomation pal can understand and then put into the results file also this is the only thing to use c#  
+ - TextStrip --Give it the result from the InfoAdded (or just any old file) and it will strip away all charters that can not be found on your standered keybord which is vey useful for filles med with web content 
  - WordExtractor --extracts words from pal info files (this is useful for the spellchecker)
  - SpellingEnhancement --generates most of the possible missspellings for a list of words and then outputs the results to a file as pal spellchecking data which makes AIs better at understanding english 
  - SynonymsGrouping --give it a list of synonyms and it will output a synonyms file in pal data and it can also modify infomodel file data to use those synonyms which makes AIs seem more dynamic in there responces 

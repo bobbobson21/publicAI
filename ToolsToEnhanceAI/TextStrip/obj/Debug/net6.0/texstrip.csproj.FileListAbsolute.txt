@@ -1,0 +1,60 @@
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\obj\Debug\net6.0\texstrip.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\obj\Debug\net6.0\texstrip.AssemblyInfoInputs.cache
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\obj\Debug\net6.0\texstrip.AssemblyInfo.cs
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\obj\Debug\net6.0\texstrip.csproj.CoreCompileInputs.cache
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\bin\Debug\net6.0\texstrip.exe
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\bin\Debug\net6.0\texstrip.deps.json
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\bin\Debug\net6.0\texstrip.runtimeconfig.json
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\bin\Debug\net6.0\texstrip.dll
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\bin\Debug\net6.0\texstrip.pdb
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\obj\Debug\net6.0\texstrip.dll
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\obj\Debug\net6.0\refint\texstrip.dll
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\obj\Debug\net6.0\texstrip.pdb
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\obj\Debug\net6.0\texstrip.genruntimeconfig.cache
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\obj\Debug\net6.0\ref\texstrip.dll
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\bin\Debug\net6.0\System.Text.Encoding.CodePages.dll
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\bin\Debug\net6.0\System.Text.Encodings.Web.dll
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Text.Encoding.CodePages.dll
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\bin\Debug\net6.0\runtimes\browser\lib\net6.0\System.Text.Encodings.Web.dll
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\obj\Debug\net6.0\texstrip.csproj.AssemblyReference.cache
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\texstrip\obj\Debug\net6.0\texstrip.csproj.CopyComplete
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\bin\Debug\net6.0\texstrip.exe
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\bin\Debug\net6.0\texstrip.deps.json
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\bin\Debug\net6.0\texstrip.runtimeconfig.json
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\bin\Debug\net6.0\texstrip.dll
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\bin\Debug\net6.0\texstrip.pdb
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\bin\Debug\net6.0\System.Text.Encoding.CodePages.dll
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\bin\Debug\net6.0\System.Text.Encodings.Web.dll
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Text.Encoding.CodePages.dll
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\bin\Debug\net6.0\runtimes\browser\lib\net6.0\System.Text.Encodings.Web.dll
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\obj\Debug\net6.0\texstrip.csproj.AssemblyReference.cache
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\obj\Debug\net6.0\texstrip.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\obj\Debug\net6.0\texstrip.AssemblyInfoInputs.cache
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\obj\Debug\net6.0\texstrip.AssemblyInfo.cs
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\obj\Debug\net6.0\texstrip.csproj.CoreCompileInputs.cache
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\obj\Debug\net6.0\texstrip.csproj.CopyComplete
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\obj\Debug\net6.0\texstrip.dll
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\obj\Debug\net6.0\refint\texstrip.dll
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\obj\Debug\net6.0\texstrip.pdb
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\obj\Debug\net6.0\texstrip.genruntimeconfig.cache
+C:\Users\dsbkh\OneDrive\Desktop\textstripperr\obj\Debug\net6.0\ref\texstrip.dll
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\bin\Debug\net6.0\texstrip.exe
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\bin\Debug\net6.0\texstrip.deps.json
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\bin\Debug\net6.0\texstrip.runtimeconfig.json
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\bin\Debug\net6.0\texstrip.dll
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\bin\Debug\net6.0\texstrip.pdb
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\bin\Debug\net6.0\System.Text.Encoding.CodePages.dll
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\bin\Debug\net6.0\System.Text.Encodings.Web.dll
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\bin\Debug\net6.0\runtimes\win\lib\net6.0\System.Text.Encoding.CodePages.dll
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\bin\Debug\net6.0\runtimes\browser\lib\net6.0\System.Text.Encodings.Web.dll
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\obj\Debug\net6.0\texstrip.csproj.AssemblyReference.cache
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\obj\Debug\net6.0\texstrip.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\obj\Debug\net6.0\texstrip.AssemblyInfoInputs.cache
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\obj\Debug\net6.0\texstrip.AssemblyInfo.cs
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\obj\Debug\net6.0\texstrip.csproj.CoreCompileInputs.cache
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\obj\Debug\net6.0\texstrip.csproj.CopyComplete
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\obj\Debug\net6.0\texstrip.dll
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\obj\Debug\net6.0\refint\texstrip.dll
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\obj\Debug\net6.0\texstrip.pdb
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\obj\Debug\net6.0\texstrip.genruntimeconfig.cache
+C:\Users\dsbkh\OneDrive\Desktop\github projects\publicAI\ToolsToEnhanceAI\WebTextStrip\obj\Debug\net6.0\ref\texstrip.dll

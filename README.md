@@ -46,12 +46,12 @@ You can also seach for infomation in the Info_Database using the id tag at the e
 ```
 pal:GetInfoById( ID ) --will return table of all info with that id
 pal:GetInfoIndexById( ID ) --will return table of all index belonging to all the info with that id
-pal:GetInfoByIndex( Index ) --will return the info with that index in the info_database
+pal:GetInfoByIndex( Index ) --will return the info with that index in the Info_Database
 ```
 However using these functions will only return copyies of the infomation so to modify the origional info you should use:
 ```
-pal["info_database"][pal:GetInfoIndexById( ID )[1]].WhatUWantToChage = value
-pal["info_database"][pal:GetInfoIndexById( ID )[1]].SearchFor[#pal["Info_Database"][pal:GetInfoIndexById( ID )[1]]["SearchFor"]] = nil --deleats the last search for requirment
+pal["Info_Database"][pal:GetInfoIndexById( ID )[1]].WhatUWantToChage = value
+pal["Info_Database"][pal:GetInfoIndexById( ID )[1]].SearchFor[#pal["Info_Database"][pal:GetInfoIndexById( ID )[1]]["SearchFor"]] = nil --deleats the last search for requirment
 ```
 examples of info:
 

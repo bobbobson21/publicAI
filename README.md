@@ -38,11 +38,11 @@ Oh and the word after the slash is the name the value is stored by in the info.
  - Annoyable = bool or nil --false will make so you cant annoy it if its respone is coming from this infos responces  
  - Importance = number or nil --the higher this number is the more of a chance you have of this responce being selected over other responces
  - Responces = table of string or nil --one of the string will be retuned to the player as a responce it may also be modifyied on the return trip
- - SubInfo = table of infomation nil --run pal:ReturnInfo() in here to put info into the sub info table and the sub info will be added to the info_database if a respoce is selected from the info it's contained in  
+ - SubInfo = table of infomation nil --run pal:ReturnInfo() in here to put info into the sub info table and the sub info will be added to the Info_Database if a respoce is selected from the info it's contained in  
  - Append/AppendAllResponcesWith = string or nil --if string string will be added to the end of all responce useful for running functions
- - ID anything or nil --if it is someting it can be search out of the info_database using the functions below
+ - ID anything or nil --if it is someting it can be search out of the Info_Database using the functions below
 
-You can also seach for infomation in the info_database using the id tag at the end and one the functions below:
+You can also seach for infomation in the Info_Database using the id tag at the end and one the functions below:
 ```
 pal:GetInfoById( ID ) --will return table of all info with that id
 pal:GetInfoIndexById( ID ) --will return table of all index belonging to all the info with that id
@@ -51,7 +51,7 @@ pal:GetInfoByIndex( Index ) --will return the info with that index in the info_d
 However using these functions will only return copyies of the infomation so to modify the origional info you should use:
 ```
 pal["info_database"][pal:GetInfoIndexById( ID )[1]].WhatUWantToChage = value
-pal["info_database"][pal:GetInfoIndexById( ID )[1]].SearchFor[#pal["info_database"][pal:GetInfoIndexById( ID )[1]]["SearchFor"]] = nil --deleats the last search for requirment
+pal["info_database"][pal:GetInfoIndexById( ID )[1]].SearchFor[#pal["Info_Database"][pal:GetInfoIndexById( ID )[1]]["SearchFor"]] = nil --deleats the last search for requirment
 ```
 examples of info:
 

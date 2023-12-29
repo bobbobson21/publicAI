@@ -1,424 +1,425 @@
 
-	local inruntime = false
-	local cdc = io.popen( "cd" )
-	local current_dir = cdc:read( "*l" )
-for z = 1, string.len( current_dir ) do if string.sub( current_dir, z, z ) == string.char( 92 ) then current_dir = string.sub( current_dir, 1, z -1 ).."/"..string.sub( current_dir, z +1, string.len( current_dir ) ) end end
-cdc:close()
+	local InRunTime = false
+	local CurrentDirCommandData = io.popen( "cd" )
+	local CurrentDir = CurrentDirCommandData:read( "*L" )
+for Z = 1, string.len( CurrentDir ) do if string.sub( CurrentDir, Z, Z ) == string.char( 92 ) then CurrentDir = string.sub( CurrentDir, 1, Z -1 ).."/"..string.sub( CurrentDir, Z +1, string.len( CurrentDir ) ) end end
+if string.sub( CurrentDir, string.len( CurrentDir ), string.len( CurrentDir ) ) == string.char( 10 ) then CurrentDir = string.sub( CurrentDir, 1, string.len( CurrentDir ) -1 ) end
+CurrentDirCommandData:close()
 
 	pal = {}
-	pal["selfhooks"] = {}
-	pal["info_database"] = {}
-	pal["info_database_added"] = {}
-	pal["info_database_removed"] = {}
-	pal["info_degrade_level"] = {}
-	pal["synonyms_groups"] = {}
-	pal["spellchecking"] = {}
-	pal["prior_input"] = ""
-	pal["emotion_level"] = {3,2}
-	pal["emotion_level_wanted"] = {3,2}
-	pal["emotion_grid"] = {}
-	pal["emotion_grid_max_size"] = 3
-	pal["emotion_sensitivity"] = 0.2
-	pal["emotion_gravatate_power"] = 0.003
-	pal["idk_responces"] = {}
-	pal["annoyance_maxlevel"] = 4
-	pal["annoyance_responcecounter"] = {}
-	pal["annoyance_responces_attachment"] = {}
-	pal["annoyance_decreese_in"] = 15
-	pal["annoyance_responces"] = {}
-	pal["annoyance_effectemotionby"] = {-0.5,-0.5}
-	pal["searchfor_groups"] = {}
-	pal["max_gender_momory_time"] = 240
-	pal["sandbox"] = {["funcs"]={},}
-	pal["runfunctionkey"] = "|"
+	pal["Info_Database"] = {}
+	pal["Info_DatabaseAdded"] = {}
+	pal["Info_DatabaseRemoved"] = {}
+	pal["Info_DegradeLevel"] = {}
+	pal["Emotion_Level"] = {3,2}
+	pal["Emotion_LevelWanted"] = {3,2}
+	pal["Emotion_Grid"] = {}
+	pal["Emotion_GridMaxSize"] = 3
+	pal["Emotion_Sensitivity"] = 0.2
+	pal["Emotion_GravatatePower"] = 0.003
+	pal["Annoyance_MaxLevel"] = 4
+	pal["Annoyance_ResponceCounter"] = {}
+	pal["Annoyance_ResponcesAttachment"] = {}
+	pal["Annoyance_DecreeseIn"] = 15
+	pal["Annoyance_Responces"] = {}
+	pal["Annoyance_EffectEmotionBy"] = {-0.5,-0.5}
+	pal["Tag_Groups"] = {}
+	pal["Synonyms_Groups"] = {}
+	pal["IDK_Responces"] = {}
+	pal["SelfHooks"] = {}
+	pal["Spellchecking"] = {}
+	pal["PriorEnteredInput"] = ""
+	pal["MaxGenderMemoryTime"] = 240
+	pal["Sandbox"] = {["Funcs"]={},}
+	pal["RunFunctionKey"] = "|"
 
 -- end of seting pal vars start of sandbox -------------------------------------------------------------------------------------------------------------------
 
-function pal:GetVar( v ) return pal["sandbox"][v] end --sandbox is for data that pal needs to access
-function pal:SetVar( k, v ) pal["sandbox"][k] = v end
-function pal:SandBox() return pal["sandbox"]["funcs"] end --use the sandbox so that if you need to restore the AI to a prior point you can also restore function and values you created
+function pal:GetVar( V ) return pal["Sandbox"][V] end --sandbox is for data that pal needs to access
+function pal:SetVar( K, V ) pal["Sandbox"][K] = V end
+function pal:SandBox() return pal["Sandbox"]["Funcs"] end --use the sandbox so that if you need to restore the AI to a prior point you can also restore function and values you created
 
 -- end of sandbox start of hooks -----------------------------------------------------------------------------------------------------------------------------
 
-function pal:SetNewSelfHook( cat, id, v ) --catagory, hook id, function --adds hooks so systems can better interract with the AI
-if pal["selfhooks"][cat] == nil then pal["selfhooks"][cat] = {} end
-	pal["selfhooks"][cat][id] = v
+function pal:SetNewSelfHook( Catagory, ID, Func ) --catagory, hook ID, function --adds hooks so systems can better interract with the AI
+if pal["SelfHooks"][Catagory] == nil then pal["SelfHooks"][Catagory] = {} end
+	pal["SelfHooks"][Catagory][ID] = Func
 end
 
-function pal:RemoveSelfHook( cat, id )
-if cat == nil then pal["selfhooks"] = nil;  pal["selfhooks"] = {}; return end
-if id == nil then pal["selfhooks"][cat] = nil; return end
-	pal["selfhooks"][cat][id] = nil
+function pal:RemoveSelfHook( Catagory, ID )
+if Catagory == nil then pal["SelfHooks"] = nil;  pal["SelfHooks"] = {}; return end
+if ID == nil then pal["SelfHooks"][Catagory] = nil; return end
+	pal["SelfHooks"][Catagory][ID] = nil
 end
 
 function pal:GetSelfHooksAsTable() --gets all the hooks
-return pal["selfhooks"]
+return pal["SelfHooks"]
 end
 
-function pal:RunSelfHooks( cat, tbl ) --runs hooks
-	local selfuseid = "PALOn"
-if string.sub( cat, 1, string.len( selfuseid ) ) ~= selfuseid then return nil end --to make it only useable for pal functions as to not mess stuff up
-	local returns = {}
-	local mostcommonvalues = {}
+function pal:RunSelfHooks( Catagory, VarTable ) --runs hooks
+	local IsPalHookIdenifier = "PALOn"
+if string.sub( Catagory, 1, string.len( IsPalHookIdenifier ) ) ~= IsPalHookIdenifier then return nil end --to make it only useable for pal functions as to not mess stuff up
+	local Returns = {}
+	local MostCommonValues = {}
 
-if pal["selfhooks"][cat] ~= nil then
-for k, v in pairs( pal["selfhooks"][cat] ) do
-	local temp = {v( table.unpack( tbl ) )} --runs the hook and collects the returns
+if pal["SelfHooks"][Catagory] ~= nil then
+for K, V in pairs( pal["SelfHooks"][Catagory] ) do
+	local temp = {V( table.unpack( VarTable ) )} --runs the hook and collects the returns
 	
-for l, w in pairs( temp ) do
-if mostcommonvalues[l] == nil then mostcommonvalues[l] = {} end --l = value posistion
-if mostcommonvalues[l]["*"..tostring( w )] == nil then mostcommonvalues[l]["*"..tostring( w )] = 0 end --w = the value; * is used to pervent clashes with MCVR which stands for most common value result
-	mostcommonvalues[l]["*"..tostring( w )] = mostcommonvalues[l]["*"..tostring( w )] +1 --if value is detected increece its common level
-if mostcommonvalues[l]["MCVR"] == nil then mostcommonvalues[l]["MCVR"] = 0 end --PAL_MCVR_!£$%^&*()_qwerty is where we store the highest common level
-if mostcommonvalues[l]["*"..tostring( w )] >= mostcommonvalues[l]["MCVR"] then --if is most common for posistion
-	mostcommonvalues[l]["MCVR"] = mostcommonvalues[l]["*"..tostring( w )]
-	returns[l] = w --file under returns
+for L, W in pairs( temp ) do
+if MostCommonValues[L] == nil then MostCommonValues[L] = {} end --L = value posistion
+if MostCommonValues[L]["*"..tostring( W )] == nil then MostCommonValues[L]["*"..tostring( W )] = 0 end --W = the value; * is used to pervent clashes with MCVR which stands for most common value result
+	
+	MostCommonValues[L]["*"..tostring( W )] = MostCommonValues[L]["*"..tostring( W )] +1 --if value is detected increece its common level
+if MostCommonValues[L]["MCVR"] == nil then MostCommonValues[L]["MCVR"] = 0 end --MCVR is where we store the highest common level
+
+if MostCommonValues[L]["*"..tostring( W )] >= MostCommonValues[L]["MCVR"] then --if is most common for posistion
+	MostCommonValues[L]["MCVR"] = MostCommonValues[L]["*"..tostring( W )]
+	Returns[L] = W --file under returns
          end
       end
    end
 end
 
-return table.unpack( returns ) --we only return the most common values because thats the only one you will care about
+return table.unpack( Returns ) --we only return the most common values because thats the only one you will care about
 end
 
 -- end of hooks start of data/info control functions ---------------------------------------------------------------------------------------------------------
 
-function pal:NRT( tag ) --for tags/words you want it to seach for but only mark down the result and not desqalify it if result cant be found
-	local starts, ends = string.find( pal:BRTGetTextToRespondTo(), " "..tostring( tag ).." ", pal["found_tag_at"], true )
-	local strlen = pal["found_tag_at"]
-if starts ~= nil or tag == true then
-	strlen = strlen +string.len( tag )
+function pal:NRT( Tag ) --for tags/words you want it to seach for but only mark down the result and not desqalify it if result cant be found
+	local CombinedTagLength = pal["FoundTagAt"]
+if string.find( pal:BRTGetTextToRespondTo(), " "..tostring( Tag ).." ", pal["FoundTagAt"], true ) ~= nil or Tag == true then
+	CombinedTagLength = CombinedTagLength +string.len( Tag )
 else
-if pal["found_tag_at"] >= pal["match_level_length_processed"] then
-	pal["match_level_tags_processed"] = pal["match_level_tags_processed"] -1
+if pal["FoundTagAt"] >= pal["MatchLevelLengthProcessed"] then
+	pal["MatchLevelTagsProcessed"] = pal["MatchLevelTagsProcessed"] -1
    end
 end
-return true, strlen
+return true, CombinedTagLength
 end --also stands for non reqired tag
 
-function pal:MWTG( id ) --compares input to a tag group and if one tag in the group is found in input it returns true and pal["found_tag_at"] +tag length --also stands for match with tag group
-if pal["searchfor_groups"][id] == nil then return false end
-for k, v in pairs( pal["searchfor_groups"][id] ) do
-	local starts, ends = string.find( pal:BRTGetTextToRespondTo(), " "..v.." ", pal["found_tag_at"], true )
-if starts ~= nil then return true, pal["found_tag_at"] +string.len( v ) end --if found say
+function pal:MWTG( ID ) --compares input to a tag group and if one tag in the group is found in input it returns true and pal["FoundTagAt"] +tag length --also stands for match with tag group
+if pal["Tag_Groups"][ID] == nil then return false end
+for K, V in pairs( pal["Tag_Groups"][ID] ) do
+if string.find( pal:BRTGetTextToRespondTo(), " "..V.." ", pal["FoundTagAt"], true ) ~= nil then return true, pal["FoundTagAt"] +string.len( V ) end --if found say
 end   
-return false, pal["found_tag_at"] --if no tag is found it retuns false and ends
+return false, pal["FoundTagAt"] --if no tag is found it retuns false and ends
 end --also stands for match with tag group
 
-function pal:MemGen( id, tbl ) --connets ids to pronows and then puts it into short term memory
-pal:AddNewSpellChecking( id, tbl )
-if pal["gender_momory"] == nil then pal["gender_momory"] = {} end
-	pal["gender_momory"][#pal["gender_momory"] +1] = id
-	pal["gender_momory_time"] = pal["max_gender_momory_time"] --time it takes to lose it's short term memory for pronowns should be 4 minutes
+function pal:MemGen( ID, PronownTable ) --connets ids to pronows and then puts it into short term memory
+pal:AddNewSpellChecking( ID, PronownTable )
+if pal["GenderMemory"] == nil then pal["GenderMemory"] = {} end
+	pal["GenderMemory"][#pal["GenderMemory"] +1] = ID
+	pal["GenderMemoryTime"] = pal["MaxGenderMemoryTime"] --time it takes to lose it's short term memory for pronowns should be 4 minutes
 end
 
-function pal:SetMaxPronounMemoryAssociationTime( seconds ) --time in seconds
-	pal["max_gender_momory_time"] = seconds
+function pal:SetMaxPronounMemoryAssociationTime( Seconds ) --time in seconds
+	pal["MaxGenderMemoryTime"] = Seconds
 end
 
 function pal:GetMaxPronounMemoryAssociationTime() --time in seconds
-return pal["max_gender_momory_time"]
+return pal["MaxGenderMemoryTime"]
 end
 
 function pal:GetPronounMemoryAssociationTime() --time in seconds
-return pal["gender_momory_time"] --not the max time
+return pal["GenderMemoryTime"] --not the max time
 end
 
-function pal:DegradeInfoOverXCycles( id, cyclesinfostayesinmemory ) --makes info eventually degrades to nothing use to simulates forgetfulness
-if pal:RunSelfHooks( "PALOnDegradeInfoOverXCycles", {id,cyclesinfostayesinmemory} ) == false then return end
-for k, v in pairs( pal["info_database"] ) do
-if v["id"] == id then
-	pal["info_degrade_level"][k] = cyclesinfostayesinmemory -1
+function pal:DegradeInfoOverXCycles( ID, CyclesInfoStayesInMemory ) --makes info eventually degrades to nothing use to simulates forgetfulness
+if pal:RunSelfHooks( "PALOnDegradeInfoOverXCycles", {ID,CyclesInfoStayesInMemory} ) == false then return end
+for K, V in pairs( pal["Info_Database"] ) do
+if V["ID"] == ID then
+	pal["Info_DegradeLevel"][K] = CyclesInfoStayesInMemory -1
 	  end
    end
 end
 
-function pal:SetNewInfo( searchfor, searchfor_prior, emotion_change, emotionappend, annoyable, inportance, responces, subinfo, append, id ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier even functions like "֍hi( true )"
-if pal:RunSelfHooks( "PALOnSetNewInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subinfo,id,append} ) == false then return end
-	pal["info_database"][#pal["info_database"] +1] = {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["ea"]=emotionappend,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subinfo"]=subinfo,["append"]=append,["id"]=id}
+function pal:SetNewInfo( SearchFor, SearchForPrior, EmotionChange, EmotionAppend, Annoyable, Inportance, Responces, SubInfo, Append, ID ) --SearchFor is done like so {"hodey","hello","hi"} it can ethier even functions like "֍hi( true )"
+if pal:RunSelfHooks( "PALOnSetNewInfo", {SearchFor,SearchForPrior,EmotionChange,Annoyable,Inportance,Responces,SubInfo,ID,Append} ) == false then return end
+	pal["Info_Database"][#pal["Info_Database"] +1] = {["SearchFor"]=SearchFor,["PriorSearchFor"]=SearchForPrior,["EmotionChange"]=EmotionChange,["AppendEmotionStatment"]=EmotionAppend,["Annoyable"]=Annoyable,["Importance"]=Importance,["Responces"]=Responces,["SubInfo"]=SubInfo,["AppendAllResponcesWith"]=Append,["ID"]=ID}
 
-if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
-for k, v in pairs( pal["info_database_removed"] ) do
-if v == id then pal["info_database_removed"][k] = nil end
+if InRunTime == true then pal["Info_DatabaseAdded"][#pal["Info_DatabaseAdded"] +1] = pal["Info_Database"][#pal["Info_Database"]] end
+for K, V in pairs( pal["Info_DatabaseRemoved"] ) do
+if V == ID then pal["Info_DatabaseRemoved"][K] = nil end
    end
 end
 
-function pal:SetNewInfoTbl( tbl, denysaving ) --an unscure but fast way of adding info
-if pal:RunSelfHooks( "PALOnSetNewInfoTbl", {tbl} ) == false then return end
-	pal["info_database"][#pal["info_database"] +1] = tbl
+function pal:SetNewInfoTbl( InfoTable, DenySaveLoging ) --an unscure but fast way of adding info
+if pal:RunSelfHooks( "PALOnSetNewInfoTbl", {InfoTable} ) == false then return end
+	pal["Info_Database"][#pal["Info_Database"] +1] = InfoTable
 
-if denysaving ~= true then --this function has a deny saveing var because using it can result in the same info being saved more than once
-if inruntime == true then pal["info_database_added"][#pal["info_database_added"] +1] = pal["info_database"][#pal["info_database"]] end
-for k, v in pairs( pal["info_database_removed"] ) do
-if v == id then pal["info_database_removed"][k] = nil end
+if DenySaveLoging ~= true then --this function has a deny saveing var because using it can result in the same info being saved more than once
+if InRunTime == true then pal["Info_DatabaseAdded"][#pal["Info_DatabaseAdded"] +1] = pal["Info_Database"][#pal["Info_Database"]] end
+for K, V in pairs( pal["Info_DatabaseRemoved"] ) do
+if V == ID then pal["Info_DatabaseRemoved"][K] = nil end
       end
    end
 end
 
-function pal:ReturnInfo( searchfor, searchfor_prior, emotion_change, emotionappend, annoyable, inportance, responces, subinfo, append, id ) --format like so {"word","word","word"}, {"word","from","the","prior","text","responded","to"}, {0.15,0.001}, true, 1, {"hi","bye","gay"}, {ReturnInfo( DATA ),ReturnInfo( DATA )}, "code_for_editing_info", "appends_to_all_responces"
-if pal:RunSelfHooks( "PALOnReturnInfo", {searchfor,searchfor_prior,emotion_change,annoyable,inportance,responces,subinfo,id,append} ) == false then return end
-return {["sf"]=searchfor,["sfl"]=searchfor_prior,["ec"]=emotion_change,["ea"]=emotionappend,["a"]=annoyable,["i"]=inportance,["responces"]=responces,["subinfo"]=subinfo,["append"]=append,["id"]=id,}
+function pal:ReturnInfo( SearchFor, SearchForPrior, EmotionChange, EmotionAppend, Annoyable, Importance, Responces, SubInfo, Append, ID ) --format like so {"word","word","word"}, {"word","from","the","prior","text","responded","to"}, {0.15,0.001}, true, 1, {"hi","bye","gay"}, {ReturnInfo( DATA ),ReturnInfo( DATA )}, "code_for_editing_info", "Appends_to_all_Responces"
+if pal:RunSelfHooks( "PALOnReturnInfo", {SearchFor,SearchForPrior,EmotionChange,Annoyable,Importance,Responces,SubInfo,ID,Append} ) == false then return end
+return {["SearchFor"]=SearchFor,["PriorSearchFor"]=SearchForPrior,["EmotionChange"]=EmotionChange,["AppendEmotionStatment"]=EmotionAppend,["Annoyable"]=Annoyable,["Importance"]=Importance,["Responces"]=Responces,["SubInfo"]=SubInfo,["AppendAllResponcesWith"]=Append,["ID"]=ID,}
 end
 
-function pal:RemoveInfo( id ) -- removes info by id
-if pal:RunSelfHooks( "PALOnRemoveInfo", id ) == false then return end
-if inruntime == true then pal["info_database_removed"][#pal["info_database_removed"] +1] = id end
-for k, v in pairs( pal["info_database"] ) do
-if id == v["id"] then pal["info_database"][k] = nil end
+function pal:RemoveInfo( ID ) -- removes info by id
+if pal:RunSelfHooks( "PALOnRemoveInfo", ID ) == false then return end
+if InRunTime == true then pal["Info_DatabaseRemoved"][#pal["Info_DatabaseRemoved"] +1] = ID end
+for K, V in pairs( pal["Info_Database"] ) do
+if ID == V["ID"] then pal["Info_Database"][K] = nil end
 end
    
-for k, v in pairs( pal["info_database_added"] ) do
-if id == v["id"] then pal["info_database_added"][k] = nil end
+for K, V in pairs( pal["Info_DatabaseAdded"] ) do
+if ID == V["ID"] then pal["Info_DatabaseAdded"][K] = nil end
    end   
 end
 
 function pal:RemoveAllInfo() --removes all the info and all memory of it ever exsisting
 if pal:RunSelfHooks( "PALOnRemoveAllInfo", {} ) == false then return end
-	pal["info_database"] = nil
-	pal["info_database_added"] = nil
-	pal["info_database_removed"] = nil
-	pal["info_database_removed"] = {}
-	pal["info_database_added"] = {}
-	pal["info_database"] = {}
+	pal["Info_Database"] = nil
+	pal["Info_DatabaseAdded"] = nil
+	pal["Info_DatabaseRemoved"] = nil
+	pal["Info_DatabaseRemoved"] = {}
+	pal["Info_DatabaseAdded"] = {}
+	pal["Info_Database"] = {}
 end
 
-function pal:GetInfoByIndex( index ) --finds info by the index which repasents its placement it the database
-	local resultin = pal["info_database"][index]
-	local resultout = {}
-if resultin == nil then return {} end
-for k, v in pairs( resultin ) do resultout[k] = v end --to keep the noraml info table safe from changes to the retuned info
-return resultout
+function pal:GetInfoByIndex( Index ) --finds info by the index which repasents its placement it the database
+	local ResultIn = pal["Info_Database"][Index]
+	local ResultOut = {}
+if ResultIn == nil then return {} end
+for K, V in pairs( ResultIn ) do ResultOut[K] = V end --to keep the noraml info table safe from changes to the retuned info
+return ResultOut
 end
 
-function pal:GetInfoById( id ) --finds info by id
-	local results = {}
-for k, v in pairs( pal["info_database"] ) do
-if v["id"] == id then
-	local resultout = {}
-for l, w in pairs( v ) do resultout[l] = w end
-	results[#results +1] = resultout
+function pal:GetInfoById( ID ) --finds info by id
+	local Results = {}
+for K, V in pairs( pal["Info_Database"] ) do
+if V["ID"] == ID then
+	local ResultOut = {}
+for L, W in pairs( V ) do ResultOut[L] = W end
+	Results[#Results +1] = ResultOut
    end
 end
-return results
+return Results
 end
 
-function pal:GetInfoIndexById( id ) --finds info indexs by id
-	local results = {}
-for k, v in pairs( pal["info_database"] ) do
-if v["id"] == id then
-	results[#results +1] = k --k should be index
+function pal:GetInfoIndexById( ID ) --finds info indexs by id
+	local Results = {}
+for K, V in pairs( pal["Info_Database"] ) do
+if V["ID"] == ID then
+	Results[#Results +1] = K --K should be index
    end
 end
-return results
+return Results
 end
 
-function pal:AddNewTagGroup( id, collection ) --a collection of tags which if refrenced like so @TAG_id, in the search for sections of added info will be replaced with collection
-if pal:RunSelfHooks( "PALOnAddNewTagGroup", {id,collection} ) == false then return end
-	pal["searchfor_groups"][id] = collection
+function pal:AddNewTagGroup( ID, Collection ) --a collection of tags which if refrenced like so @TAG_ID, in the search for sections of added info will be replaced with collection
+if pal:RunSelfHooks( "PALOnAddNewTagGroup", {ID,Collection} ) == false then return end
+	pal["Tag_Groups"][ID] = Collection
 end
 
-function pal:RemoveTagGroup( id ) --remove tag group
-if pal:RunSelfHooks( "PALOnRemoveTagGroup", {id} ) == false then return end
-	pal["searchfor_groups"][id] = nil
+function pal:RemoveTagGroup( ID ) --remove tag group
+if pal:RunSelfHooks( "PALOnRemoveTagGroup", {ID} ) == false then return end
+	pal["Tag_Groups"][ID] = nil
 end
 
-function pal:AddNewSpellChecking( correct, tbl ) --spellchecker
-if pal:RunSelfHooks( "PALOnAddNewSpellChecking", {correct,tbl} ) == false then return end
-	pal["spellchecking"][#pal["spellchecking"] +1] = {["c"]=correct,["i"]=tbl}
+function pal:AddNewSpellChecking( Correct, IncorrectTbl ) --spellchecker
+if pal:RunSelfHooks( "PALOnAddNewSpellChecking", {Correct,IncorrectTbl} ) == false then return end
+	pal["Spellchecking"][#pal["Spellchecking"] +1] = {["CorrectWord"]=Correct,["IncorrectWords"]=IncorrectTbl}
 end
 
-function pal:RemoveSpellChecking( correct ) --spellchecker
-if pal:RunSelfHooks( "PALOnRemoveSpellChecking", {correct} ) == false then return end
-for k, v in pairs( pal["spellchecking"] ) do if v["c"] == correct then pal["spellchecking"][k] = nil end end
+function pal:RemoveSpellChecking( Correct ) --spellchecker
+if pal:RunSelfHooks( "PALOnRemoveSpellChecking", {Correct} ) == false then return end
+for K, V in pairs( pal["Spellchecking"] ) do if V["CorrectWord"] == Correct then pal["Spellchecking"][K] = nil end end
 end
 
-function pal:AddNewSynonymsGroup( id, tbl ) --for grouping synonyms togethed so that one could be select via the id
-if pal:RunSelfHooks( "PALOnSetNewSynonymsGroup", {correct,tbl} ) == false then return end
-	pal["synonyms_groups"][id] = tbl
+function pal:AddNewSynonymsGroup( ID, SynonymTbl ) --for grouping synonyms togethed so that one could be select via the id
+if pal:RunSelfHooks( "PALOnSetNewSynonymsGroup", {ID,SynonymTbl} ) == false then return end
+	pal["Synonyms_Groups"][ID] = SynonymTbl
 end
 
-function pal:RemoveSynonymsGroup( id ) --spellchecker
-if pal:RunSelfHooks( "PALOnRemoveSynonymsGroup", {id} ) == false then return end
-	pal["synonyms_groups"][id] = nil
+function pal:RemoveSynonymsGroup( ID ) --spellchecker
+if pal:RunSelfHooks( "PALOnRemoveSynonymsGroup", {ID} ) == false then return end
+	pal["Synonyms_Groups"][ID] = nil
 end
 
-function pal:GetSynonymsWord( id ) --gets a synonym from a synonym id
-if pal["synonyms_groups"][id] == nil then return "" end
-return pal["synonyms_groups"][id][math.random( 1, #pal["synonyms_groups"][id] )]
+function pal:GetSynonymsWord( ID ) --gets a synonym from a synonym id
+if pal["Synonyms_Groups"][ID] == nil then return "" end
+return pal["Synonyms_Groups"][ID][math.random( 1, #pal["Synonyms_Groups"][ID] )]
 end
 
-function pal:BuildEmotionGrid( size ) --sets the play field used for emotion simulation
-if pal:RunSelfHooks( "PALOnBuildEmotionGrid", {size} ) == false then return end
-	pal["emotion_grid_max_size"] = size
-for x = 1, size do
-for y = 1, size do
-	pal["emotion_grid"][x] = {}
-	pal["emotion_grid"][x][y] = {}
+function pal:BuildEmotionGrid( Size ) --sets the play field used for emotion simulation
+if pal:RunSelfHooks( "PALOnBuildEmotionGrid", {Size} ) == false then return end
+	pal["Emotion_GridMaxSize"] = Size
+for X = 1, Size do
+for Y = 1, Size do
+	pal["Emotion_Grid"][X] = {}
+	pal["Emotion_Grid"][X][Y] = {}
       end
    end 
 end
 
-function pal:AddNewEmotion( gridlocation, emotivewords, wordsthatmaketheaifeelmorelikethis, emotionclass, sentanceappending ) --for when the ai dose not have a responce
-if pal:RunSelfHooks( "PALOnAddNewEmotion", {gridlocation,emotivewords,wordsthatmaketheaifeelmorelikethis,emotionclass,sentanceappending} ) == false then return end
-	pal["emotion_grid"][gridlocation[1]][gridlocation[2]] = {["words"]=emotivewords,["wtmifmlt"]=wordsthatmaketheaifeelmorelikethis,["emotionclass"]=emotionclass,["sentanceappending"]=sentanceappending,}
+function pal:AddNewEmotion( GridLocation, EmotiveWords, WordsThatMakeTheAIFeelMoreLikeThis, Emotionclass, sentanceAppending ) --for when the ai dose not have a responce
+if pal:RunSelfHooks( "PALOnAddNewEmotion", {GridLocation,EmotiveWords,WordsThatMakeTheAIFeelMoreLikeThis,Emotionclass,SentanceAppending} ) == false then return end
+	pal["Emotion_Grid"][GridLocation[1]][GridLocation[2]] = {["Words"]=EmotiveWords,["WTMIFMLT"]=WordsThatMakeTheAIFeelMoreLikeThis,["EmotionClass"]=Emotionclass,["SentanceAppending"]=sentanceAppending,}
 end
 
-function pal:EmotionLevelEquals( tbl ) --can be used in responces to determin if this responce could or should have a chance of selection
-return ( tbl[1] == math.floor( pal["emotion_level"][1] +0.50 ) and tbl[2] == math.floor( pal["emotion_level"][2] +0.50 ) )
+function pal:EmotionLevelEquals( EmotionTbl ) --can be used in Responces to determin if this responce could or should have a chance of selection
+return ( EmotionTbl[1] == math.floor( pal["Emotion_Level"][1] +0.50 ) and EmotionTbl[2] == math.floor( pal["Emotion_Level"][2] +0.50 ) )
 end
 
-function pal:EmotionLevelNotEquals( tbl ) 
-return ( tbl[1] ~= math.floor( pal["emotion_level"][1] +0.50 ) or tbl[2] ~= math.floor( pal["emotion_level"][2] +0.50 ) )
+function pal:EmotionLevelNotEquals( EmotionTbl ) 
+return ( EmotionTbl[1] ~= math.floor( pal["Emotion_Level"][1] +0.50 ) or EmotionTbl[2] ~= math.floor( pal["Emotion_Level"][2] +0.50 ) )
 end
 
 function pal:EmotionLevelEqualsOr( ... ) --give it a bunch of emotion points and if the emotion level = one of them it will return true
-	local ortable = {...}
-	local returnstate = false
-for z = 1, #ortable do if pal:EmotionLevelEquals( ortable[z] ) == true then returnstate = true end end
-return returnstate
+	local OrTable = {...}
+	local ReturnState = false
+for Z = 1, #OrTable do if pal:EmotionLevelEquals( OrTable[Z] ) == true then ReturnState = true end end
+return ReturnState
 end
 
 function pal:EmotionLevelNotEqualsOr( ... ) --if the emotion level ~= any of the emotion points, it will return true
-	local ortable = {...}
-	local returnstate = true
-for z = 1, #ortable do if pal:EmotionLevelEquals( ortable[z] ) == true then returnstate = false end end
-return returnstate
+	local OrTable = {...}
+	local ReturnState = true
+for Z = 1, #OrTable do if pal:EmotionLevelEquals( OrTable[Z] ) == true then ReturnState = false end end
+return ReturnState
 end
 
 function pal:GetEmotiveWord() --words that describe what it thinks of the user
-if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )] == nil then return "" end
-if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["words"] == nil then return "" end
-return pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["words"][math.random( 1, #pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["words"] )]
+if pal["Emotion_Grid"][math.floor( 0.50 +pal["Emotion_Level"][1] )][math.floor( 0.50 +pal["Emotion_Level"][2] )] == nil then return "" end
+if pal["Emotion_Grid"][math.floor( 0.50 +pal["Emotion_Level"][1] )][math.floor( 0.50 +pal["Emotion_Level"][2] )]["Words"] == nil then return "" end
+return pal["Emotion_Grid"][math.floor( 0.50 +pal["Emotion_Level"][1] )][math.floor( 0.50 +pal["Emotion_Level"][2] )]["Words"][math.random( 1, #pal["Emotion_Grid"][math.floor( 0.50 +pal["Emotion_Level"][1] )][math.floor( 0.50 +pal["Emotion_Level"][2] )]["Words"] )]
 end
 
 function pal:GetEmotiveClass() --words that describe how it is feeling in genral
-if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )] == nil then return "" end
-if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["emotionclass"] == nil then return "" end
-return pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["emotionclass"][math.random( 1, #pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["emotionclass"] )]
+if pal["Emotion_Grid"][math.floor( 0.50 +pal["Emotion_Level"][1] )][math.floor( 0.50 +pal["Emotion_Level"][2] )] == nil then return "" end
+if pal["Emotion_Grid"][math.floor( 0.50 +pal["Emotion_Level"][1] )][math.floor( 0.50 +pal["Emotion_Level"][2] )]["EmotionClass"] == nil then return "" end
+return pal["Emotion_Grid"][math.floor( 0.50 +pal["Emotion_Level"][1] )][math.floor( 0.50 +pal["Emotion_Level"][2] )]["EmotionClass"][math.random( 1, #pal["Emotion_Grid"][math.floor( 0.50 +pal["Emotion_Level"][1] )][math.floor( 0.50 +pal["Emotion_Level"][2] )]["EmotionClass"] )]
 end
 
 function pal:GetEmotiveEnd() --an emotive ending to a sentence
-if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )] == nil then return "" end
-if pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["sentanceappending"] == nil then return "" end
-return pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["sentanceappending"][math.random( 1, #pal["emotion_grid"][math.floor( 0.50 +pal["emotion_level"][1] )][math.floor( 0.50 +pal["emotion_level"][2] )]["sentanceappending"] )]
+if pal["Emotion_Grid"][math.floor( 0.50 +pal["Emotion_Level"][1] )][math.floor( 0.50 +pal["Emotion_Level"][2] )] == nil then return "" end
+if pal["Emotion_Grid"][math.floor( 0.50 +pal["Emotion_Level"][1] )][math.floor( 0.50 +pal["Emotion_Level"][2] )]["SentanceAppending"] == nil then return "" end
+return pal["Emotion_Grid"][math.floor( 0.50 +pal["Emotion_Level"][1] )][math.floor( 0.50 +pal["Emotion_Level"][2] )]["SentanceAppending"][math.random( 1, #pal["Emotion_Grid"][math.floor( 0.50 +pal["Emotion_Level"][1] )][math.floor( 0.50 +pal["Emotion_Level"][2] )]["SentanceAppending"] )]
 end
 
-function pal:SetEmotiiveGravity( point, gravity ) --sets its main emotion
-if pal:RunSelfHooks( "PALOnSetEmotiiveGravity", {point,gravity} ) == false then return end
-	pal["emotion_level"] = point
-	pal["emotion_level_wanted"], pal["emotion_gravatate_power"] = point, gravity
+function pal:SetEmotiiveGravity( Point, GravityAmount ) --sets its main emotion
+if pal:RunSelfHooks( "PALOnSetEmotiiveGravity", {Point,GravityAmount} ) == false then return end
+	pal["Emotion_Level"] = Point
+	pal["Emotion_LevelWanted"], pal["Emotion_GravatatePower"] = point, GravityAmount
 end
 
 function pal:GetEmotiiveGravity()
-return pal["emotion_level_wanted"], pal["emotion_gravatate_power"]
+return pal["Emotion_LevelWanted"], pal["Emotion_GravatatePower"]
 end
 
-function pal:SetEmotiveWordPower( num ) --sets how strong it reacts to words like sware words
-if pal:RunSelfHooks( "PALOnSetEmotiveWordPower", {num} ) == false then return end
-	pal["emotion_sensitivity"] = num
+function pal:SetEmotiveWordPower( Num ) --sets how strong it reacts to words like sware words
+if pal:RunSelfHooks( "PALOnSetEmotiveWordPower", {Num} ) == false then return end
+	pal["Emotion_Sensitivity"] = Num
 end
 
 function pal:GetEmotiveWordPower()
-return pal["emotion_sensitivity"]
+return pal["Emotion_Sensitivity"]
 end
 
-function pal:SetNewIDKresponces( responce ) --for when the ai dose not have a responce
-	pal["idk_responces"][#pal["idk_responces"] +1] = responce
+function pal:SetNewIDKResponces( Responce ) --for when the ai dose not have a responce
+	pal["IDK_Responces"][#pal["IDK_Responces"] +1] = Responce
 end
 
 function pal:GetIDKresponce()
-if #pal["idk_responces"] <= 0 then return "ERROR: AI TRIED TO MAKE AN IDK RESPONCE BUT HAS NO IDK DATA" end
-return pal["idk_responces"][math.random( 1, #pal["idk_responces"] )]
+if #pal["IDK_Responces"] <= 0 then return "ERROR: AI TRIED TO MAKE AN IDK RESPONCE BUT HAS NO IDK DATA" end
+return pal["IDK_Responces"][math.random( 1, #pal["IDK_Responces"] )]
 end
 
-function pal:SetMaxAnnoyanceAmount( num )
-	pal["annoyance_maxlevel"] = num
+function pal:SetMaxAnnoyanceAmount( Num )
+	pal["Annoyance_MaxLevel"] = Num
 end
 
 function pal:GetMaxAnnoyanceAmount()
-return pal["annoyance_maxlevel"]
+return pal["Annoyance_MaxLevel"]
 end
 
-function pal:SetNewAnnoyanceRespoces( level, responce ) --for if you ask the same question to many times
-if pal:RunSelfHooks( "PALOnSetNewAnnoyanceRespoces", {level,responce} ) == false then return end
-if level == 1 then pal["annoyance_responces_attachment"][#pal["annoyance_responces_attachment"] +1] = responce end --at level 1 it will still awnser questions and stuff but it will tell you this is getting annoying
-if level == 2 then pal["annoyance_responces"][#pal["annoyance_responces"] +1] = responce end --at level 2 it will refuse to awnser questions
+function pal:SetNewAnnoyanceRespoces( Level, Responce ) --for if you ask the same question to many times
+if pal:RunSelfHooks( "PALOnSetNewAnnoyanceRespoces", {level,Responce} ) == false then return end
+if Level == 1 then pal["Annoyance_ResponcesAttachment"][#pal["Annoyance_ResponcesAttachment"] +1] = Responce end --at level 1 it will still awnser questions and stuff but it will tell you this is getting annoying
+if Level == 2 then pal["Annoyance_Responces"][#pal["Annoyance_Responces"] +1] = Responce end --at level 2 it will refuse to awnser questions
 end
 
-function pal:GetAnnoyanceRespoce( level ) --for if you ask the same question to many times
-if #pal["annoyance_responces_attachment"] <= 0 then return "ERROR: AI TRIED TO APPEND ANOYANCE BUT THERE IS NO ANNOYANCE DATA" end
-if #pal["annoyance_responces"] <= 0 then return "ERROR: AI TRIED TO MAKE AN ANNOYED RESPONCE BUT HAS NO ANNOYED RESPONCE DATA" end
-if level == 1 then return pal["annoyance_responces_attachment"][math.random( 1, #pal["annoyance_responces_attachment"] )] end
-if level == 2 then return pal["annoyance_responces"][math.random( 1, #pal["annoyance_responces"] )] end
+function pal:GetAnnoyanceRespoce( Level ) --for if you ask the same question to many times
+if #pal["Annoyance_ResponcesAttachment"] <= 0 then return "ERROR: AI TRIED TO Append ANOYANCE BUT THERE IS NO ANNOYANCE DATA" end
+if #pal["Annoyance_Responces"] <= 0 then return "ERROR: AI TRIED TO MAKE AN ANNOYED RESPONCE BUT HAS NO ANNOYED RESPONCE DATA" end
+if Level == 1 then return pal["Annoyance_ResponcesAttachment"][math.random( 1, #pal["Annoyance_ResponcesAttachment"] )] end
+if Level == 2 then return pal["Annoyance_Responces"][math.random( 1, #pal["Annoyance_Responces"] )] end
 end
 
-function pal:GetAnnoyanceLevel( inputindex ) --for if you ask the same question to many times
-	local annoyedlevel = pal["annoyance_responcecounter"][inputindex] or 0
-if annoyedlevel >= 1 then
-if annoyedlevel >= pal["annoyance_maxlevel"] then
-   return 2
+function pal:GetAnnoyanceLevel( InputIndex ) --for if you ask the same question to many times
+	local AnnoyedLevel = pal["Annoyance_ResponceCounter"][InputIndex] or 0 --how many times as the same question been asked
+if AnnoyedLevel >= 1 then
+if AnnoyedLevel >= pal["Annoyance_MaxLevel"] then
+   return 2 --to much repeat asking
 else
-   return 1
+   return 1 --some repeat asking
    end
 else
-   return 0
+   return 0 --no repeat asking
    end
 end
 
-function pal:SetPriorInput( text ) --sets the previous thing the player said
-if pal:RunSelfHooks( "PALOnSetPriorInput", {text} ) == false then return end
-	pal["prior_input"] = text
+function pal:SetPriorInput( Text ) --sets the previous thing the player said
+if pal:RunSelfHooks( "PALOnSetPriorInput", {Text} ) == false then return end
+	pal["PriorEnteredInput"] = Text
 end
 
 function pal:GetPriorInput() --the previous thing the player said
-return pal["prior_input"]
+return pal["PriorEnteredInput"]
 end
 
-pal:BuildEmotionGrid( pal["emotion_grid_max_size"] )
+pal:BuildEmotionGrid( pal["Emotion_GridMaxSize"] )
 
 -- end of data/info control functions and start of AI loop ---------------------------------------------------------------------------------------------------
 
 function pal:EmotionGravatate() --allows for emotion to go back to normal levels
-	local x = pal["emotion_level_wanted"][1] -pal["emotion_level"][1]
-	local y = pal["emotion_level_wanted"][2] -pal["emotion_level"][2]
-if x ~= 0 then x = ( x /( math.abs( x ) +math.abs( y ) ) ) *pal["emotion_gravatate_power"] end
-if y ~= 0 then y = ( y /( math.abs( x ) +math.abs( y ) ) ) *pal["emotion_gravatate_power"] end
-    pal["emotion_level"][1] = pal["emotion_level"][1] +x
-	pal["emotion_level"][2] = pal["emotion_level"][2] +y
-	pal["emotion_level"][1] = math.min( math.max( 1, pal["emotion_level"][1] ), pal["emotion_grid_max_size"] ) --remove here to remove emotion change
-	pal["emotion_level"][2] = math.min( math.max( 1, pal["emotion_level"][2] ), pal["emotion_grid_max_size"] )
+	local X = pal["Emotion_LevelWanted"][1] -pal["Emotion_Level"][1]
+	local Y = pal["Emotion_LevelWanted"][2] -pal["Emotion_Level"][2]
+if X ~= 0 then X = ( X /( math.abs( X ) +math.abs( Y ) ) ) *pal["Emotion_GravatatePower"] end
+if Y ~= 0 then Y = ( Y /( math.abs( X ) +math.abs( Y ) ) ) *pal["Emotion_GravatatePower"] end
+    pal["Emotion_Level"][1] = pal["Emotion_Level"][1] +X
+	pal["Emotion_Level"][2] = pal["Emotion_Level"][2] +Y
+	pal["Emotion_Level"][1] = math.min( math.max( 1, pal["Emotion_Level"][1] ), pal["Emotion_GridMaxSize"] ) --remove here to remove emotion change
+	pal["Emotion_Level"][2] = math.min( math.max( 1, pal["Emotion_Level"][2] ), pal["Emotion_GridMaxSize"] )
 end
 
 function pal:AnnoyanceDecreese() --allows for annoyence to war off over time
-if pal["annoyance_decreese_time"] == nil then pal["annoyance_decreese_time"] = pal["annoyance_decreese_in"] end
-	pal["annoyance_decreese_time"] = pal["annoyance_decreese_time"] -1
-if pal["annoyance_decreese_time"] <= 0 then
-	pal["annoyance_decreese_time"] = nil
-for k, v in pairs( pal["annoyance_responcecounter"] ) do
-	pal["annoyance_responcecounter"][k] = pal["annoyance_responcecounter"][k] -1
-if v <= 0 then pal["annoyance_responcecounter"][k] = nil end
+if pal["Annoyance_DecreeseTime"] == nil then pal["Annoyance_DecreeseTime"] = pal["Annoyance_DecreeseIn"] end
+	pal["Annoyance_DecreeseTime"] = pal["Annoyance_DecreeseTime"] -1
+if pal["Annoyance_DecreeseTime"] <= 0 then
+	pal["Annoyance_DecreeseTime"] = nil
+for K, V in pairs( pal["Annoyance_ResponceCounter"] ) do
+	pal["Annoyance_ResponceCounter"][K] = pal["Annoyance_ResponceCounter"][K] -1
+if V <= 0 then pal["Annoyance_ResponceCounter"][K] = nil end
       end
    end
 end
 
 function pal:MemGenDecreese() --forgets which pronowns gose to who
-if pal["gender_momory_time"] == nil then return end
-	pal["gender_momory_time"] = pal["gender_momory_time"] -1
-	
-if pal["gender_momory_time"] <= 0 then
-	pal["gender_momory_time"] = nil
-for k, v in pairs( pal["gender_momory"] ) do
-pal:RemoveSpellChecking( v )
+if pal["GenderMemoryTime"] == nil then return end
+	pal["GenderMemoryTime"] = pal["GenderMemoryTime"] -1
+
+if pal["GenderMemoryTime"] <= 0 then
+	pal["GenderMemoryTime"] = nil
+for K, V in pairs( pal["GenderMemory"] ) do
+pal:RemoveSpellChecking( V )
      end
    end
 end
 
 function pal:DegradeInfo() --dose the actually info degradeing
-for k, v in pairs( pal["info_degrade_level"] ) do
-	pal["info_degrade_level"][k] = pal["info_degrade_level"][k] -1
-if pal["info_degrade_level"][k] <= 0 then
-	pal["info_database_removed"][#pal["info_database_removed"] +1] = pal["info_database"][k]["id"]
-	pal["info_database"][k], pal["info_degrade_level"][k] = nil, nil
+for K, V in pairs( pal["Info_DegradeLevel"] ) do
+	pal["Info_DegradeLevel"][K] = pal["Info_DegradeLevel"][K] -1
+if pal["Info_DegradeLevel"][K] <= 0 then
+	pal["Info_DatabaseRemoved"][#pal["Info_DatabaseRemoved"] +1] = pal["Info_Database"][K]["ID"]
+	pal["Info_Database"][K], pal["Info_DegradeLevel"][K] = nil, nil
       end
    end
 end
@@ -433,158 +434,153 @@ pal:DegradeInfo()
 end
 
 function pal:RunLoopSimulation()
-if pal["last_sim_time"] == nil then pal["last_sim_time"] = os.time() end
-	local simlen = os.time() -pal["last_sim_time"]
-	pal["last_sim_time"] = os.time()	
-for z = 1, simlen do pal:Loop() end
+if pal["LoopSimLastRunTime"] == nil then pal["LoopSimLastRunTime"] = os.time() end
+	local SimLength = os.time() -pal["LoopSimLastRunTime"]
+	pal["LoopSimLastRunTime"] = os.time()	
+for Z = 1, SimLength do pal:Loop() end
 end
 
-function pal:RunSpellCheck( input ) --fixes spelling issues in what theplayer says so it is easyer to find the best responce to what the player says
-if pal:RunSelfHooks( "PALOnRunSpellCheck", {input} ) == false then return end
-	local mstr = ( string.gsub( input, ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%z"} ) )
-	local nul = 0
-for k, v in pairs( pal["spellchecking"] ) do
-for y = 1, #v["i"] do
-	mstr, nul = string.gsub( mstr, " "..v["i"][y].." ", " "..v["c"].." " )
-if input == " "..v["i"][y].." " then mstr = " "..v["c"].." " end
+function pal:RunSpellCheck( Input ) --fixes spelling issues in what theplayer says so it is easyer to find the best responce to what the player says
+if pal:RunSelfHooks( "PALOnRunSpellCheck", {Input} ) == false then return end
+	local CorrectedReturnText = ( string.gsub( Input, ".", {["("]="%(",[")"]="%)",["."]="%.",["%"]="%%",["+"]="%+",["-"]="%-",["*"]="%*",["?"]="%?",["["]="%[",["]"]="%]",["^"]="%^",["$"]="%$",["\0"]="%Z"} ) )
+	local Nul = 0
+for K, V in pairs( pal["Spellchecking"] ) do
+for Z = 1, #V["IncorrectWords"] do
+	CorrectedReturnText, Nul = string.gsub( CorrectedReturnText, " "..V["IncorrectWords"][Z].." ", " "..V["CorrectWord"].." " )
+if Input == " "..V["IncorrectWords"][Z].." " then CorrectedReturnText = " "..V["CorrectWord"].." " end
    end
 end
-return mstr
+return CorrectedReturnText
 end
 
 --remove function below to get rid of emotion change
-function pal:RunAjustEmotionToEmotiveKeyWords( input ) --allows for to AI to feel hurt by the manner of which the player speeks
-if pal:RunSelfHooks( "PALOnRunAjustEmotionToEmotiveKeyWords", {input} ) == false then return end
-	local xy = {0,0}
+function pal:RunAjustEmotionToEmotiveKeyWords( Input ) --allows for to AI to feel hurt by the manner of which the player speeks
+if pal:RunSelfHooks( "PALOnRunAjustEmotionToEmotiveKeyWords", {Input} ) == false then return end
+	local XY = {0,0}
 
-for x = 1, pal["emotion_grid_max_size"] do
-for y = 1, pal["emotion_grid_max_size"] do
-if pal["emotion_grid"][x] ~= nil and pal["emotion_grid"][x][y] ~= nil and pal["emotion_grid"][x][y]["words"] ~= nil then
-for z = 1, #pal["emotion_grid"][x][y]["words"] do
-	local has, word = string.find( input, pal["emotion_grid"][x][y]["words"][z], 1, true )
-if has ~= nil then
-	xy[1] = x
-	xy[2] = y
+for X = 1, pal["Emotion_GridMaxSize"] do
+for Y = 1, pal["Emotion_GridMaxSize"] do
+if pal["Emotion_Grid"][X] ~= nil and pal["Emotion_Grid"][X][Y] ~= nil and pal["Emotion_Grid"][X][Y]["Words"] ~= nil then
+for Z = 1, #pal["Emotion_Grid"][X][Y]["Words"] do
+if string.find( Input, pal["Emotion_Grid"][X][Y]["Words"][Z], 1, true ) ~= nil then
+	XY[1] = X
+	XY[2] = Y
       end
    end
 end
 
-if pal["emotion_grid"][x] ~= nil and pal["emotion_grid"][x][y] ~= nil and pal["emotion_grid"][x][y]["wtmifmlt"] ~= nil then
-for z = 1, #pal["emotion_grid"][x][y]["wtmifmlt"] do
-	local has, word = string.find( input, pal["emotion_grid"][x][y]["wtmifmlt"][z], 1, true )
-if has ~= nil then
-	xy[1] = x
-	xy[2] = y
+if pal["Emotion_Grid"][X] ~= nil and pal["Emotion_Grid"][X][Y] ~= nil and pal["Emotion_Grid"][X][Y]["WTMIFMLT"] ~= nil then
+for Z = 1, #pal["Emotion_Grid"][X][Y]["WTMIFMLT"] do
+if string.find( Input, pal["Emotion_Grid"][X][Y]["WTMIFMLT"][Z], 1, true ) ~= nil then
+	XY[1] = X
+	XY[2] = Y
             end
          end
       end
    end
 end
 
-if xy[1] ~= 0 then xy[1] = xy[1] /( math.abs( xy[1] ) +math.abs( xy[2] ) ) end
-if xy[2] ~= 0 then xy[2] = xy[2] /( math.abs( xy[1] ) +math.abs( xy[2] ) ) end
+if XY[1] ~= 0 then XY[1] = XY[1] /( math.abs( XY[1] ) +math.abs( XY[2] ) ) end
+if XY[2] ~= 0 then XY[2] = XY[2] /( math.abs( XY[1] ) +math.abs( XY[2] ) ) end
 
-	pal["emotion_level"][1]	= pal["emotion_level"][1] +( xy[1] *pal["emotion_sensitivity"] )
-	pal["emotion_level"][2] = pal["emotion_level"][2] +( xy[2] *pal["emotion_sensitivity"] )
-	pal["emotion_level"][1] = math.min( math.max( 1, pal["emotion_level"][1] ), pal["emotion_grid_max_size"] )
-	pal["emotion_level"][2] = math.min( math.max( 1, pal["emotion_level"][2] ), pal["emotion_grid_max_size"] )
-if pal:RunSelfHooks( "PALRunAjustEmotionToEmotiveKeyWordsNewEmotion", {input,{math.floor( 0.50 +pal["emotion_level"][1] ),math.floor( 0.50 +pal["emotion_level"][2] )}} ) == false then return end
+	pal["Emotion_Level"][1]	= pal["Emotion_Level"][1] +( XY[1] *pal["Emotion_Sensitivity"] )
+	pal["Emotion_Level"][2] = pal["Emotion_Level"][2] +( XY[2] *pal["Emotion_Sensitivity"] )
+	pal["Emotion_Level"][1] = math.min( math.max( 1, pal["Emotion_Level"][1] ), pal["Emotion_GridMaxSize"] )
+	pal["Emotion_Level"][2] = math.min( math.max( 1, pal["Emotion_Level"][2] ), pal["Emotion_GridMaxSize"] )
+if pal:RunSelfHooks( "PALRunAjustEmotionToEmotiveKeyWordsNewEmotion", {Input,{math.floor( 0.50 +pal["Emotion_Level"][1] ),math.floor( 0.50 +pal["Emotion_Level"][2] )}} ) == false then return end
 end
 
-function pal:RunFindResponce( input )
-if pal:RunSelfHooks( "PALOnRunFindResponce", {input} ) == false then return end
+function pal:RunFindResponce( Input )
+if pal:RunSelfHooks( "PALOnRunFindResponce", {Input} ) == false then return end
 
-	pal["current_responce_importance"] = -999
-	pal["match_level_tags_processed_old"] = -999
-	local currentresponceindex = -1
+	pal["CurrentResponceImportance"] = -999
+	pal["MatchLevelTagsProcessedOld"] = -999
+	local CurrentResponceIndex = -1
 
-if pal["info_database"] ~= nil then
-for k, v in pairs( pal["info_database"] ) do --pulls thougth all infomation in pal's info_database for it to be compare aginst
+if pal["Info_Database"] ~= nil then
+for K, V in pairs( pal["Info_Database"] ) do --pulls thougth all infomation in pal's info_database for it to be compare aginst
 
-	local searchin = v["sf"]
-	local searchin_prior = v["sfl"]
-	local importance = v["i"] or 0
+	local SearchIn = V["SearchFor"]
+	local SearchInPrior = V["PriorSearchFor"]
+	local Importance = V["Importance"] or 0
 
-	pal["match_level_tags_processed"] = 0 --this data needs to not be lost in order for compareing results to add up
+	pal["MatchLevelTagsProcessed"] = 0 --this data needs to not be lost in order for compareing results to add up
 
-if searchin ~= nil and next( searchin ) ~= nil then --checks to see if the text the player entered shares enougth words with the current infomation being searched thougth
-	pal["match_level_length_processed"] = 0 --this data needs to be lost for all compareing oparations
-	pal["found_tag_at"] = 0 --this data can not be lost unitll all input/level 1 compareing is complete but it dose need to be lost at the start 
-for l, w in pairs( searchin ) do
+if SearchIn ~= nil and next( SearchIn ) ~= nil then --checks to see if the text the player entered shares enougth words with the current infomation being searched thougth
+	pal["MatchLevelLengthProcessed"] = 0 --this data needs to be lost for all compareing oparations
+	pal["FoundTagAt"] = 0 --this data can not be lost unitll all input/level 1 compareing is complete but it dose need to be lost at the start 
+for L, W in pairs( SearchIn ) do
 	pal["found_tag"] = false --this data need to be lost per tag check or it could cause isssues
-	local tag = w
-if string.sub( tag, 1, 1 ) == pal["runfunctionkey"] and string.sub( tag, string.len( tag ), string.len( tag ) ) == pal["runfunctionkey"] then --is tag in a function string if so run it
-	local run, err = load( "return "..string.sub( tag, 2, string.len( tag ) -1 ) ) -- runs function
-	local ft, fta = run()
-	pal["found_tag"] = ( ft == true ) --did function say it found tag
-	pal["found_tag_at"] = ( fta or pal["found_tag_at"] ) --did function say where to start searching for the next tag
+	local Tag = W
+if string.sub( Tag, 1, 1 ) == pal["RunFunctionKey"] and string.sub( Tag, string.len( Tag ), string.len( Tag ) ) == pal["RunFunctionKey"] then --is tag in a function string if so run it
+	local Run, Error = load( "return "..string.sub( Tag, 2, string.len( Tag ) -1 ) ) -- runs function
+	local FoundTag, FoundTagAt = Run()
+	pal["found_tag"] = ( FoundTag == true ) --did function say it found tag
+	pal["FoundTagAt"] = ( FoundTagAt or pal["FoundTagAt"] ) --did function say where to start searching for the next tag
 else
-	local starts, ends = string.find( input, " "..tag.." ", pal["found_tag_at"], true ) --if tag is not a function find it in player input as plain text
-if starts ~= nil or input == " "..tag.." " then
+if string.find( Input, " "..Tag.." ", pal["FoundTagAt"], true ) ~= nil then  --if tag is not a function find it in player input as plain text
 	pal["found_tag"] = true --tag was found
-	pal["found_tag_at"] = pal["found_tag_at"] +string.len( tag ) --where to start the search for the next one
+	pal["FoundTagAt"] = pal["FoundTagAt"] +string.len( Tag ) --where to start the search for the next one
    end
 end
 
 if pal["found_tag"] == true then 
-if pal["found_tag_at"] >= pal["match_level_length_processed"] then
-	pal["match_level_length_processed"] = pal["found_tag_at"]  --if length processed <= 0 then current search will be disguarded and it also hels as an extra means to compare data
-	pal["match_level_tags_processed"] = pal["match_level_tags_processed"] +1 --tag found
+if pal["FoundTagAt"] >= pal["MatchLevelLengthProcessed"] then
+	pal["MatchLevelLengthProcessed"] = pal["FoundTagAt"]  --if length processed <= 0 then current search will be disguarded and it also hels as an extra means to compare data
+	pal["MatchLevelTagsProcessed"] = pal["MatchLevelTagsProcessed"] +1 --tag found
 else
-	pal["found_tag_at"] = -99999999 --basiclly disguards current search if found tag at < length processed
-	pal["match_level_length_processed"] = -99999999 --basiclly disguards current search if found tag at < length processed
+	pal["FoundTagAt"] = -99999999 --basiclly disguards current search if found tag at < length processed
+	pal["MatchLevelLengthProcessed"] = -99999999 --basiclly disguards current search if found tag at < length processed
 end
 else
-	pal["found_tag_at"] = -99999999 --basiclly disguards current search if found tag == false
-	pal["match_level_length_processed"] = -99999999 --basiclly disguards current search if found tag == false
+	pal["FoundTagAt"] = -99999999 --basiclly disguards current search if found tag == false
+	pal["MatchLevelLengthProcessed"] = -99999999 --basiclly disguards current search if found tag == false
       end
    end
 end
 
-if pal["found_tag_at"] >= 0 and pal["match_level_length_processed"] >= 0 and pal["match_level_tags_processed"] >= 0 then --to pervent prior search if first search already failed as if we dont do this it could result in broken returns
-if searchin_prior ~= nil and next( searchin_prior ) ~= nil then --checks to see if the text the player entered previously shares enougth words with the current infomation being searched thougth
-	local oldmatchleveltagsprocessed = pal["match_level_tags_processed"]
-	pal["match_level_length_processed"] = 0
-	pal["found_tag_at"] = 0
-for l, w in pairs( searchin_prior ) do
+if pal["FoundTagAt"] >= 0 and pal["MatchLevelLengthProcessed"] >= 0 and pal["MatchLevelTagsProcessed"] >= 0 then --to pervent prior search if first search already failed as if we dont do this it could result in broken returns
+if SearchInPrior ~= nil and next( SearchInPrior ) ~= nil then --checks to see if the text the player entered previously shares enougth words with the current infomation being searched thougth
+	pal["MatchLevelLengthProcessed"] = 0
+	pal["FoundTagAt"] = 0
+for L, W in pairs( SearchInPrior ) do
 	pal["found_tag"] = false
-	local tag = w
-if string.sub( tag, 1, 1 ) == pal["runfunctionkey"] and string.sub( tag, string.len( tag ), string.len( tag ) ) == pal["runfunctionkey"] then
-	local run, err = load( "return "..string.sub( tag, 2, string.len( tag ) -1 ) )
-	local ft, fta = run()
-	pal["found_tag"] = ( ft == true )
-	pal["found_tag_at"] = ( fta or pal["found_tag_at"] )
+	local Tag = W
+if string.sub( Tag, 1, 1 ) == pal["RunFunctionKey"] and string.sub( Tag, string.len( Tag ), string.len( Tag ) ) == pal["RunFunctionKey"] then
+	local Run, Error = load( "return "..string.sub( Tag, 2, string.len( Tag ) -1 ) ) -- runs function
+	local FoundTag, FoundTagAt = Run()
+	pal["found_tag"] = ( FoundTag == true )
+	pal["FoundTagAt"] = ( FoundTagAt or pal["FoundTagAt"] )
 else
-	local starts, ends = string.find( pal["prior_input"], " "..tag.." ", pal["found_tag_at"], true )
-if starts ~= nil or pal["prior_input"] == " "..tag.." " then
+if string.find( pal["PriorEnteredInput"], " "..Tag.." ", pal["FoundTagAt"], true ) ~= nil then  --if tag is not a function find it in player input as plain text
 	pal["found_tag"] = true
-	pal["found_tag_at"] = pal["found_tag_at"] +string.len( tag )
+	pal["FoundTagAt"] = pal["FoundTagAt"] +string.len( Tag )
    end
 end
 
 if pal["found_tag"] == true then 
-if pal["found_tag_at"] >= pal["match_level_length_processed"] then
-	pal["match_level_length_processed"] = pal["found_tag_at"]
-	pal["match_level_tags_processed"] = pal["match_level_tags_processed"] +1
+if pal["FoundTagAt"] >= pal["MatchLevelLengthProcessed"] then
+	pal["MatchLevelLengthProcessed"] = pal["FoundTagAt"]
+	pal["MatchLevelTagsProcessed"] = pal["MatchLevelTagsProcessed"] +1
 else
-	pal["found_tag_at"] = -99999999
-	pal["match_level_length_processed"] = -99999999
+	pal["FoundTagAt"] = -99999999
+	pal["MatchLevelLengthProcessed"] = -99999999
 end
 else
-	pal["found_tag_at"] = -99999999
-	pal["match_level_length_processed"] = -99999999
+	pal["FoundTagAt"] = -99999999
+	pal["MatchLevelLengthProcessed"] = -99999999
          end
       end
    end
 end
 
-if pal["match_level_length_processed"] >= 1 then --checks acceptablity
-if pal["match_level_tags_processed"] >= pal["match_level_tags_processed_old"] then --checks acceptablity
-if importance >= pal["current_responce_importance"] then --checks acceptablity
+if pal["MatchLevelLengthProcessed"] >= 1 then --checks acceptablity
+if pal["MatchLevelTagsProcessed"] >= pal["MatchLevelTagsProcessedOld"] then --checks acceptablity
+if Importance >= pal["CurrentResponceImportance"] then --checks acceptablity
 
-	pal["match_level_tags_processed_old"] = pal["match_level_tags_processed"] --updates minmal acceptablity level
-	pal["current_responce_importance"] = importance --updates minmal acceptablity level
-	currentresponceindex = k
+	pal["MatchLevelTagsProcessedOld"] = pal["MatchLevelTagsProcessed"] --updates minmal acceptablity level
+	pal["CurrentResponceImportance"] = Importance --updates minmal acceptablity level
+	CurrentResponceIndex = K
 
             end
          end
@@ -592,214 +588,213 @@ if importance >= pal["current_responce_importance"] then --checks acceptablity
    end
 end
 
-if currentresponceindex ~= -1 then
-if pal:RunSelfHooks( "PALOnRunFindResponceFound", {currentresponceindex} ) == false then return end
-	return currentresponceindex
+if CurrentResponceIndex ~= -1 then
+if pal:RunSelfHooks( "PALOnRunFindResponceFound", {CurrentResponceIndex} ) == false then return end
+	return CurrentResponceIndex
    end
 end
 
-function pal:RunAnnoyanceTest( inputindex, input ) --simulate annoyance
-	local annoyedlevel = pal["annoyance_responcecounter"][inputindex] or 0
-if pal:RunSelfHooks( "PALOnRunAnnoyanceTest", {inputindex, input, annoyedlevel} ) == false then return end
+function pal:RunAnnoyanceTest( InputIndex, Input ) --simulate annoyance
+	local AnnoyedLevel = pal["Annoyance_ResponceCounter"][InputIndex] or 0
+if pal:RunSelfHooks( "PALOnRunAnnoyanceTest", {InputIndex, Input, AnnoyedLevel} ) == false then return end
 
-	pal["annoyance_responcecounter"][inputindex] = math.min( annoyedlevel +1, pal["annoyance_maxlevel"] )
+	pal["Annoyance_ResponceCounter"][InputIndex] = math.min( AnnoyedLevel +1, pal["Annoyance_MaxLevel"] )
 
-if annoyedlevel >= 1 then
-	pal["emotion_level"][1] = pal["emotion_level"][1] +pal["annoyance_effectemotionby"][1]
-	pal["emotion_level"][2] = pal["emotion_level"][2] +pal["annoyance_effectemotionby"][2]
-	pal["emotion_level"][1] = math.min( math.max( 1, pal["emotion_level"][1] ), pal["emotion_grid_max_size"] ) --remove here to remove emotion change
-	pal["emotion_level"][2] = math.min( math.max( 1, pal["emotion_level"][2] ), pal["emotion_grid_max_size"] )
+if AnnoyedLevel >= 1 then
+	pal["Emotion_Level"][1] = pal["Emotion_Level"][1] +pal["Annoyance_EffectEmotionBy"][1]
+	pal["Emotion_Level"][2] = pal["Emotion_Level"][2] +pal["Annoyance_EffectEmotionBy"][2]
+	pal["Emotion_Level"][1] = math.min( math.max( 1, pal["Emotion_Level"][1] ), pal["Emotion_GridMaxSize"] ) --remove here to remove emotion change
+	pal["Emotion_Level"][2] = math.min( math.max( 1, pal["Emotion_Level"][2] ), pal["Emotion_GridMaxSize"] )
 
-if annoyedlevel >= pal["annoyance_maxlevel"] then
+if AnnoyedLevel >= pal["Annoyance_MaxLevel"] then
 	return pal:GetAnnoyanceRespoce( 2 )
 else
-   return input.." "..pal:GetAnnoyanceRespoce( 1 )
+   return Input.." "..pal:GetAnnoyanceRespoce( 1 )
 end
 else
-   return input
+   return Input
    end
 end
 
-function pal:RunLuaCodeInResponce( input ) --exacutes any lua code in a responce from the responce section of infomation 
-if input == nil then return end
-if pal:RunSelfHooks( "PALOnRunLuaCodeInResponce", {input} ) == false then return end
+function pal:RunLuaCodeInResponce( Input ) --exacutes any lua code in a responce from the responce section of infomation 
+if Input == nil then return end
+if pal:RunSelfHooks( "PALOnRunLuaCodeInResponce", {Input} ) == false then return end
 
-	local outstring = input
-	local stringdiffreance = 0
-	local pointa = 0
-	local pointb = 0
+	local OutString = Input
+	local StringDiffreance = 0
+	local CodeStart = 0
+	local CodeEnd = 0
 
-for z = 1, string.len( input ) do
-if string.sub( input, z, z ) == pal["runfunctionkey"] then
-if pointa == 0 then pointa = z else pointb = z end
-if pointa ~= 0 and pointb ~= 0 then
+for Z = 1, string.len( Input ) do
+if string.sub( Input, Z, Z ) == pal["RunFunctionKey"] then
+if CodeStart == 0 then CodeStart = Z else CodeEnd = Z end
+if CodeStart ~= 0 and CodeEnd ~= 0 then
   
-	local exe, null = load( "return "..string.sub( input, pointa +1, pointb -1 ) )
+	local exe, null = load( "return "..string.sub( Input, CodeStart +1, CodeEnd -1 ) )
 	local result = exe()  
   
 if result ~= nil then
-	outstring = string.sub( outstring, 1, pointa -1 +stringdiffreance )..tostring( result )..string.sub( outstring, pointb +1 +stringdiffreance, string.len( outstring ) )
-	stringdiffreance = string.len( outstring ) -string.len( input )	
+	OutString = string.sub( OutString, 1, CodeStart -1 +StringDiffreance )..tostring( result )..string.sub( OutString, CodeEnd +1 +StringDiffreance, string.len( OutString ) )
+	StringDiffreance = string.len( OutString ) -string.len( Input )	
 else
-	outstring = string.sub( outstring, 1, pointa -1 +stringdiffreance )..string.sub( outstring, pointb +1 +stringdiffreance, string.len( outstring ) )
-	stringdiffreance = string.len( outstring ) -string.len( input )	
+	OutString = string.sub( OutString, 1, CodeStart -1 +StringDiffreance )..string.sub( OutString, CodeEnd +1 +StringDiffreance, string.len( OutString ) )
+	StringDiffreance = string.len( OutString ) -string.len( Input )	
 end
-	pointa, pointb = 0, 0
+	CodeStart, CodeEnd = 0, 0
       end  
    end 
 end
 
-if pal:RunSelfHooks( "PALOnRunLuaCodeInResponceChange", {input,outstring} ) == false then return end
-return outstring
+if pal:RunSelfHooks( "PALOnRunLuaCodeInResponceChange", {Input,OutString} ) == false then return end
+return OutString
 end
 
-function pal:BuildResponceTo( input ) --USE THIS TO GET THE AI TO MAKE A RESPONCE TO THE INPUT
-function pal:BRTGetTextToRespondToOrignal() return input end --added just encase someone wants the orignal text the player types
-	local master = pal:RunSpellCheck( string.lower( " "..input.." " ) ) --stage one: spellchecking
-function pal:BRTGetTextToRespondTo() return master end --spell checking is done before this so that functions like the NRT do not have to continusely do spellchecking
+function pal:BuildResponceTo( Input ) --USE THIS TO GET THE AI TO MAKE A RESPONCE TO THE INPUT
+function pal:BRTGetTextToRespondToOrignal() return Input end --added just encase someone wants the orignal text the player types
+	local Master = pal:RunSpellCheck( string.lower( " "..Input.." " ) ) --stage one: spellchecking
+function pal:BRTGetTextToRespondTo() return Master end --spell checking is done before this so that functions like the NRT do not have to continusely do spellchecking
 	
-	local A, B = pal:RunSelfHooks( "PALOnBuildResponceTo", {master} )
+	local A, B = pal:RunSelfHooks( "PALOnBuildResponceTo", {Master} )
 if A == false then return B end
 
 pal:RunLoopSimulation() --stage two: this makes it so that the loop runs every second kinda
-pal:RunAjustEmotionToEmotiveKeyWords( master ) --stage three: remove here to remove emotion change
+pal:RunAjustEmotionToEmotiveKeyWords( Master ) --stage three: remove here to remove emotion change
 
-	local outputindex = pal:RunFindResponce( master ) --stage four: find a suitable set responce
-	local outputdata = pal:GetInfoByIndex( outputindex ) --stage four: fetch set responce
+	local OutputIndex = pal:RunFindResponce( Master ) --stage four: find a suitable set responce
+	local OutputData = pal:GetInfoByIndex( OutputIndex ) --stage four: fetch set responce
 
-function pal:BRTGetInfoIndex() return outputindex end
+function pal:BRTGetInfoIndex() return OutputIndex end
 
-if outputindex == nil then --if no responce could be found to what the user says run this code
-	local A, B = pal:RunSelfHooks( "PALOnIDKoutput", {master} )
+if OutputIndex == nil then --if no responce could be found to what the user says run this code
+	local A, B = pal:RunSelfHooks( "PALOnIDKoutput", {Master} )
 if A == false then return B end
 return pal:GetIDKresponce() 
 end
 
-	local outputresponce = "" --stage five: pick a responce out of the set
-	local emotiveending = pal:GetEmotiveEnd()
+	local OutputResponce = "" --stage five: pick a responce out of the set
+	local EmotiveEnding = pal:GetEmotiveEnd()
 	
-if outputdata["responces"] ~= nil then outputresponce = outputdata["responces"][math.random( 1, #outputdata["responces"] )] end
-if outputdata["ea"] ~= false and emotiveending ~= "" and emotiveending ~= nil then outputresponce = outputresponce.." "..emotiveending end --stage six: appending of responce section --emotion appending
-if outputdata["a"] ~= false then outputresponce = pal:RunAnnoyanceTest( outputindex, outputresponce ) end --stage six: annoyence appending
-if pal:GetAnnoyanceLevel( outputindex ) == 2 then --stage six: end function if to annoyed appending
-	local str = pal:RunSelfHooks( "PALOnMaxAnnoyanceoutput", {input} )
+if OutputData["Responces"] ~= nil then OutputResponce = OutputData["Responces"][math.random( 1, #OutputData["Responces"] )] end
+if OutputData["AppendEmotionStatment"] ~= false and EmotiveEnding ~= "" and EmotiveEnding ~= nil then OutputResponce = OutputResponce.." "..EmotiveEnding end --stage six: Appending of responce section --emotion Appending
+if OutputData["Annoyable"] ~= false then OutputResponce = pal:RunAnnoyanceTest( OutputIndex, OutputResponce ) end --stage six: annoyence Appending
+if pal:GetAnnoyanceLevel( OutputIndex ) == 2 then --stage six: end function if to annoyed Appending
+	local str = pal:RunSelfHooks( "PALOnMaxAnnoyanceoutput", {Input} )
 if str ~= nil and str ~= false then return str end
-return outputresponce
+return OutputResponce
 end
-	outputresponce = outputresponce..( outputdata["append"] or "" ) --stage six
+	OutputResponce = OutputResponce..( OutputData["AppendAllResponcesWith"] or "" ) --stage six
 
-if outputdata["ec"] ~= nil then --stage seven: remove here to remove emotion change
-	pal["emotion_level"][1] = pal["emotion_level"][1] +outputdata["ec"][1]  --stage seven: remove here to remove emotion change
-	pal["emotion_level"][2] = pal["emotion_level"][2] +outputdata["ec"][2]  --stage seven: remove here to remove emotion change
-	pal["emotion_level"][1] = math.min( math.max( 1, pal["emotion_level"][1] ), pal["emotion_grid_max_size"] ) --stage seven: remove here to remove emotion change
-	pal["emotion_level"][2] = math.min( math.max( 1, pal["emotion_level"][2] ), pal["emotion_grid_max_size"] ) --stage seven: remove here to remove emotion change
+if OutputData["EmotionChange"] ~= nil then --stage seven: remove here to remove emotion change
+	pal["Emotion_Level"][1] = pal["Emotion_Level"][1] +OutputData["EmotionChange"][1]  --stage seven: remove here to remove emotion change
+	pal["Emotion_Level"][2] = pal["Emotion_Level"][2] +OutputData["EmotionChange"][2]  --stage seven: remove here to remove emotion change
+	pal["Emotion_Level"][1] = math.min( math.max( 1, pal["Emotion_Level"][1] ), pal["Emotion_GridMaxSize"] ) --stage seven: remove here to remove emotion change
+	pal["Emotion_Level"][2] = math.min( math.max( 1, pal["Emotion_Level"][2] ), pal["Emotion_GridMaxSize"] ) --stage seven: remove here to remove emotion change
 end --stage seven: remove here to remove emotion change
 
-	pal["prior_input"] = master --stage eight: alllows us to search througth what the player said before what there currently saying 
-	outputresponce = pal:RunLuaCodeInResponce( outputresponce )
+	pal["PriorEnteredInput"] = master --stage eight: alllows us to search througth what the player said before what there currently saying 
+	OutputResponce = pal:RunLuaCodeInResponce( OutputResponce )
 	
-if outputdata["subinfo"] ~= nil then --stage nine: add sub responces this was move to after to make it easy to replace id'ed responces
-	for z = 1, #outputdata["subinfo"] do
-if outputdata["subinfo"][z] ~= nil then 
-	local t = outputdata["subinfo"][z]
-pal:SetNewInfoTbl( outputdata["subinfo"][z], ( pal["info_database"][outputindex]["subinfoadded"] == true ) )
+if OutputData["SubInfo"] ~= nil then --stage nine: add sub Responces this was move to after to make it easy to replace id'ed Responces
+for Z = 1, #OutputData["SubInfo"] do
+if OutputData["SubInfo"][Z] ~= nil then 
+pal:SetNewInfoTbl( OutputData["SubInfo"][Z], ( pal["Info_Database"][OutputIndex]["SubInfoadded"] == true ) )
    end
 end
-	pal["info_database"][outputindex]["subinfoadded"] = true --stage nine: ensure that the save system only logs the responce being added once
+	pal["Info_Database"][OutputIndex]["SubInfoadded"] = true --stage nine: ensure that the save system only logs the responce being added once
 end
 
 local A, B = pal:RunSelfHooks( "PALOnGotResponce", {master} )
 if A == false then return B end
 
-return outputresponce
+return OutputResponce
 end
 
 pal:RunLoopSimulation()
 
 -- end of main ai loop and start of loading external data ----------------------------------------------------------------------------------------------------
 
-function pal:SetInRunTime( irt ) --just encase you want to turn it off to load content without the save system taking note
-	inruntime = irt
+function pal:SetInRunTime( IRT ) --just encase you want to turn it off to load content without the save system taking note
+	InRunTime = IRT
 end
 
 function pal:GetInRunTime() --just encase you want to turn it off to load content without the save system taking note
-return inruntime
+return InRunTime
 end
 
 function pal:SaveInfo() --saves all info added to AI after intal loading
 if pal:RunSelfHooks( "PALOnSaveInfo", {} ) == false then return end
 
-	local addresponcesfiledata = "" --start of saveing responce file data
+	local FileData = "" --start of saveing to file
 
-for k, v in pairs( pal["info_database_added"] ) do
-	local responces = ""
-	local sf = ""
-	local sfp = ""
+for K, V in pairs( pal["Info_DatabaseAdded"] ) do
+	local Responces = ""
+	local SearchFor = ""
+	local SearchForPrior = ""
 
-if v["sf"] ~= nil then
-for y = 1, #v["sf"] do --reformats search data so thay can be saved with ease
-if sf == "" then
-	sf = sf.."'"..v["sf"][y].."'"
+if V["SearchFor"] ~= nil then
+for Y = 1, #V["SearchFor"] do --reformats search data so thay can be saved with ease
+if SearchFor == "" then
+	SearchFor = SearchFor.."'"..V["SearchFor"][Y].."'"
 else
-	sf = sf..",".."'"..v["sf"][y].."'"
+	SearchFor = SearchFor..",".."'"..V["SearchFor"][Y].."'"
       end
    end
 end
 
-if v["sfl"] ~= nil then
-for y = 1, #v["sfl"] do --reformats prior search data so thay can be saved with ease
-if sfp == "" then
-	sfp = sfp.."'"..v["sfl"][y].."'"
+if V["PriorSearchFor"] ~= nil then
+for Y = 1, #V["PriorSearchFor"] do --reformats prior search data so thay can be saved with ease
+if SearchForPrior == "" then
+	SearchForPrior = SearchForPrior.."'"..V["PriorSearchFor"][Y].."'"
 else
-	sfp = sfp..",".."'"..v["sfl"][y].."'"
+	SearchForPrior = SearchForPrior..",".."'"..V["PriorSearchFor"][Y].."'"
       end
    end
 end
 
-if v["responces"] ~= nil then
-for y = 1, #v["responces"] do --reformats responces so thay can be saved with ease
-if responces == "" then
-responces = responces.."'"..v["responces"][y].."'"
+if V["Responces"] ~= nil then
+for Y = 1, #V["Responces"] do --reformats Responces so thay can be saved with ease
+if Responces == "" then
+Responces = Responces.."'"..V["Responces"][Y].."'"
 else
-responces = responces..",".."'"..v["responces"][y].."'"
+Responces = Responces..",".."'"..V["Responces"][Y].."'"
       end
    end
 end
 
-if v["ec"] == nil then v["ec"] = {0,0} end --pervents saveing issues
+if V["EmotionChange"] == nil then V["EmotionChange"] = {0,0} end --pervents saveing issues
 
-	local currentline = "pal:SetNewInfo( {"..tostring( sf ).."}, {"..tostring( sfp ).."}, {"..tostring( v["ec"][1] )..","..tostring( v["ec"][2] ).."}, "..tostring( v["a"] )..", "..tostring( v["i"] )..", {"..tostring( responces ).."}, nil, "..tostring( v["append"] )..", "..tostring( v["id"] ).." )"
-if addresponcesfiledata == "" then --responce saveing
-addresponcesfiledata = addresponcesfiledata..currentline
+	local currentline = "pal:SetNewInfo( {"..tostring( SearchFor ).."}, {"..tostring( SearchForPrior ).."}, {"..tostring( V["EmotionChange"][1] )..","..tostring( V["EmotionChange"][2] ).."}, "..tostring( V["Annoyable"] )..", "..tostring( V["Importance"] )..", {"..tostring( Responces ).."}, nil, "..tostring( V["AppendAllResponcesWith"] )..", "..tostring( V["ID"] ).." )"
+if FileData == "" then --responce saveing
+FileData = FileData..currentline
 else
-addresponcesfiledata = addresponcesfiledata..string.char( 10 )..currentline
+FileData = FileData..string.char( 10 )..currentline
    end
 end
 
-for k, v in pairs( pal["info_database_removed"] ) do
-	local currentdata = "pal:RemoveInfo( "..v.." )"
-if addresponcesfiledata == "" then
-addresponcesfiledata = addresponcesfiledata..currentdata
+for K, V in pairs( pal["Info_DatabaseRemoved"] ) do
+	local currentdata = "pal:RemoveInfo( "..V.." )"
+if FileData == "" then
+FileData = FileData..currentdata
 else
-addresponcesfiledata = addresponcesfiledata..string.char( 10 )..currentdata
+FileData = FileData..string.char( 10 )..currentdata
    end
 end
 
-	local hasitbeendonebefore = {}
-for k, v in pairs( pal["info_degrade_level"] ) do
-	local currentdata = "pal:DegradeInfoOverXCyclesByIndex( "..tostring( pal["info_database"][k]["id"] )..","..tostring( v ).." )"
-if pal["info_database"][k] ~= nil and pal["info_database"][k]["id"] ~= nil and hasitbeendonebefore[pal["info_database"][k]["id"]] ~= true then
-	hasitbeendonebefore[pal["info_database"][k]["id"]] = true
-if addresponcesfiledata == "" then
-addresponcesfiledata = addresponcesfiledata..currentdata
+	local IsAlreadyAddedCheck = {}
+for K, V in pairs( pal["Info_DegradeLevel"] ) do
+	local currentdata = "pal:DegradeInfoOverXCyclesByIndex( "..tostring( pal["Info_Database"][K]["ID"] )..","..tostring( V ).." )"
+if pal["Info_Database"][K] ~= nil and pal["Info_Database"][K]["ID"] ~= nil and IsAlreadyAddedCheck[pal["Info_Database"][K]["ID"]] ~= true then
+	IsAlreadyAddedCheck[pal["Info_Database"][K]["ID"]] = true
+if FileData == "" then
+FileData = FileData..currentdata
 else
-addresponcesfiledata = addresponcesfiledata..string.char( 10 )..currentdata
+FileData = FileData..string.char( 10 )..currentdata
       end
    end
 end
 
 io.output( "main_save.dat" ) --we are doing files this way because the other way just kept giving me grife
-io.write( addresponcesfiledata )
+io.write( FileData )
 io.close()
 io.output( io.stdout )
 end
@@ -815,9 +810,9 @@ function pal:SetRestorePoint() --sets a restore point that we can undo to which 
 if pal:RunSelfHooks( "PALOnSetRestorePoint", {} ) == false then return end
 if PAL_RESTORE_TABLE == nil then PAL_RESTORE_TABLE = {} end
 
-for k, v in pairs( pal ) do
-if k ~= "last_sim_time" then
-	PAL_RESTORE_TABLE[k] = v
+for K, V in pairs( pal ) do
+if K ~= "last_sim_time" then
+	PAL_RESTORE_TABLE[K] = V
       end
    end
 end
@@ -827,17 +822,17 @@ if pal:RunSelfHooks( "PALOnLoadRestorePoint", {} ) == false then return end
 if PAL_RESTORE_TABLE ~= nil then
 	pal = nil
 	pal = {}
-for k, v in pairs( PAL_RESTORE_TABLE ) do
-	pal[k] = v
+for K, V in pairs( PAL_RESTORE_TABLE ) do
+	pal[K] = V
       end
    end
 end
 
 -- end of loading external data start of everything ----------------------------------------------------------------------------------------------------------
 
-dofile( current_dir.."/AI/loads.lua" )
+dofile( CurrentDir.."/AI/loads.lua" )
 
-	inruntime = true
+	InRunTime = true
 	
 pal:LoadInfo()
 pal:SetRestorePoint()

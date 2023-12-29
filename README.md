@@ -22,8 +22,8 @@
 Infomation is the backbone of what makes pal/public AIs AIs work and if a pal ai has no infomation it is nothing but junk so this is one of the most important things for pal. To add infmation you use one of the following functions:
 
 ```
-pal:SetNewInfo( searchfor, searchfor_prior, emotion_change, emotionappend, annoyable, inportance, responces, subinfo, append, id )
-data = pal:ReturnInfo( searchfor, searchfor_prior, emotion_change, emotionappend, annoyable, inportance, responces, subinfo, append, id )
+pal:SetNewInfo( SearchFor, SearchForPrior, EmotionChange, EmotionAppend, Annoyable, Inportance, Responces, SubInfo, Append, ID )
+data = pal:ReturnInfo( SearchFor, SearchForPrior, EmotionChange, EmotionAppend, Annoyable, Inportance, Responces, SubInfo, Append, ID )
 pal:SetNewInfoTbl( data )
 ```
 
@@ -31,27 +31,27 @@ The input vars also stand for the following things:
 
 Oh and the word after the slash is the name the value is stored by in the info.
 
- - searchfor/sf = table of string or nil --table will be compared to current user input and if all compares are true a responce will most likely be chosen from this  
- - searchfor_prior/sfl = table of string or nil --table will be compared to the user input before the current user input  
- - emotion_change/ec = table of two numbers or nil --table values will be added to current emotion level  
- - emotionappend/ea = bool or nil --false will result in it never being able to express emotion with how it ends a output if its responce comes from here  
- - annoyable/a = bool or nil --false will make so you cant annoy it if its respone is coming from this infos responces  
- - importance/i = number or nil --the higher this number is the more of a chance you have of this responce being selected over other responces
- - responces/responces = table of string or nil --one of the string will be retuned to the player as a responce it may also be modifyied on the return trip
- - subinfo/subinfo = table of infomation nil --run pal:ReturnInfo() in here to put info into the sub info table and the sub info will be added to the info_database if a respoce is selected from the info it's contained in  
- - append/append = string or nil --if string string will be added to the end of all responce useful for running functions
- - id/id anything or nil --if it is someting it can be search out of the info_database using the functions below
+ - SearchFor = table of string or nil --table will be compared to current user input and if all compares are true a responce will most likely be chosen from this  
+ - PriorSearchFor = table of string or nil --table will be compared to the user input before the current user input  
+ - EmotionChange = table of two numbers or nil --table values will be added to current emotion level  
+ - emotionappend/AppendEmotionStatment = bool or nil --false will result in it never being able to express emotion with how it ends a output if its responce comes from here  
+ - Annoyable = bool or nil --false will make so you cant annoy it if its respone is coming from this infos responces  
+ - Importance = number or nil --the higher this number is the more of a chance you have of this responce being selected over other responces
+ - Responces = table of string or nil --one of the string will be retuned to the player as a responce it may also be modifyied on the return trip
+ - SubInfo = table of infomation nil --run pal:ReturnInfo() in here to put info into the sub info table and the sub info will be added to the info_database if a respoce is selected from the info it's contained in  
+ - Append/AppendAllResponcesWith = string or nil --if string string will be added to the end of all responce useful for running functions
+ - ID anything or nil --if it is someting it can be search out of the info_database using the functions below
 
 You can also seach for infomation in the info_database using the id tag at the end and one the functions below:
 ```
-pal:GetInfoById( id ) --will return table of all info with that id
-pal:GetInfoIndexById( id ) --will return table of all index belonging to all the info with that id
-pal:GetInfoByIndex( index ) --will return the info with that index in the info_database
+pal:GetInfoById( ID ) --will return table of all info with that id
+pal:GetInfoIndexById( ID ) --will return table of all index belonging to all the info with that id
+pal:GetInfoByIndex( Index ) --will return the info with that index in the info_database
 ```
 However using these functions will only return copyies of the infomation so to modify the origional info you should use:
 ```
-pal["info_database"][pal:GetInfoIndexById( id )[1]].WhatUWantToChage = value
-pal["info_database"][pal:GetInfoIndexById( id )[1]].sf[#pal["info_database"][pal:GetInfoIndexById( id )[1]]["sf"]] = nil --deleats the last search for requirment
+pal["info_database"][pal:GetInfoIndexById( ID )[1]].WhatUWantToChage = value
+pal["info_database"][pal:GetInfoIndexById( ID )[1]].sf[#pal["info_database"][pal:GetInfoIndexById( ID )[1]]["sf"]] = nil --deleats the last search for requirment
 ```
 examples of info:
 
@@ -73,19 +73,19 @@ To put a function into infomation it is very simple all you have to do is type t
 Also in the responce table if a string is returned from a function then that string will be made to repace the area the funtion took up otherwise the area will be replace with an empty string. 
 
 functions you can use in the search for tables:  
- - pal:NRT( str ) --it will always return true but if the string in the function can not be found the odds that a responce is selected from the info this is in are lowered  
- - pal:MWTG( name ) --compares the player input aginst all info in a tag group(pal:AddNewTagGroup( "taggroupexample", {"wow"} )) and will retun false if a match can not be found  
- - pal:EmotionLevelEquals( tbl ) --dose the emotion level x and y = the tbls x and y  
- - pal:EmotionLevelNotEquals( tbl ) --the reverse of the above  
+ - pal:NRT( Tag ) --it will always return true but if the string in the function can not be found (or if its a bool it dosent equal true) the odds that a responce is selected from the info this is in are lowered  
+ - pal:MWTG( ID ) --compares the player input aginst all info in a tag group(pal:AddNewTagGroup( "taggroupexample", {"wow"} )) and will retun false if a match can not be found  
+ - pal:EmotionLevelEquals( EmotionTbl ) --dose the emotion level x and y = the tbls x and y  
+ - pal:EmotionLevelNotEquals( EmotionTbl ) --the reverse of the above  
  - pal:EmotionLevelEqualsOr( endless input range of tables ) --dose the emotion level x and y = any of the tables x and y  
  - EmotionLevelNotEqualsOr( endless input range of tables ) --dose the emotion level x and y not equal all of the tables x and y
 
 functions you can use in responces/append:
- - pal:MemGen( name, tbl ) --assoaties a name the ai said to pronowns wich is then save into a shortterm memory and then you can use the prownowns to refence that person for a short time 
- - DegradeInfoOverXCycles( id, cyclesinfostayesinmemory ) --deletes all info with an id after the seconds in cyclesinfostayesinmemory has elapsed  
+ - pal:MemGen( name, PronownTable ) --assoaties a name the ai said to pronowns wich is then save into a shortterm memory and then you can use the prownowns to refence that person for a short time 
+ - DegradeInfoOverXCycles( ID, CyclesInfoStayesInMemory ) --deletes all info with an id after the seconds in cyclesinfostayesinmemory has elapsed  
  - pal:GetEmotiveWord() --gets a word the ai thinks of when it thinks of the user  
  - pal:GetEmotiveClass() --how it is feeling in genral
- - pal:SetPriorInput( str ) --you can chage the prior input to whatever you want which is what the searchfor_prior gose through
+ - pal:SetPriorInput( Text ) --you can chage the prior input to whatever you want which is what the searchfor_prior gose through
 
 ## IDK responces
 
@@ -139,8 +139,9 @@ This AI system come with a set of tools that allows you to make AIs really fast 
 
  - InfoAdded --give it two files one a list of questions and two a place to put the result and it will use the first file to scrape awnser off the internet and once it is done it will all be formatted to infomation pal can understand and then put into the results file also this is the only thing to use c#  
  - WordExtractor --extracts words from pal info files (this is useful for the spellchecker)
- - SpellingEnhancement generates most of the possible missspellings for a list of words and then outputs the results to a file as pal spellchecking data which makes AIs better at understanding english 
- - SynonymsGrouping give it a list of synonyms and it will output a synonyms file in pal data and it can also modify infomodel file data to use those synonyms which makes AIs seem more dynamic in there responces 
+ - SpellingEnhancement --generates most of the possible missspellings for a list of words and then outputs the results to a file as pal spellchecking data which makes AIs better at understanding english 
+ - SynonymsGrouping --give it a list of synonyms and it will output a synonyms file in pal data and it can also modify infomodel file data to use those synonyms which makes AIs seem more dynamic in there responces 
+ - SynonymsListCreator --converts a list of words to a list of Synonyms (SYNONYM LISTS MADE WITH THIS SHOULD BE CHECKED OVER BY A HUMAN FOR SYNONYMS THAT DONBT WORK IN EVERY SECNARIO AS THE GROUPING TOOL WORKS REGUARDLESS OF CONTEXT)
 
 Also you should open the source code of the tools to get a better uderstanding of what its for and what files it should be used with and changeing thoese file should you need to.
 

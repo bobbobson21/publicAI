@@ -7,6 +7,9 @@ if string.sub( CurrentDir, string.len( CurrentDir ), string.len( CurrentDir ) ) 
 CurrentDirCommandData:close()
 
 	pal = {}
+	pal["IDK_Responces"] = {}
+	pal["IDK_TailoredResponces"] = {}
+	pal["IDK_FailTailoredTagIfOver"] = 6
 	pal["Info_Database"] = {}
 	pal["Info_DatabaseAdded"] = {}
 	pal["Info_DatabaseRemoved"] = {}
@@ -25,7 +28,6 @@ CurrentDirCommandData:close()
 	pal["Annoyance_EffectEmotionBy"] = {-0.5,-0.5}
 	pal["Tag_Groups"] = {}
 	pal["Synonyms_Groups"] = {}
-	pal["IDK_Responces"] = {}
 	pal["SelfHooks"] = {}
 	pal["Spellchecking"] = {}
 	pal["PriorEnteredInput"] = ""
@@ -323,13 +325,23 @@ function pal:GetEmotiveWordPower()
 return pal["Emotion_Sensitivity"]
 end
 
-function pal:SetNewIDKResponces( Responce ) --for when the ai dose not have a responce
+function pal:AddNewIDKResponce( Responce ) --for when the ai dose not have a responce
 	pal["IDK_Responces"][#pal["IDK_Responces"] +1] = Responce
 end
 
-function pal:GetIDKresponce()
+function pal:AddNewIDKTailoredResponce( TalioredTag, Responce ) --for when the ai dose not have a responce
+if pal["IDK_TailoredResponces"][TalioredTag] == nil then pal["IDK_TailoredResponces"][TalioredTag] = {} end
+	pal["IDK_TailoredResponces"][TalioredTag][(#pal["IDK_TailoredResponces"][TalioredTag]) +1] = Responce
+end
+
+function pal:GetIDKResponce( TalioredTag )
 if #pal["IDK_Responces"] <= 0 then return "ERROR: AI TRIED TO MAKE AN IDK RESPONCE BUT HAS NO IDK DATA" end
 return pal["IDK_Responces"][math.random( 1, #pal["IDK_Responces"] )]
+end
+
+function pal:GetIDKTailoredResponce( TalioredTag )
+if #pal["IDK_Responces"] <= 0 then return "ERROR: AI TRIED TO MAKE AN IDK RESPONCE BUT HAS NO IDK DATA" end
+return pal["IDK_TailoredResponces"][TalioredTag][math.random( 1, #pal["IDK_TailoredResponces"][TalioredTag] )]
 end
 
 function pal:SetMaxAnnoyanceAmount( Num )
@@ -594,6 +606,27 @@ if pal:RunSelfHooks( "PALOnRunFindResponceFound", {CurrentResponceIndex} ) == fa
    end
 end
 
+function pal:RunBestIDKResponce( Input )
+if pal:RunSelfHooks( "PALOnRunBestIDKResponce", {Input} ) == false then return end
+
+	local FoundTailoredTagAt = 999999
+	local TheFoundTag = "nil"
+	
+for K, V in pairs( pal["IDK_TailoredResponces"] ) do
+ local Starts, Ends = string.find( Input, " "..V.." ", 1, true )
+if Starts ~= nil and Starts <= FoundTailoredTagAt then
+	FoundTailoredTagAt = Starts
+	TheFoundTag = V
+   end
+end
+
+if TheFoundTag ~= "nil" and FoundTaliredTagAt <= pal["IDK_FailTailoredTagIfOver"] then 
+return pal:GetIDKTailoredResponce( k )
+else
+return pal:GetIDKResponce()
+   end
+end
+
 function pal:RunAnnoyanceTest( InputIndex, Input ) --simulate annoyance
 	local AnnoyedLevel = pal["Annoyance_ResponceCounter"][InputIndex] or 0
 if pal:RunSelfHooks( "PALOnRunAnnoyanceTest", {InputIndex, Input, AnnoyedLevel} ) == false then return end
@@ -668,7 +701,7 @@ function pal:BRTGetInfoIndex() return OutputIndex end
 if OutputIndex == nil then --if no responce could be found to what the user says run this code
 	local A, B = pal:RunSelfHooks( "PALOnIDKoutput", {Master} )
 if A == false then return B end
-return pal:GetIDKresponce() 
+return pal:RunBestIDKResponce( Master ) 
 end
 
 	local OutputResponce = "" --stage five: pick a responce out of the set

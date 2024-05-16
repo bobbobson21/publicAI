@@ -334,7 +334,7 @@ if pal["IDK_TailoredResponces"][TalioredTag] == nil then pal["IDK_TailoredRespon
 	pal["IDK_TailoredResponces"][TalioredTag][(#pal["IDK_TailoredResponces"][TalioredTag]) +1] = Responce
 end
 
-function pal:GetIDKResponce( TalioredTag )
+function pal:GetIDKResponce()
 if #pal["IDK_Responces"] <= 0 then return "ERROR: AI TRIED TO MAKE AN IDK RESPONCE BUT HAS NO IDK DATA" end
 return pal["IDK_Responces"][math.random( 1, #pal["IDK_Responces"] )]
 end

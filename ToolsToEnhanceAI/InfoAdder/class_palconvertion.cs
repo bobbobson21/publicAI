@@ -142,15 +142,10 @@ namespace PalConvertion
                 A[I] = A[I].Replace( ((char)92).ToString(), "/" );
                 A[I] = A[I].Replace( ((char)34).ToString(), "");
                 A[I] = ARemoveQuoraJargon(A[I]);
-                string TempA = A[I];
 
                 if (ATextRemovealIf(A[I]) == true) //true means we can add faulse means WE SHOULD NOT ADD
                 {
-                    if (TempA.Length >= 1 && TempA.Substring(TempA.Length - 1, 1) == ".")
-                    {
-                        TempA = TempA.Substring(1, TempA.Length - 1);
-                    };
-                    TempA = TempA + " |pal:GetEmotiveWord()| user.";
+                    string TempA = A[I] + " |pal:GetEmotiveWord()| user.";
                     newA = newA + (char)34 + A[I] + (char)34 + "," + (char)34 + TempA + (char)34 + ",";
                 }
             }

@@ -705,7 +705,7 @@ return pal:RunBestIDKResponce( Master )
 end
 
 	local OutputResponce = "" --stage five: pick a responce out of the set
-	local EmotiveEnding = pal:GetEmotiveEnd()
+--	local EmotiveEnding = pal:GetEmotiveEnd()
 	
 if OutputData["Responces"] ~= nil then OutputResponce = OutputData["Responces"][math.random( 1, #OutputData["Responces"] )] end
 if OutputData["AppendEmotionStatment"] ~= false and EmotiveEnding ~= "" and EmotiveEnding ~= nil then OutputResponce = OutputResponce.." "..EmotiveEnding end --stage six: Appending of responce section --emotion Appending
@@ -713,7 +713,6 @@ if OutputData["Annoyable"] ~= false then OutputResponce = pal:RunAnnoyanceTest( 
 if pal:GetAnnoyanceLevel( OutputIndex ) == 2 then --stage six: end function if to annoyed Appending
 	local str = pal:RunSelfHooks( "PALOnMaxAnnoyanceoutput", {Input} )
 if str ~= nil and str ~= false then return str end
-return OutputResponce
 end
 	OutputResponce = OutputResponce..( OutputData["AppendAllResponcesWith"] or "" ) --stage six
 

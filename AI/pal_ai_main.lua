@@ -522,21 +522,21 @@ if SearchIn ~= nil and next( SearchIn ) ~= nil then --checks to see if the text 
 	pal["MatchLevelLengthProcessed"] = 0 --this data needs to be lost for all compareing oparations
 	pal["FoundTagAt"] = 0 --this data can not be lost unitll all input/level 1 compareing is complete but it dose need to be lost at the start 
 for L, W in pairs( SearchIn ) do
-	pal["found_tag"] = false --this data need to be lost per tag check or it could cause isssues
+	pal["FoundTag"] = false --this data need to be lost per tag check or it could cause isssues
 	local Tag = W
 if string.sub( Tag, 1, 1 ) == pal["RunFunctionKey"] and string.sub( Tag, string.len( Tag ), string.len( Tag ) ) == pal["RunFunctionKey"] then --is tag in a function string if so run it
 	local Run, Error = load( "return "..string.sub( Tag, 2, string.len( Tag ) -1 ) ) -- runs function
 	local FoundTag, FoundTagAt = Run()
-	pal["found_tag"] = ( FoundTag == true ) --did function say it found tag
+	pal["FoundTag"] = ( FoundTag == true ) --did function say it found tag
 	pal["FoundTagAt"] = ( FoundTagAt or pal["FoundTagAt"] ) --did function say where to start searching for the next tag
 else
 if string.find( Input, " "..Tag.." ", pal["FoundTagAt"], true ) ~= nil then  --if tag is not a function find it in player input as plain text
-	pal["found_tag"] = true --tag was found
+	pal["FoundTag"] = true --tag was found
 	pal["FoundTagAt"] = pal["FoundTagAt"] +string.len( Tag ) --where to start the search for the next one
    end
 end
 
-if pal["found_tag"] == true then 
+if pal["FoundTag"] == true then 
 if pal["FoundTagAt"] >= pal["MatchLevelLengthProcessed"] then
 	pal["MatchLevelLengthProcessed"] = pal["FoundTagAt"]  --if length processed <= 0 then current search will be disguarded and it also hels as an extra means to compare data
 	pal["MatchLevelTagsProcessed"] = pal["MatchLevelTagsProcessed"] +1 --tag found
@@ -556,21 +556,21 @@ if SearchInPrior ~= nil and next( SearchInPrior ) ~= nil then --checks to see if
 	pal["MatchLevelLengthProcessed"] = 0
 	pal["FoundTagAt"] = 0
 for L, W in pairs( SearchInPrior ) do
-	pal["found_tag"] = false
+	pal["FoundTag"] = false
 	local Tag = W
 if string.sub( Tag, 1, 1 ) == pal["RunFunctionKey"] and string.sub( Tag, string.len( Tag ), string.len( Tag ) ) == pal["RunFunctionKey"] then
 	local Run, Error = load( "return "..string.sub( Tag, 2, string.len( Tag ) -1 ) ) -- runs function
 	local FoundTag, FoundTagAt = Run()
-	pal["found_tag"] = ( FoundTag == true )
+	pal["FoundTag"] = ( FoundTag == true )
 	pal["FoundTagAt"] = ( FoundTagAt or pal["FoundTagAt"] )
 else
 if string.find( pal["PriorEnteredInput"], " "..Tag.." ", pal["FoundTagAt"], true ) ~= nil then  --if tag is not a function find it in player input as plain text
-	pal["found_tag"] = true
+	pal["FoundTag"] = true
 	pal["FoundTagAt"] = pal["FoundTagAt"] +string.len( Tag )
    end
 end
 
-if pal["found_tag"] == true then 
+if pal["FoundTag"] == true then 
 if pal["FoundTagAt"] >= pal["MatchLevelLengthProcessed"] then
 	pal["MatchLevelLengthProcessed"] = pal["FoundTagAt"]
 	pal["MatchLevelTagsProcessed"] = pal["MatchLevelTagsProcessed"] +1
@@ -663,11 +663,11 @@ if string.sub( Input, Z, Z ) == pal["RunFunctionKey"] then
 if CodeStart == 0 then CodeStart = Z else CodeEnd = Z end
 if CodeStart ~= 0 and CodeEnd ~= 0 then
   
-	local exe, null = load( "return "..string.sub( Input, CodeStart +1, CodeEnd -1 ) )
-	local result = exe()  
+	local Exe, Null = load( "return "..string.sub( Input, CodeStart +1, CodeEnd -1 ) )
+	local Result = Exe()  
   
-if result ~= nil then
-	OutString = string.sub( OutString, 1, CodeStart -1 +StringDiffreance )..tostring( result )..string.sub( OutString, CodeEnd +1 +StringDiffreance, string.len( OutString ) )
+if Result ~= nil then
+	OutString = string.sub( OutString, 1, CodeStart -1 +StringDiffreance )..tostring( Result )..string.sub( OutString, CodeEnd +1 +StringDiffreance, string.len( OutString ) )
 	StringDiffreance = string.len( OutString ) -string.len( Input )	
 else
 	OutString = string.sub( OutString, 1, CodeStart -1 +StringDiffreance )..string.sub( OutString, CodeEnd +1 +StringDiffreance, string.len( OutString ) )
@@ -688,7 +688,7 @@ function pal:BRTGetTextToRespondToOrignal() return Input end --added just encase
 function pal:BRTGetTextToRespondTo() return Master end --spell checking is done before this so that functions like the NRT do not have to continusely do spellchecking
 	
 	local A, B = pal:RunSelfHooks( "PALOnBuildResponceTo", {Master} )
-if A == false then return B end
+if A == false then return pal:RunLuaCodeInResponce( B or "" ) end
 
 pal:RunLoopSimulation() --stage two: this makes it so that the loop runs every second kinda
 pal:RunAjustEmotionToEmotiveKeyWords( Master ) --stage three: remove here to remove emotion change
@@ -700,8 +700,8 @@ function pal:BRTGetInfoIndex() return OutputIndex end
 
 if OutputIndex == nil then --if no responce could be found to what the user says run this code
 	local A, B = pal:RunSelfHooks( "PALOnIDKoutput", {Master} )
-if A == false then return B end
-return pal:RunBestIDKResponce( Master ) 
+if A == false then return pal:RunLuaCodeInResponce( B or "" ) end
+return pal:RunLuaCodeInResponce( pal:RunBestIDKResponce( Master ) )
 end
 
 	local OutputResponce = "" --stage five: pick a responce out of the set
@@ -712,7 +712,7 @@ if OutputData["AppendEmotionStatment"] ~= false and EmotiveEnding ~= "" and Emot
 if OutputData["Annoyable"] ~= false then OutputResponce = pal:RunAnnoyanceTest( OutputIndex, OutputResponce ) end --stage six: annoyence Appending
 if pal:GetAnnoyanceLevel( OutputIndex ) == 2 then --stage six: end function if to annoyed Appending
 	local str = pal:RunSelfHooks( "PALOnMaxAnnoyanceoutput", {Input} )
-if str ~= nil and str ~= false then return str end
+if str ~= nil and str ~= false then return pal:RunLuaCodeInResponce( str or "" ) end
 end
 	OutputResponce = OutputResponce..( OutputData["AppendAllResponcesWith"] or "" ) --stage six
 
@@ -723,7 +723,7 @@ if OutputData["EmotionChange"] ~= nil then --stage seven: remove here to remove 
 	pal["Emotion_Level"][2] = math.min( math.max( 1, pal["Emotion_Level"][2] ), pal["Emotion_GridMaxSize"] ) --stage seven: remove here to remove emotion change
 end --stage seven: remove here to remove emotion change
 
-	pal["PriorEnteredInput"] = master --stage eight: alllows us to search througth what the player said before what there currently saying 
+	pal["PriorEnteredInput"] = Master --stage eight: alllows us to search througth what the player said before what there currently saying 
 	OutputResponce = pal:RunLuaCodeInResponce( OutputResponce )
 	
 if OutputData["SubInfo"] ~= nil then --stage nine: add sub Responces this was move to after to make it easy to replace id'ed Responces
@@ -735,8 +735,8 @@ end
 	pal["Info_Database"][OutputIndex]["SubInfoadded"] = true --stage nine: ensure that the save system only logs the responce being added once
 end
 
-local A, B = pal:RunSelfHooks( "PALOnGotResponce", {master} )
-if A == false then return B end
+local A, B = pal:RunSelfHooks( "PALOnGotResponce", {Master,OutputResponce} )
+if A == false then return pal:RunBestIDKResponce( B or "" ) end
 
 return OutputResponce
 end

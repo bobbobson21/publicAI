@@ -684,7 +684,10 @@ end
 
 function pal:BuildResponceTo( Input ) --USE THIS TO GET THE AI TO MAKE A RESPONCE TO THE INPUT
 function pal:BRTGetTextToRespondToOrignal() return Input end --added just encase someone wants the orignal text the player types
-	local Master = pal:RunSpellCheck( string.lower( " "..Input.." " ) ) --stage one: spellchecking
+
+	local Master = ( string.gsub( Input, ".", {["."]="",["?"]="",["!"]="",} ) )
+
+	Master = pal:RunSpellCheck( string.lower( " "..Input.." " ) ) --stage one: spellchecking
 function pal:BRTGetTextToRespondTo() return Master end --spell checking is done before this so that functions like the NRT do not have to continusely do spellchecking
 	
 	local A, B = pal:RunSelfHooks( "PALOnBuildResponceTo", {Master} )

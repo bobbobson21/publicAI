@@ -13,3 +13,4 @@ print( "" )
 print( "AI: "..tostring( AI:BuildResponceTo( Input ) ) )
 print( "" )
 goto talk_start
+
